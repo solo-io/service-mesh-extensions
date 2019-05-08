@@ -1,0 +1,94 @@
+applicationCreator: Kiali.io
+applicationMaintainer: Kiali.io
+applicationProvider: Kiali.io
+documentationUrl: https://www.kiali.io/documentation/overview/
+logoUrl: https://avatars0.githubusercontent.com/u/36001875?s=200&v=4
+longDescription: |
+  A Microservice Architecture breaks up the monolith into many smaller pieces that are composed together. Patterns to secure the communication between services like fault tolerance (via timeout, retry, circuit breaking, etc.) have come up as well as distributed tracing to be able to see where calls are going.
+
+  A service mesh can now provide these services on a platform level and frees the application writers from those tasks. Routing decisions are done at the mesh level.
+
+  Kiali works with Istio to visualise the service mesh topology, features like circuit breakers or request rates.
+
+  Kiali also includes Jaeger Tracing to provide distributed tracing out of the box.
+name: kiali
+repositoryUrl: github.com/kiali/kiali
+shortDescription: |
+  Kiali provides answers to the questions: What microservices are part of my Istio service mesh and how are they connected?
+versions:
+- github:
+    org: istio
+    repo: istio
+    ref: "1.0.6"
+    chartDirectory: install/kubernetes/helm/istio
+  requiredLabels:
+    app: kiali
+  valuesYaml: |
+    kiali:
+      enabled: true
+      createDemoSecret: true
+  datePublished: "2019-01-10T15:04:06Z"
+  requirements:
+    supportedMeshes:
+      istio:
+        allowedVersions:
+          minVersion: "1.0.6"
+          maxVersion: "1.0.6"
+  version: "0.12"
+- github:
+    org: istio
+    repo: istio
+    ref: "1.0.4"
+    chartDirectory: install/kubernetes/helm/istio
+  requiredLabels:
+    app: kiali
+  valuesYaml: |
+    kiali:
+      enabled: true
+      createDemoSecret: true
+  datePublished: "2018-11-06T15:04:06Z"
+  requirements:
+    supportedMeshes:
+      istio:
+        allowedVersions:
+          minVersion: "1.0.4"
+          maxVersion: "1.0.4"
+  version: "0.9"
+- github:
+    org: istio
+    repo: istio
+    ref: "1.0.2"
+    chartDirectory: install/kubernetes/helm/istio
+  datePublished: "2018-08-23T15:04:06Z"
+  requiredLabels:
+    app: kiali
+  valuesYaml: |
+    kiali:
+      enabled: true
+      createDemoSecret: true
+  requirements:
+    supportedMeshes:
+      istio:
+        allowedVersions:
+          minVersion: "1.0.2"
+          maxVersion: "1.0.2"
+  version: "0.6.0"
+- github:
+    org: istio
+    repo: istio
+    ref: "1.1.4"
+    chartDirectory: install/kubernetes/helm/istio
+  requiredLabels:
+    app: kiali
+  valuesYaml: |
+    kiali:
+      enabled: true
+      createDemoSecret: true
+  datePublished: "2019-03-19T15:04:06Z"
+  requirements:
+    supportedMeshes:
+      istio:
+        allowedVersions:
+          minVersion: "1.1.4"
+          maxVersion: "1.1.4"
+  version: "0.16"
