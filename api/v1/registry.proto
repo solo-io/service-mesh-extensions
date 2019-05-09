@@ -139,12 +139,10 @@ message MeshError {
     repeated string errors = 2;
 }
 
-// Deprecated: use TgzLocation
 message HelmInstallationSpec {
     string chart_url = 1;
 }
 
-// Deprecated: use GithubRepositoryLocation
 // A directory inside of a github repo containing the values, chart, templates, and other resources.
 // For example: https://github.com/helm/charts/tree/master/stable/envoy
 message GithubInstallationSpec {
@@ -154,24 +152,12 @@ message GithubInstallationSpec {
     string chart_directory = 4;
 }
 
-// Deprecated: use TgzLocation
 message ManifestArchiveSpec {
     // Url to manifest archive, which currently must be a gzipped tar containing one or more rendered yaml manifests.
     string url = 1;
 }
 
 message AllowedVersions {
-    // Deprecated
-    oneof version_constraint {
-        string exactly = 1;
-    }
     string min_version = 2;
     string max_version = 3;
-}
-
-// Deprecated
-message VersionCompatibility {
-    string version = 1;
-    repeated ResourceRef compatible_meshes = 2;
-    repeated MeshError incompatible_meshes = 3;
 }
