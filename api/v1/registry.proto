@@ -1,0 +1,171 @@
+syntax = "proto3";
+package hub.solo.io;
+option go_package = "github.com/solo-io/service-mesh-hub/generated/api/v1";
+
+import "gogoproto/gogo.proto";
+option (gogoproto.equal_all) = true;
+
+import "google/protobuf/timestamp.proto";
+
+// This is static content for an application. It includes basic metadata that is common to every version of an
+// application, and a list of versions. For each version, there is information about how to install the application
+// (for example, a Helm chart location), and the requirements for installation.
+message ApplicationSpec {
+    string name = 2;
+    string logo_url = 3;
+    string short_description = 4;
+    string long_description = 5;
+    string documentation_url = 6;
+    string repository_url = 7;
+    string application_creator = 8;
+    string application_provider = 9;
+    string application_maintainer = 10;
+    google.protobuf.Timestamp date_created = 11 [(gogoproto.stdtime) = true];
+
+    repeated VersionedApplicationSpec versions = 12;
+}
+
+
+// Represents a specific version of an extension.
+message VersionedApplicationSpec {
+
+    // The version of the application
+    string version = 1;
+
+    // The date this version of the application was published
+    google.protobuf.Timestamp date_published = 2 [(gogoproto.stdtime) = true];
+
+    // Location of the Helm chart that will be used to install this application
+    oneof installation_spec {
+        HelmInstallationSpec helm = 10;
+        GithubInstallationSpec github = 11;
+        ManifestArchiveSpec manifest_archive = 12;
+    }
+
+    // Optional default values yaml; if none provided, chart default will be used
+    string values_yaml = 30;
+
+    // Optional filter on the resources that should be considered part of the install, to handle cases
+    // where a single chart can be used to deploy many applications (i.e. Istio chart deploys Kiali)
+    map<string, string> required_labels = 31;
+
+    // Mesh-specific modifications to the extension installation manifest.
+    repeated Flavor flavors = 40;
+}
+
+// A flavor represents a particular variant of an extension.
+message Flavor {
+    // Identifier of the flavor
+    string name = 1;
+    // This field should contain a clear description of what this flavor is intended to accomplish.
+    string description = 2;
+    // Optional customizations that are to be applied to the installation manifest.
+    repeated Layer customization_layers = 3;
+    // The flavor is considered applicable if any of the specified requirement sets is satisfied.
+    repeated RequirementSet requirement_sets = 4;
+}
+
+// A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
+// the rendered extension installation manifest.
+message Layer {
+    // The actual implementation of the layer
+    oneof type {
+        Kustomize kustomize = 1;
+    }
+}
+
+// Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
+message Kustomize {
+
+    // Location of the root of the kustomize directory structure
+    oneof location {
+        GithubRepositoryLocation github = 1;
+        TgzLocation tgz_archive = 2;
+    }
+
+    // Path to the overlay overlay that will be applied to the base (the rendered installation manifest).
+    string overlay_path = 3;
+}
+
+// Wraps a collection of FlavorCompatibilityInfo
+message FlavorCompatibility {
+    repeated CompatibleFlavorMeshPair compatible_pairs = 1;
+}
+
+message ResourceRef {
+    string name = 1;
+    string namespace = 2;
+}
+
+// Represents a Flavor and a Mesh instance that are compatible with one another.
+message CompatibleFlavorMeshPair {
+    Flavor flavor = 1;
+    ResourceRef mesh = 2;
+}
+
+// Represents a set of requirements that all need to be satisfied.
+message RequirementSet {
+    MeshRequirement mesh_requirement = 1;
+}
+
+// Represents the requirement for a mesh to be installed.
+message MeshRequirement {
+    // Type of mesh
+    MeshType mesh_type = 1;
+    // Range of allowed versions. If empty, any version is allowed.
+    AllowedVersions versions = 2;
+}
+
+enum MeshType {
+    ISTIO = 0;
+    LINKERD = 1;
+    AWS_APP_MESH = 2;
+}
+
+// A directory inside of a github repo
+message GithubRepositoryLocation {
+    string org = 1;
+    string repo = 2;
+    string ref = 3;
+    string directory = 4;
+}
+
+// Location of a gzipped tar file
+message TgzLocation {
+    string url = 1;
+}
+
+message MeshError {
+    ResourceRef mesh = 1;
+    repeated string errors = 2;
+}
+
+// Deprecated: use TgzLocation
+message HelmInstallationSpec {
+    string chart_url = 1;
+}
+
+// Deprecated: use GithubRepositoryLocation
+// A directory inside of a github repo containing the values, chart, templates, and other resources.
+// For example: https://github.com/helm/charts/tree/master/stable/envoy
+message GithubInstallationSpec {
+    string org = 1;
+    string repo = 2;
+    string ref = 3;
+    string chart_directory = 4;
+}
+
+// Deprecated: use TgzLocation
+message ManifestArchiveSpec {
+    // Url to manifest archive, which currently must be a gzipped tar containing one or more rendered yaml manifests.
+    string url = 1;
+}
+
+message AllowedVersions {
+    // Deprecated
+    oneof version_constraint {
+        string exactly = 1;
+    }
+    string min_version = 2;
+    string max_version = 3;
+}
