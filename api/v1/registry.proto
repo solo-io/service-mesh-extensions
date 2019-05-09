@@ -168,3 +168,10 @@ message AllowedVersions {
     string min_version = 2;
     string max_version = 3;
 }
+
+// Deprecated
+message VersionCompatibility {
+    string version = 1;
+    repeated ResourceRef compatible_meshes = 2;
+    repeated MeshError incompatible_meshes = 3;
+}
