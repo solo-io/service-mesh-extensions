@@ -1,27 +1,32 @@
 package test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	v1 "github.com/solo-io/service-mesh-hub/api/v1"
-	"github.com/solo-io/go-utils/protoutils"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/solo-io/go-utils/protoutils"
+	"github.com/solo-io/service-mesh-hub/api/v1"
 )
 
-var _ = Describe("Extensions Yaml Test", func() {
 
+
+var _ = Describe("Extensions Yaml Test", func() {
 	const (
 		specYamlFilename = "spec.yaml"
+		rootDir          = "../extensions/v1"
 	)
 
-	Context("extensions/v1/EXTENSION_NAME/spec.yaml", func() {
-		It("is valid yaml", func() {
-			rootDir := "../extensions/v1"
-			extensions, err := ioutil.ReadDir(rootDir)
-			Expect(err).NotTo(HaveOccurred())
+	extensions, err := ioutil.ReadDir(rootDir)
+	if err != nil {
+		Fail(err.Error())
+	}
 
-			for _, extension := range extensions {
+	Context("spec yaml validity", func() {
+		for _, extension := range extensions {
+			It(fmt.Sprintf("extensions/v1/%s/spec.yaml is valid", extension.Name()), func() {
 				Expect(extension.IsDir()).To(BeTrue())
 				specPath := filepath.Join(rootDir, extension.Name(), specYamlFilename)
 				bytes, err := ioutil.ReadFile(specPath)
@@ -30,7 +35,8 @@ var _ = Describe("Extensions Yaml Test", func() {
 				err = protoutils.UnmarshalYaml(bytes, &spec)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(spec.Name).To(BeEquivalentTo(extension.Name()))
-			}
-		})
+
+			})
+		}
 	})
 })
