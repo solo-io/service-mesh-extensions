@@ -17,4 +17,3 @@ steps:
   args: ['-r', '-failFast', '-race']
   waitFor: ['dep']
   id: 'test'
-
