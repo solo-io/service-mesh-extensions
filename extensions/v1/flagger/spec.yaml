@@ -16,11 +16,11 @@ repositoryUrl: github.com/weaveworks/flagger
 shortDescription: |
   Flagger is a Kubernetes operator that automates the promotion of canary deployments.
 versions:
-- github:
+- githubChart:
     org: weaverworks
     repo: flagger
     ref: "0.12.0"
-    chartDirectory: charts/flagger
+    directory: charts/flagger
   datePublished: "2019-05-02T00:00:00Z"
   flavors:
   - name: istio
