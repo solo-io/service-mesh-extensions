@@ -22,17 +22,6 @@
     - manifestArchive:
         url: https://storage.googleapis.com/solo-public-helms
       datePublished: "2019-01-09T15:04:06Z"
-      requirements:
-        supportedMeshes:
-          istio:
-            allowedVersions:
-              minVersion: "1.0.0"
-          linkerd:
-            allowedVersions:
-              minVersion: "2.3.0"
-          awsAppMesh:
-            allowedVersions:
-              minVersion: "0.0.1"
         flavors:
           - name: supergloo
             description: "Install gloo as an ingress to your mesh using supergloo"
@@ -44,4 +33,15 @@
                   ref: master
                   directory: extensions/v1/gloo/overlays
                 overlayPath: supergloo
+            requirementSets:
+            - meshRequirement:
+                meshType: AWS_APP_MESH
+            - meshRequirement:
+                meshType: ISTIO
+                versions:
+                  minVersion: "1.0.0"
+            - meshRequirement:
+                meshType: LINKERD
+                versions:
+                  minVersion: "2.3.0"
       version: "0.13.20"
