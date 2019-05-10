@@ -2,4 +2,4 @@ bases:
 - ./../base
 
 generators:
-- test.yaml
+- cluster-role-binding.yaml
