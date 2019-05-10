@@ -22,18 +22,6 @@ versions:
     ref: "0.12.0"
     chartDirectory: charts/flagger
   datePublished: "2019-05-02T00:00:00Z"
-  requirements:
-    supportedMeshes:
-      istio:
-        allowedVersions:
-          minVersion: "1.0.0"
-      awsAppMesh:
-        allowedVersions:
-          minVersion: "0.0.1" # dummy value, App Mesh is not versioned
-    applicationRequirements:
-      allowedVersions:
-        prometheus:
-          minVersion: "2.0.0"
   flavors:
   - name: istio
     description: "Install flagger to your Istio mesh"
