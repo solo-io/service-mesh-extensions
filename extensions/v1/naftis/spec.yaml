@@ -1,0 +1,40 @@
+applicationCreator: Xiaomi
+applicationMaintainer: Xiaomi
+applicationProvider: Xiaomi
+documentationUrl:
+logoUrl: https://avatars0.githubusercontent.com/u/1309360?s=200&v=4
+longDescription: |
+  Features
+  - Integrates with some real-time dashboards
+  - Customizable task template
+  - Support Rollback specific task
+  - Optimized Istio service graph with supporting of specifying particular root service node
+  - With diagnose data of Istio services and pods
+  - Out of the box, easy deployment with kubectl commands
+  - Istio 1.0 supported
+name: naftis
+repositoryUrl: https://github.com/XiaoMi/naftis
+shortDescription: |
+  Naftis is a web-based dashboard for Istio. It helps user manage their Istio tasks more easily. Using Naftis we can custom our own task templates, then build task from them and execute it.
+versions:
+- manifestArchive:
+    url: https://github.com/XiaoMi/naftis/releases/download/0.1.4-rc6/manifest.tar.gz
+  datePublished: "2019-01-09T15:04:06Z"
+  flavors:
+  - name: istio
+    description: "Install Xiaomi to your Istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/istio
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
+          minVersion: "1.0.0"
+          maxVersion: "1.0.7"
+  version: "0.1.4-rc6"
