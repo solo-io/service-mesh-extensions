@@ -43,5 +43,5 @@
             - meshRequirement:
                 meshType: LINKERD
                 versions:
-                  minVersion: "2.3.0"
+                  minVersion: "2"
       version: "0.13.20"
