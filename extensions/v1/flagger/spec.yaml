@@ -31,8 +31,8 @@ versions:
           org: solo-io
           repo: service-mesh-hub
           ref: master
-          directory: extensions/v1
-        overlayPath: overlays/istio
+          directory: extensions/v1/flagger/kustomize
+        overlayPath: istio
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
@@ -46,8 +46,8 @@ versions:
           org: solo-io
           repo: service-mesh-hub
           ref: master
-          directory: extensions/v1
-        overlayPath: overlays/app_mesh
+          directory: extensions/v1/flagger/kustomize
+        overlayPath: appmesh
     requirementSets:
     - meshRequirement:
         meshType: AWS_APP_MESH
@@ -59,8 +59,8 @@ versions:
           org: solo-io
           repo: service-mesh-hub
           ref: master
-          directory: extensions/v1
-        overlayPath: overlays/app_mesh_supergloo
+          directory: extensions/v1/flagger/kustomize
+        overlayPath: appmesh_supergloo
     requirementSets:
     - meshRequirement:
         meshType: AWS_APP_MESH
