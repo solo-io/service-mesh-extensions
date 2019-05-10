@@ -28,10 +28,21 @@ versions:
       enabled: true
       createDemoSecret: true
   datePublished: "2019-01-10T15:04:06Z"
-  requirements:
-    supportedMeshes:
-      istio:
-        allowedVersions:
+  flavors:
+  - name: istio
+    description: "Install kiali to your istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/istio
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
           minVersion: "1.0.6"
           maxVersion: "1.0.6"
   version: "0.12"
@@ -47,10 +58,21 @@ versions:
       enabled: true
       createDemoSecret: true
   datePublished: "2018-11-06T15:04:06Z"
-  requirements:
-    supportedMeshes:
-      istio:
-        allowedVersions:
+  flavors:
+  - name: istio
+    description: "Install kiali to your istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/istio
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
           minVersion: "1.0.4"
           maxVersion: "1.0.4"
   version: "0.9"
@@ -66,10 +88,21 @@ versions:
     kiali:
       enabled: true
       createDemoSecret: true
-  requirements:
-    supportedMeshes:
-      istio:
-        allowedVersions:
+  flavors:
+  - name: istio
+    description: "Install kiali to your istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/istio
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
           minVersion: "1.0.2"
           maxVersion: "1.0.2"
   version: "0.6.0"
@@ -85,10 +118,21 @@ versions:
       enabled: true
       createDemoSecret: true
   datePublished: "2019-03-19T15:04:06Z"
-  requirements:
-    supportedMeshes:
-      istio:
-        allowedVersions:
+  flavors:
+  - name: istio
+    description: "Install kiali to your istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/istio
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
           minVersion: "1.1.4"
           maxVersion: "1.1.4"
   version: "0.16"

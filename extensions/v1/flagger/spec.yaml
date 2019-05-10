@@ -21,10 +21,6 @@ versions:
     repo: flagger
     ref: "0.12.0"
     chartDirectory: charts/flagger
-  # Currently these values do not get interpolated, they need to be overridden
-  valuesYaml: |
-    metricsServer: {{ PROMETHEUS_URL }}
-    meshProvider: supergloo:{{ MESH_NAME }}.{{ MESH_NAMESPACE }}
   datePublished: "2019-05-02T00:00:00Z"
   requirements:
     supportedMeshes:
@@ -37,6 +33,47 @@ versions:
     applicationRequirements:
       allowedVersions:
         prometheus:
-          minVersion: "1.0.6"
-          maxVersion: "1.0.6"
+          minVersion: "2.0.0"
+  flavors:
+  - name: istio
+    description: "Install flagger to your Istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/istio
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
+          minVersion: "1.0.0"
+  - name: appmesh
+    description: "Install flagger to your AWS App Mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/app_mesh
+    requirementSets:
+    - meshRequirement:
+        meshType: AWS_APP_MESH
+  - name: appmesh-supergloo
+    description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1
+        overlayPath: overlays/app_mesh_supergloo
+    requirementSets:
+    - meshRequirement:
+        meshType: AWS_APP_MESH
   version: "0.12.0"
