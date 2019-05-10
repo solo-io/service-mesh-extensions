@@ -1,0 +1,47 @@
+- applicationCreator: Solo-io
+  applicationMaintainer: Solo-io
+  applicationProvider: Solo-io
+  documentationUrl: https://gloo.solo.io/
+  logoUrl: https://camo.githubusercontent.com/e65d0b9a4a19b0789d77dd385200889b6819aa65/68747470733a2f2f676c6f6f2e736f6c6f2e696f2f696d672f476c6f6f2d30312e706e67
+  longDescription: |
+    Features
+    - Dynamic Load Balancing: Load balance traffic across multiple upstream services.
+    - Health Checks: Active and passive monitoring of your upstream services.
+    - SSL: Highly customizable options for adding SSL encryption to upstream services with full support for SNI.
+    - Automated API Translation: Automatically transform client requests to upstream API calls using Gloo’s Function Discovery.
+    - Failure Recovery: Gloo is completely stateless and will immediately return to the desired configuration at boot time.
+    - Scalability: Gloo acts as a control plane for Envoy, allowing Envoy instances and Gloo instances to be scaled independently. Both Gloo and Envoy are stateless.
+    - Performance: Gloo leverages Envoy for its high performance and low footprint.
+    - JSON-to-gRPC transcoding: Connect JSON clients to gRPC services.
+    - Istio, Linkerd and AppMesh supported
+  name: gloo
+  repositoryUrl: https://github.com/solo-io/gloo
+  shortDescription: |
+    Gloo is a feature-rich, Kubernetes-native ingress controller, and next-generation API gateway.
+  versions:
+    - manifestArchive:
+        url: https://storage.googleapis.com/solo-public-helms
+      datePublished: "2019-01-09T15:04:06Z"
+      requirements:
+        supportedMeshes:
+          istio:
+            allowedVersions:
+              minVersion: "1.0.0"
+          linkerd:
+            allowedVersions:
+              minVersion: "2.3.0"
+          awsAppMesh:
+            allowedVersions:
+              minVersion: "0.0.1"
+        flavors:
+          - name: supergloo
+            description: "Install gloo as an ingress to your mesh using supergloo"
+            customizationLayers:
+            - kustomize:
+                github:
+                  org: solo-io
+                  repo: service-mesh-hub
+                  ref: master
+                  directory: extensions/v1/gloo/overlays
+                overlayPath: supergloo
+      version: "0.13.20"
