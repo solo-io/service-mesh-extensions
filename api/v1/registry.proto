@@ -134,7 +134,7 @@ message GithubRepositoryLocation {
 
 // Location of a gzipped tar file
 message TgzLocation {
-    string url = 1;
+    string uri = 1;
 }
 
 message AllowedVersions {
