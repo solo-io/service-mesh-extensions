@@ -11,8 +11,6 @@ import (
 	"github.com/solo-io/service-mesh-hub/api/v1"
 )
 
-
-
 var _ = Describe("Extensions Yaml Test", func() {
 	const (
 		specYamlFilename = "spec.yaml"
