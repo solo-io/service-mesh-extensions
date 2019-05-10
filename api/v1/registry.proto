@@ -36,9 +36,12 @@ message VersionedApplicationSpec {
 
     // Location of the Helm chart that will be used to install this application
     oneof installation_spec {
-        HelmInstallationSpec helm = 10;
-        GithubInstallationSpec github = 11;
-        ManifestArchiveSpec manifest_archive = 12;
+        // A github directory containing a helm chart
+        GithubRepositoryLocation github_chart = 13;
+        // A location of a tgz containing a helm chart
+        TgzLocation helm_archive = 14;
+        // A location of a tgz containing one or more yaml manifests
+        TgzLocation manifests_archive = 15;
     }
 
     // Optional default values yaml; if none provided, chart default will be used
@@ -131,29 +134,6 @@ message GithubRepositoryLocation {
 
 // Location of a gzipped tar file
 message TgzLocation {
-    string url = 1;
-}
-
-message MeshError {
-    ResourceRef mesh = 1;
-    repeated string errors = 2;
-}
-
-message HelmInstallationSpec {
-    string chart_url = 1;
-}
-
-// A directory inside of a github repo containing the values, chart, templates, and other resources.
-// For example: https://github.com/helm/charts/tree/master/stable/envoy
-message GithubInstallationSpec {
-    string org = 1;
-    string repo = 2;
-    string ref = 3;
-    string chart_directory = 4;
-}
-
-message ManifestArchiveSpec {
-    // Url to manifest archive, which currently must be a gzipped tar containing one or more rendered yaml manifests.
     string url = 1;
 }
 

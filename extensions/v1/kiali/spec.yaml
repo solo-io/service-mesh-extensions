@@ -16,11 +16,11 @@ repositoryUrl: github.com/kiali/kiali
 shortDescription: |
   Kiali provides answers to the questions: What microservices are part of my Istio service mesh and how are they connected?
 versions:
-- github:
+- githubChart:
     org: istio
     repo: istio
     ref: "1.0.6"
-    chartDirectory: install/kubernetes/helm/istio
+    directory: install/kubernetes/helm/istio
   requiredLabels:
     app: kiali
   valuesYaml: |
@@ -46,11 +46,11 @@ versions:
           minVersion: "1.0.6"
           maxVersion: "1.0.6"
   version: "0.12"
-- github:
+- githubChart:
     org: istio
     repo: istio
     ref: "1.0.4"
-    chartDirectory: install/kubernetes/helm/istio
+    directory: install/kubernetes/helm/istio
   requiredLabels:
     app: kiali
   valuesYaml: |
@@ -76,11 +76,11 @@ versions:
           minVersion: "1.0.4"
           maxVersion: "1.0.4"
   version: "0.9"
-- github:
+- githubChart:
     org: istio
     repo: istio
     ref: "1.0.2"
-    chartDirectory: install/kubernetes/helm/istio
+    directory: install/kubernetes/helm/istio
   datePublished: "2018-08-23T15:04:06Z"
   requiredLabels:
     app: kiali
@@ -106,11 +106,11 @@ versions:
           minVersion: "1.0.2"
           maxVersion: "1.0.2"
   version: "0.6.0"
-- github:
+- githubChart:
     org: istio
     repo: istio
     ref: "1.1.4"
-    chartDirectory: install/kubernetes/helm/istio
+    directory: install/kubernetes/helm/istio
   requiredLabels:
     app: kiali
   valuesYaml: |
