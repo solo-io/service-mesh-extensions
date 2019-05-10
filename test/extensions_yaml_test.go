@@ -24,17 +24,19 @@ var _ = Describe("Extensions Yaml Test", func() {
 		Fail(err.Error())
 	}
 
-	for _, extension := range extensions {
-		It(fmt.Sprintf("extensions/v1/%s/spec.yaml is valid", extension.Name()), func() {
-			Expect(extension.IsDir()).To(BeTrue())
-			specPath := filepath.Join(rootDir, extension.Name(), specYamlFilename)
-			bytes, err := ioutil.ReadFile(specPath)
-			Expect(err).NotTo(HaveOccurred())
-			var spec v1.ApplicationSpec
-			err = protoutils.UnmarshalYaml(bytes, &spec)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(spec.Name).To(BeEquivalentTo(extension.Name()))
+	Context("spec yaml validity", func() {
+		for _, extension := range extensions {
+			It(fmt.Sprintf("extensions/v1/%s/spec.yaml is valid", extension.Name()), func() {
+				Expect(extension.IsDir()).To(BeTrue())
+				specPath := filepath.Join(rootDir, extension.Name(), specYamlFilename)
+				bytes, err := ioutil.ReadFile(specPath)
+				Expect(err).NotTo(HaveOccurred())
+				var spec v1.ApplicationSpec
+				err = protoutils.UnmarshalYaml(bytes, &spec)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(spec.Name).To(BeEquivalentTo(extension.Name()))
 
-		})
-	}
+			})
+		}
+	})
 })
