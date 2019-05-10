@@ -1,0 +1,19 @@
+steps:
+# Run dep to set up the project so it can be built and tested
+# Dep modifies workspace so that the code is moved into the PROJECT_ROOT
+# All steps after this must set GOPATH
+- name: 'gcr.io/$PROJECT_ID/dep:0.1.8'
+  args: ['ensure']
+  env:
+  - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
+  - 'GIT_SSH_CONFIG=FALSE'
+  id: 'dep'
+
+- name: 'gcr.io/$PROJECT_ID/ginkgo:0.1.8'
+  env:
+  - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
+  - 'GOPATH=/workspace/gopath'
+  dir: './gopath/src/github.com/solo-io/service-mesh-hub'
+  args: ['-r', '-failFast', '-race']
+  waitFor: ['dep']
+  id: 'test'
