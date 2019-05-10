@@ -25,21 +25,20 @@ versions:
   flavors:
   - name: istio
     description: "Install flagger to your Istio mesh"
-    customizationLayers:
-    - kustomize:
-        github:
-          org: solo-io
-          repo: service-mesh-hub
-          ref: master
-          directory: extensions/v1/flagger/kustomize
-        overlayPath: istio
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
         versions:
           minVersion: "1.0.0"
+
   - name: appmesh
     description: "Install flagger to your AWS App Mesh"
+    requirementSets:
+    - meshRequirement:
+        meshType: AWS_APP_MESH
+
+  - name: istio-supergloo
+    description: "Install flagger to your Istio mesh with supergloo as mesh provider"
     customizationLayers:
     - kustomize:
         github:
@@ -47,10 +46,11 @@ versions:
           repo: service-mesh-hub
           ref: master
           directory: extensions/v1/flagger/kustomize
-        overlayPath: appmesh
+        overlayPath: appmesh_istio
     requirementSets:
     - meshRequirement:
-        meshType: AWS_APP_MESH
+        meshType: ISTIO
+
   - name: appmesh-supergloo
     description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
     customizationLayers:
