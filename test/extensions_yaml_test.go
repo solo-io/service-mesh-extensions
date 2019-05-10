@@ -11,8 +11,6 @@ import (
 	"github.com/solo-io/service-mesh-hub/api/v1"
 )
 
-
-
 var _ = Describe("Extensions Yaml Test", func() {
 	const (
 		specYamlFilename = "spec.yaml"
@@ -31,11 +29,10 @@ var _ = Describe("Extensions Yaml Test", func() {
 				specPath := filepath.Join(rootDir, extension.Name(), specYamlFilename)
 				bytes, err := ioutil.ReadFile(specPath)
 				Expect(err).NotTo(HaveOccurred())
-				var spec v1.ApplicationSpec
+				var spec hub_solo_io.ApplicationSpec
 				err = protoutils.UnmarshalYaml(bytes, &spec)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(spec.Name).To(BeEquivalentTo(extension.Name()))
-
 			})
 		}
 	})
