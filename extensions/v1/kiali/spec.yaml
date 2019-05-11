@@ -26,7 +26,6 @@ versions:
   valuesYaml: |
     kiali:
       enabled: true
-      createDemoSecret: true
   datePublished: "2019-01-10T15:04:06Z"
   flavors:
   - name: istio
@@ -56,11 +55,18 @@ versions:
   valuesYaml: |
     kiali:
       enabled: true
-      createDemoSecret: true
   datePublished: "2018-11-06T15:04:06Z"
   flavors:
   - name: istio
     description: "Install kiali to your istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1/kiali/overlays
+        overlayPath: kiali-demo-secret
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
@@ -79,10 +85,17 @@ versions:
   valuesYaml: |
     kiali:
       enabled: true
-      createDemoSecret: true
   flavors:
   - name: istio
     description: "Install kiali to your istio mesh"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1/kiali/overlays
+        overlayPath: kiali-demo-secret
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
