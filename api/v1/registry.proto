@@ -66,6 +66,22 @@ message Flavor {
     repeated Layer customization_layers = 3;
     // The flavor is considered applicable if any of the specified requirement sets is satisfied.
     repeated RequirementSet requirement_sets = 4;
+    // Optional set of parameters to be used during installation.
+    repeated Parameter parameters = 5;
+}
+
+// Parameters represent values that are used to configure the installation of an extension.
+message Parameter {
+    // Identifier of the parameter
+    string name = 1;
+    // Description of what the effects of the parameter are.
+    string description = 2;
+    // Value of the parameter
+    string value = 3;
+    // Default value of the parameter
+    string default = 4;
+    // Indicates whether a value for the parameter is required for the installation of the extension to be performed.
+    bool required = 5;
 }
 
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
