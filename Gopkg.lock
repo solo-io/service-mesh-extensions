@@ -50,6 +50,30 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:86c75d55fde56a814f69515d092963634d6f5f6bc1c3e9091b01fbe373a9546e"
+  name = "github.com/k0kubun/pp"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3d73dea227e0711e38b911ffa6fbafc8ff6b2991"
+  version = "v3.0.1"
+
+[[projects]]
+  digest = "1:2fa7b0155cd54479a755c629de26f888a918e13f8857a2c442205d825368e084"
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3a70a971f94a22f2fa562ffcc7a0eb45f5daf045"
+  version = "v0.1.1"
+
+[[projects]]
+  digest = "1:e150b5fafbd7607e2d638e4e5cf43aa4100124e5593385147b0a74e2733d8b0d"
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c2a7a6ca930a4cd0bc33a3f298eb71960732a3a7"
+  version = "v0.0.7"
+
+[[projects]]
   digest = "1:e9c3bb68a6c9470302b8046d4647e0612a2ea6037b9c6a47de60c0a90db504f8"
   name = "github.com/onsi/ginkgo"
   packages = [
@@ -98,6 +122,14 @@
   version = "v1.5.0"
 
 [[projects]]
+  digest = "1:93131d8002d7025da13582877c32d1fc302486775a1b06f62241741006428c5e"
+  name = "github.com/pelletier/go-toml"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "728039f679cbcd4f6a54e080d2219a4c4928c546"
+  version = "v1.4.0"
+
+[[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
   name = "github.com/pkg/errors"
   packages = ["."]
@@ -106,9 +138,13 @@
   version = "v0.8.1"
 
 [[projects]]
-  digest = "1:8a4d070cea45ab92def687ff3ab1b8fd8515bab6cdecb9c15f23a35a3277d79d"
+  digest = "1:09be40b741988ed0ebdc3c45358c53371e7abe52c8bbfa89cadc6bc1c347235e"
   name = "github.com/solo-io/go-utils"
-  packages = ["protoutils"]
+  packages = [
+    "log",
+    "protoutils",
+    "versionutils",
+  ]
   pruneopts = "UT"
   revision = "23d2d30766c45ee7a41cd9e0287f38ea22c4afd1"
   version = "v0.8.5"
@@ -195,7 +231,9 @@
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
+    "github.com/solo-io/go-utils/log",
     "github.com/solo-io/go-utils/protoutils",
+    "github.com/solo-io/go-utils/versionutils",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

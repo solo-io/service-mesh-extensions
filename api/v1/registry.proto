@@ -6,6 +6,7 @@ import "gogoproto/gogo.proto";
 option (gogoproto.equal_all) = true;
 
 import "google/protobuf/timestamp.proto";
+import "github.com/solo-io/solo-kit/api/v1/ref.proto";
 
 // This is static content for an application. It includes basic metadata that is common to every version of an
 // application, and a list of versions. For each version, there is information about how to install the application
@@ -111,19 +112,10 @@ message FlavorCompatibility {
     repeated CompatibleFlavorMeshPair compatible_pairs = 1;
 }
 
-message ResourceRef {
-    option (gogoproto.goproto_sizecache) = false;
-    option (gogoproto.goproto_unkeyed) = false;
-    option (gogoproto.goproto_unrecognized) = false;
-    
-    string name = 1;
-    string namespace = 2;
-}
-
 // Represents a Flavor and a Mesh instance that are compatible with one another.
 message CompatibleFlavorMeshPair {
     Flavor flavor = 1;
-    ResourceRef mesh = 2;
+    core.solo.io.ResourceRef mesh = 2;
 }
 
 // Represents a set of requirements that all need to be satisfied.
