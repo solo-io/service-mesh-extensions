@@ -15,9 +15,10 @@ steps:
   - 'GOPATH=/workspace/gopath'
   dir: './gopath/src/github.com/solo-io/service-mesh-hub'
   args: ['-r', '-failFast', '-race']
+  secretEnv: ['GITHUB_TOKEN']
   waitFor: ['dep']
   id: 'test'
-  
+
 secrets:
 - kmsKeyName: projects/gloo-ee/locations/global/keyRings/build/cryptoKeys/build-key
   secretEnv:
