@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "solo-corp"
+  },
+  "targets": {
+    "solo-corp": {
+      "hosting": {
+        "mesh-market-place-docs": [
+          "mesh-market-place-docs"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "target": "mesh-market-place-docs",
+    "public": "docs/site",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

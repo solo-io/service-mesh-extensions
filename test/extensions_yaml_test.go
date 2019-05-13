@@ -7,8 +7,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/solo-io/go-utils/protoutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
 )
 
 var _ = Describe("Extensions Yaml Test", func() {
@@ -23,15 +21,12 @@ var _ = Describe("Extensions Yaml Test", func() {
 	}
 
 	Context("spec yaml validity", func() {
-		for _, extension := range extensions {
+		for _, ext := range extensions {
+			extension := ext
 			It(fmt.Sprintf("extensions/v1/%s/spec.yaml is valid", extension.Name()), func() {
 				Expect(extension.IsDir()).To(BeTrue())
 				specPath := filepath.Join(rootDir, extension.Name(), specYamlFilename)
-				bytes, err := ioutil.ReadFile(specPath)
-				Expect(err).NotTo(HaveOccurred())
-				var spec v1.ApplicationSpec
-				err = protoutils.UnmarshalYaml(bytes, &spec)
-				Expect(err).NotTo(HaveOccurred())
+				spec := LoadExtensionSpec(specPath)
 				Expect(spec.Name).To(BeEquivalentTo(extension.Name()))
 			})
 		}
