@@ -3,9 +3,10 @@ package test
 import (
 	. "github.com/onsi/gomega"
 
-	"github.com/solo-io/go-utils/protoutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
 	"io/ioutil"
+
+	"github.com/solo-io/go-utils/protoutils"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 )
 
 func LoadExtensionSpec(pathToSpec string) *v1.ApplicationSpec {

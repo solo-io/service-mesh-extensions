@@ -2,7 +2,8 @@ package kustomize_test
 
 import (
 	"context"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/internal/test"
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize"
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/loader"
@@ -44,9 +45,9 @@ var _ = Describe("kustomize unit tests", func() {
 		tempDir, err = afero.TempDir(fs, "", "")
 		Expect(err).NotTo(HaveOccurred())
 		inputs = render.ValuesInputs{
-			Name: test.HelloWorldChart1_0.Name,
+			Name:             test.HelloWorldChart1_0.Name,
 			InstallNamespace: testNs,
-			FlavorName: test.DefaultFlavorName,
+			FlavorName:       test.DefaultFlavorName,
 		}
 		manifests, err = render.GetManifestsFromApplicationSpec(ctx, inputs, appSpec)
 		Expect(err).NotTo(HaveOccurred())

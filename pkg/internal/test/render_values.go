@@ -1,8 +1,6 @@
 package test
 
-import (
-	"github.com/solo-io/service-mesh-hub/api/v1"
-)
+import v1 "github.com/solo-io/service-mesh-hub/api/v1"
 
 type RenderValuesForTest struct {
 	MeshRef               v1.ResourceRef

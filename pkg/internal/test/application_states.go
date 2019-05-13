@@ -54,7 +54,6 @@ var (
 		OverlayPath: "fails",
 		Location:    kustomizeLocation,
 	}
-
 )
 
 func GetAppSpec(chart TestChart, kustomizeLayer *hubv1.Kustomize) *hubv1.VersionedApplicationSpec {

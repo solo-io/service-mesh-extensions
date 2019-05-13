@@ -3,9 +3,10 @@ package kustomize
 import (
 	"bytes"
 	"context"
+	"path/filepath"
+
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/loader"
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
-	"path/filepath"
 
 	"github.com/pkg/errors"
 

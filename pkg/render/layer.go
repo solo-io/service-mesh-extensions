@@ -2,6 +2,7 @@ package render
 
 import (
 	"context"
+
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
 
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize"
@@ -88,7 +89,7 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 	}
 
 	return manifestRenderValues{
-		MeshRef: inputs.MeshRef,
+		MeshRef:               inputs.MeshRef,
 		SuperglooNamespace:    inputs.SuperglooNamespace,
 		InstallationNamespace: inputs.InstallNamespace,
 		Custom:                customValues,
