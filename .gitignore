@@ -1,3 +1,6 @@
 .DS_Store
 .idea
 vendor/
+docs/themes/
+site
+.firebase/
