@@ -11,6 +11,6 @@ manifest: |
     kind: ClusterRole
     name: {{ .Supergloo.ClusterRole }}
   subjects:
-  - name: flagger
+  - name: {{ .Custom.serviceAccount.name }}
     namespace: {{ .InstallationNamespace }}
     kind: ServiceAccount

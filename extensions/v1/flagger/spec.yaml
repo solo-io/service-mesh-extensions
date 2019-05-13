@@ -46,10 +46,24 @@ versions:
           repo: service-mesh-hub
           ref: master
           directory: extensions/v1/flagger/kustomize
-        overlayPath: appmesh_istio
+        overlayPath: istio_supergloo
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus:9090"
+    - name: meshProvider
+      description: |-
+        This value configures flagger to delegate the configuration of the selected mesh to supergloo.
+      default: supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}
+      required: true
+    - name: serviceAccount.name
+      description: |-
+        The name of the service account that will be created and assigned to flagger pods.
 
   - name: appmesh-supergloo
     description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
@@ -64,4 +78,18 @@ versions:
     requirementSets:
     - meshRequirement:
         meshType: AWS_APP_MESH
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus:9090"
+    - name: meshProvider
+      description: |-
+        This value configures flagger to delegate the configuration of the selected mesh to supergloo.
+      default: supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}
+      required: true
+    - name: serviceAccount.name
+      description: |-
+        The name of the service account that will be created and assigned to flagger pods.
   version: "0.12.0"
