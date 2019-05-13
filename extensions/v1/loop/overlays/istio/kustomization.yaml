@@ -1,0 +1,4 @@
+bases:
+  - ./../base
+generators:
+  - envoy-filter.yaml
