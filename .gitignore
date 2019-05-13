@@ -2,5 +2,6 @@
 .idea
 vendor/
 docs/themes/
+docs/resources/
 site
 .firebase/
