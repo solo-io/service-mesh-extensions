@@ -232,9 +232,8 @@ var _ = Describe("utils", func() {
 			inputs := render.ValuesInputs{
 				UserDefinedValues: "foo: bar",
 				FlavorParams: map[string]string{
-					"baz1.baz2": "baz3",
+					"foo": "baz",
 				},
-				SpecDefinedValues: "goo: hoo",
 			}
 			expected := "foo: bar\n"
 			Expect(render.ComputeValueOverrides(context.TODO(), inputs)).To(BeEquivalentTo(expected))

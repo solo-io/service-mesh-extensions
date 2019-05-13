@@ -7,7 +7,7 @@ import (
 	"sigs.k8s.io/kustomize/pkg/transformers"
 )
 
-//go:generate mockgen -package=mocks -destination=../../internal/mocks/generators.go github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins NamedGenerator,NamedTransformer
+//go:generate mockgen -package=mocks -destination=../../pkg/internal/mocks/generators.go github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins NamedGenerator,NamedTransformer
 
 var (
 	PluginNotLoadedError = func(name string) error {

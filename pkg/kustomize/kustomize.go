@@ -3,10 +3,11 @@ package kustomize
 import (
 	"bytes"
 	"context"
-	"path/filepath"
-
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/loader"
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
+	"path/filepath"
+
+	"github.com/pkg/errors"
 
 	"github.com/solo-io/go-utils/installutils/helmchart"
 	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
@@ -21,23 +22,58 @@ import (
 	"sigs.k8s.io/kustomize/pkg/types"
 )
 
-//go:generate mockgen -package=mocks -mock_names Loader=MockPluginLoader -destination=../../pkg/internal/mocks/loader_factory.go sigs.k8s.io/kustomize/pkg/plugins LoaderFactory
+//go:generate mockgen -package=mocks -mock_names Loader=MockPluginLoader -destination=../../internal/mocks/loader_factory.go sigs.k8s.io/kustomize/pkg/plugins LoaderFactory
+
+var (
+	PluginTypeError = func(plugin plugins.NamedPlugin) error {
+		return errors.Errorf("invalid kustomize plugin: plugin %s of type %T must implement "+
+			"either the generator or the transformer interfaces", plugin.Name(), plugin)
+	}
+)
 
 type LayerEngine interface {
 	Run(dir string) ([]byte, error)
 }
 
 type Kustomizer struct {
-	pathLoader loader.Loader
-	ctx        context.Context
-	manifests  helmchart.Manifests
-
-	//installState *InstallationState
-	overlay *hubv1.Kustomize
+	pathLoader   loader.Loader
+	ctx          context.Context
+	manifests    helmchart.Manifests
+	overlay      *hubv1.Kustomize
+	pluginLoader kplugins.LoaderFactory
 }
 
-func NewKustomizer(loader loader.Loader, manifests helmchart.Manifests, layer *hubv1.Kustomize) *Kustomizer {
-	return &Kustomizer{overlay: layer, pathLoader: loader, manifests: manifests}
+func NewKustomizer(loader loader.Loader, manifests helmchart.Manifests, layer *hubv1.Kustomize, kPlugins ...plugins.NamedPlugin) (*Kustomizer, error) {
+
+	var generators []plugins.NamedGenerator
+	var transformers []plugins.NamedTransformer
+
+	for _, p := range kPlugins {
+		assigned := false
+
+		genPlugin, ok := p.(plugins.NamedGenerator)
+		if ok {
+			generators = append(generators, genPlugin)
+			assigned = true
+		}
+
+		trPlugin, ok := p.(plugins.NamedTransformer)
+		if ok {
+			transformers = append(transformers, trPlugin)
+			assigned = true
+		}
+
+		if !assigned {
+			return nil, PluginTypeError(p)
+		}
+	}
+
+	return &Kustomizer{
+		overlay:      layer,
+		pathLoader:   loader,
+		manifests:    manifests,
+		pluginLoader: plugins.NewStaticPluginLoader(generators, transformers),
+	}, nil
 }
 
 func (k *Kustomizer) Run(dir string) ([]byte, error) {
@@ -66,15 +102,7 @@ func (k *Kustomizer) Run(dir string) ([]byte, error) {
 	uf := kunstruct.NewKunstructuredFactoryWithGeneratorArgs(&genMetaArgs)
 	rf := resmap.NewFactory(resource.NewFactory(uf))
 
-	err = options.RunBuild(
-		buf, fSys,
-		rf,
-		transformer.NewFactoryImpl(),
-		kplugins.NewLoader(rf, plugins.NewStaticPluginLoader(
-			[]plugins.NamedGenerator{plugins.NewManifestRenderPlugin(k.installState)},
-			nil,
-		)),
-	)
+	err = options.RunBuild(buf, fSys, rf, transformer.NewFactoryImpl(), kplugins.NewLoader(rf, k.pluginLoader))
 	if err != nil {
 		return nil, err
 	}

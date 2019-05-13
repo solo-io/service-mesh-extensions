@@ -2,6 +2,7 @@ package render
 
 import (
 	"context"
+	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
 
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize"
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/loader"
@@ -21,9 +22,12 @@ var (
 	UnknownLayerTypeError = func(layer *hubv1.Layer) error {
 		return errors.Errorf("unknown layer type specified %T", layer.GetType())
 	}
+	FailedToCalculateValues = func(err error) error {
+		return errors.Wrapf(err, "failed to calculate values for layer rendering")
+	}
 )
 
-func ApplyLayers(ctx context.Context, installedFlavor *hubv1.Flavor, manifests helmchart.Manifests) (kuberesource.UnstructuredResources, error) {
+func ApplyLayers(ctx context.Context, inputs ValuesInputs, installedFlavor *hubv1.Flavor, manifests helmchart.Manifests) (kuberesource.UnstructuredResources, error) {
 
 	if installedFlavor.CustomizationLayers == nil || len(installedFlavor.CustomizationLayers) == 0 {
 		return GetResourcesFromManifests(ctx, manifests)
@@ -37,12 +41,21 @@ func ApplyLayers(ctx context.Context, installedFlavor *hubv1.Flavor, manifests h
 		return nil, err
 	}
 
+	values, err := getRenderValues(inputs)
+	if err != nil {
+		return nil, FailedToCalculateValues(err)
+	}
+
 	layer := installedFlavor.CustomizationLayers[0]
 	var layerEngine kustomize.LayerEngine
 	switch layerType := layer.GetType().(type) {
 	case *hubv1.Layer_Kustomize:
 		kustomizeLoader := loader.NewKustomizeLoader(ctx, fs)
-		layerEngine = kustomize.NewKustomizer(kustomizeLoader, manifests, layerType.Kustomize)
+		layerEngine, err = kustomize.NewKustomizer(kustomizeLoader, manifests, layerType.Kustomize,
+			plugins.NewManifestRenderPlugin(values))
+		if err != nil {
+			return nil, err
+		}
 	default:
 		return nil, UnknownLayerTypeError(layer)
 	}
@@ -57,4 +70,27 @@ func ApplyLayers(ctx context.Context, installedFlavor *hubv1.Flavor, manifests h
 		return nil, err
 	}
 	return resources, nil
+}
+
+func getRenderValues(inputs ValuesInputs) (interface{}, error) {
+
+	type manifestRenderValues struct {
+		MeshRef               hubv1.ResourceRef
+		SuperglooNamespace    string
+		InstallationNamespace string
+		// Custom values come from the parameters set on a  flavor
+		Custom interface{}
+	}
+
+	customValues, err := ConvertParamsToNestedMap(inputs.FlavorParams)
+	if err != nil {
+		return nil, err
+	}
+
+	return manifestRenderValues{
+		MeshRef: inputs.MeshRef,
+		SuperglooNamespace:    inputs.SuperglooNamespace,
+		InstallationNamespace: inputs.InstallNamespace,
+		Custom:                customValues,
+	}, nil
 }

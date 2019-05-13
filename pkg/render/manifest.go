@@ -25,9 +25,11 @@ var (
 )
 
 type ValuesInputs struct {
-	Name             string
-	InstallNamespace string
-	FlavorName       string
+	Name               string
+	InstallNamespace   string
+	FlavorName         string
+	MeshRef            hubv1.ResourceRef
+	SuperglooNamespace string
 
 	UserDefinedValues string
 	FlavorParams      map[string]string
@@ -45,7 +47,7 @@ func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, sp
 		return nil, err
 	}
 
-	rawResources, err := ApplyLayers(ctx, installedFlavor, manifests)
+	rawResources, err := ApplyLayers(ctx, inputs, installedFlavor, manifests)
 	if err != nil {
 		return nil, err
 	}

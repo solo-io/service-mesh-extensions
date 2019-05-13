@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"fmt"
+	"github.com/solo-io/service-mesh-hub/pkg/internal/test"
 
 	"github.com/ghodss/yaml"
 	. "github.com/onsi/ginkgo"
@@ -13,7 +14,6 @@ import (
 )
 
 var _ = Describe("manifest render plugin", func() {
-
 	const (
 		emptyYaml     = ``
 		invalidYaml_0 = `
@@ -28,7 +28,7 @@ var _ = Describe("manifest render plugin", func() {
     name: gloo
     namespace: {{ .SuperglooNamespace }}
 `
-		unknownVaiables = `
+		unknownVariables = `
   apiVersion: supergloo.solo.io/v1
   kind: MeshIngress
   metadata:
@@ -42,6 +42,7 @@ metadata:
   annotations:
     installationNamespace: {{ .InstallationNamespace }}
     superglooNamespace: {{ .SuperglooNamespace }}
+    customValue: {{ .Custom.SomeValue }}
   name: {{ .MeshRef.Name }}
   namespace: {{ .MeshRef.Namespace }}
 spec: {}
@@ -53,11 +54,12 @@ spec: {}
 		plugin *manifestRenderPlugin
 		unst   unstructured.Unstructured
 		res    *resource.Resource
+		values = test.GetRenderValues()
 	)
 
 	BeforeEach(func() {
 		rf = test.ResourceMapFactory()
-		plugin = NewManifestRenderPlugin(test.InstallState_Vanilla)
+		plugin = NewManifestRenderPlugin(values)
 		unst = unstructured.Unstructured{}
 	})
 
@@ -92,9 +94,10 @@ spec: {}
 		}{
 			{manifest: invalidYaml_0, description: "template variables are incorrect", err: ""},
 			{manifest: invalidYaml_1, description: "manifest is not valid yaml", err: "error converting YAML to JSON"},
-			{manifest: unknownVaiables, description: "template vars are incorrect", err: "can't evaluate field SupergloNamespace"},
+			{manifest: unknownVariables, description: "template vars are incorrect", err: "can't evaluate field SupergloNamespace"},
 		}
-		for _, testCase := range testCases {
+		for _, tc := range testCases {
+			testCase := tc
 			It(fmt.Sprintf("returns an error if %s", testCase.description), func() {
 				unst.SetUnstructuredContent(map[string]interface{}{
 					"manifest": testCase.manifest,
@@ -123,13 +126,13 @@ spec: {}
 			var pod corev1.Pod
 			err = yaml.Unmarshal(byt, &pod)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(pod.Name).To(Equal(""))
-			Expect(pod.Namespace).To(Equal(""))
+			Expect(pod.Name).To(Equal(values.MeshRef.Name))
+			Expect(pod.Namespace).To(Equal(values.MeshRef.Namespace))
 			Expect(pod.Annotations).To(BeEquivalentTo(map[string]string{
-				"superglooNamespace":    "supergloo-system",
-				"installationNamespace": "",
+				"superglooNamespace":    values.SuperglooNamespace,
+				"installationNamespace": values.InstallationNamespace,
+				"customValue":           (values.Custom.(map[string]interface{})["SomeValue"]).(string),
 			}))
 		})
 	})
-
 })

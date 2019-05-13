@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"text/template"
 
-	v1 "github.com/solo-io/service-mesh-hub/api/v1"
-
 	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/pkg/ifc"
@@ -22,26 +20,12 @@ var (
 	EmptyManifestError = errors.Errorf("manifest in ManifestRender cannot be empty")
 )
 
-type ManifestRenderValues struct {
-	MeshRef               v1.ResourceRef
-	SuperglooNamespace    string
-	InstallationNamespace string
-}
-
 type manifestRenderPlugin struct {
-	values   ManifestRenderValues
+	values   interface{}
 	Manifest string
 }
 
-func NewManifestRenderPlugin() *manifestRenderPlugin {
-	values := ManifestRenderValues{
-		MeshRef: v1.ResourceRef{
-			Name:      "", // state.Mesh.Name,
-			Namespace: "", // state.Mesh.Namespace,
-		},
-		SuperglooNamespace:    "supergloo-system",
-		InstallationNamespace: "", //state.InstallNamespace,
-	}
+func NewManifestRenderPlugin(values interface{}) *manifestRenderPlugin {
 	return &manifestRenderPlugin{values: values}
 }
 
