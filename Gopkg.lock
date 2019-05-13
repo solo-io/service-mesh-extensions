@@ -374,6 +374,14 @@
   version = "v0.5.1"
 
 [[projects]]
+  digest = "1:6301a898d53542f4da0fd9e8317685b172c53453afe3a60593ecd1be88c8ec4b"
+  name = "github.com/helm/helm"
+  packages = ["pkg/strvals"]
+  pruneopts = "UT"
+  revision = "618447cbf203d147601b4b9bd7f8c37a5d39fbb4"
+  version = "v2.13.1"
+
+[[projects]]
   digest = "1:a1038ef593beb4771c8f0f9c26e8b00410acd800af5c6864651d9bf160ea1813"
   name = "github.com/hpcloud/tail"
   packages = [
@@ -610,13 +618,14 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:91fea6eeb9ad97150398081212425a3d8bde1fd069cecdb5e52c89919bee74bd"
+  digest = "1:ccd75efffd422c1c4259842c8b15bf1b0911a5c22ad3994bbfa156a6119da5b1"
   name = "github.com/solo-io/go-utils"
   packages = [
     "clicore/constants",
     "contextutils",
     "errors",
     "githubutils",
+    "installutils",
     "installutils/helmchart",
     "installutils/kuberesource",
     "protoutils",
@@ -1387,18 +1396,24 @@
     "github.com/golang/mock/gomock",
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/google/go-github/github",
+    "github.com/helm/helm/pkg/strvals",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/pkg/errors",
     "github.com/solo-io/go-utils/contextutils",
     "github.com/solo-io/go-utils/errors",
     "github.com/solo-io/go-utils/githubutils",
+    "github.com/solo-io/go-utils/installutils",
     "github.com/solo-io/go-utils/installutils/helmchart",
+    "github.com/solo-io/go-utils/installutils/kuberesource",
     "github.com/solo-io/go-utils/protoutils",
     "github.com/solo-io/go-utils/tarutils",
     "github.com/spf13/afero",
+    "go.uber.org/zap",
     "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured",
+    "k8s.io/apimachinery/pkg/runtime",
+    "k8s.io/apimachinery/pkg/util/yaml",
     "sigs.k8s.io/kustomize/k8sdeps/kunstruct",
     "sigs.k8s.io/kustomize/k8sdeps/kv/plugin",
     "sigs.k8s.io/kustomize/k8sdeps/transformer",

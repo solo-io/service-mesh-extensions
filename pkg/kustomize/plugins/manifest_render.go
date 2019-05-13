@@ -3,8 +3,9 @@ package plugins
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/solo-io/service-mesh-hub/api/v1"
 	"text/template"
+
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 
 	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/k8sdeps/kunstruct"
@@ -35,7 +36,7 @@ type manifestRenderPlugin struct {
 func NewManifestRenderPlugin() *manifestRenderPlugin {
 	values := ManifestRenderValues{
 		MeshRef: v1.ResourceRef{
-			Name:      "",// state.Mesh.Name,
+			Name:      "", // state.Mesh.Name,
 			Namespace: "", // state.Mesh.Namespace,
 		},
 		SuperglooNamespace:    "supergloo-system",

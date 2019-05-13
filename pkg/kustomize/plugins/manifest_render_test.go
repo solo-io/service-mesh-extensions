@@ -13,7 +13,7 @@ import (
 )
 
 var _ = Describe("manifest render plugin", func() {
-	
+
 	const (
 		emptyYaml     = ``
 		invalidYaml_0 = `

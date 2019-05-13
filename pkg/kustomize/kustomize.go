@@ -3,8 +3,10 @@ package kustomize
 import (
 	"bytes"
 	"context"
-	"github.com/solo-io/service-mesh-hub/pkg/kustomize/loader"
 	"path/filepath"
+
+	"github.com/solo-io/service-mesh-hub/pkg/kustomize/loader"
+	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
 
 	"github.com/solo-io/go-utils/installutils/helmchart"
 	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
@@ -31,7 +33,7 @@ type Kustomizer struct {
 	manifests  helmchart.Manifests
 
 	//installState *InstallationState
-	overlay      *hubv1.Kustomize
+	overlay *hubv1.Kustomize
 }
 
 func NewKustomizer(loader loader.Loader, manifests helmchart.Manifests, layer *hubv1.Kustomize) *Kustomizer {

@@ -3,6 +3,9 @@ package plugins
 import (
 	"fmt"
 
+	"github.com/solo-io/service-mesh-hub/pkg/internal/mocks"
+	"github.com/solo-io/service-mesh-hub/pkg/internal/test"
+
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
