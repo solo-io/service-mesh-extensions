@@ -17,3 +17,8 @@ steps:
   args: ['-r', '-failFast', '-race']
   waitFor: ['dep']
   id: 'test'
+  
+secrets:
+- kmsKeyName: projects/gloo-ee/locations/global/keyRings/build/cryptoKeys/build-key
+  secretEnv:
+    GITHUB_TOKEN: CiQAwdWthrSJ1uI5Ao/LnmX8OzXmA5TNCtDpeV6JdNouaGh5vpwSUQD5SXFIkCBvnu/wYDSGwgWNJaQV75wP/kDephn5GGuGCe0EGFXXE54zyH8iHRL45Uq0s39SoHEyYoZXF2Qla8IbKGAKswPRViYSChPthQILdA==
