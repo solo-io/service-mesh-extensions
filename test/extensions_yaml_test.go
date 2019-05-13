@@ -21,7 +21,8 @@ var _ = Describe("Extensions Yaml Test", func() {
 	}
 
 	Context("spec yaml validity", func() {
-		for _, extension := range extensions {
+		for _, ext := range extensions {
+			extension := ext
 			It(fmt.Sprintf("extensions/v1/%s/spec.yaml is valid", extension.Name()), func() {
 				Expect(extension.IsDir()).To(BeTrue())
 				specPath := filepath.Join(rootDir, extension.Name(), specYamlFilename)
