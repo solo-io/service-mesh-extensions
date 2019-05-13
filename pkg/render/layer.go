@@ -2,6 +2,7 @@ package render
 
 import (
 	"context"
+	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
 
@@ -76,7 +77,7 @@ func ApplyLayers(ctx context.Context, inputs ValuesInputs, installedFlavor *hubv
 func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 
 	type manifestRenderValues struct {
-		MeshRef               hubv1.ResourceRef
+		MeshRef               core.ResourceRef
 		SuperglooNamespace    string
 		InstallationNamespace string
 		// Custom values come from the parameters set on a  flavor

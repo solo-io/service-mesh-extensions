@@ -47,6 +47,10 @@
   version = "0.8.7"
 
 [[override]]
+  name = "github.com/solo-io/solo-kit"
+  version = "0.8.0"
+
+[[override]]
   name = "k8s.io/kubernetes"
   version = "=v1.13.1"
 

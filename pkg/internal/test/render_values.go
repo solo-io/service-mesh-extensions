@@ -1,9 +1,9 @@
 package test
 
-import v1 "github.com/solo-io/service-mesh-hub/api/v1"
+import "github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
 type RenderValuesForTest struct {
-	MeshRef               v1.ResourceRef
+	MeshRef               core.ResourceRef
 	SuperglooNamespace    string
 	InstallationNamespace string
 	Custom                interface{}
@@ -11,7 +11,7 @@ type RenderValuesForTest struct {
 
 func GetRenderValues() RenderValuesForTest {
 	return RenderValuesForTest{
-		MeshRef: v1.ResourceRef{
+		MeshRef: core.ResourceRef{
 			Name:      "mesh-name",
 			Namespace: "mesh-ns",
 		},

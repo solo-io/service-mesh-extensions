@@ -638,6 +638,14 @@
   version = "v0.8.7"
 
 [[projects]]
+  digest = "1:b6c7e84a5d49dcadb67ebf89c4338a4f4348bc404ac5beaf6868b9775700b2a4"
+  name = "github.com/solo-io/solo-kit"
+  packages = ["pkg/api/v1/resources/core"]
+  pruneopts = "UT"
+  revision = "384dbdaa27e3754a07a4cc65f9331e2f5a0d7d20"
+  version = "v0.8.0"
+
+[[projects]]
   digest = "1:bb495ec276ab82d3dd08504bbc0594a65de8c3b22c6f2aaa92d05b73fbf3a82e"
   name = "github.com/spf13/afero"
   packages = [
@@ -1408,6 +1416,7 @@
     "github.com/solo-io/go-utils/installutils/kuberesource",
     "github.com/solo-io/go-utils/protoutils",
     "github.com/solo-io/go-utils/tarutils",
+    "github.com/solo-io/solo-kit/pkg/api/v1/resources/core",
     "github.com/spf13/afero",
     "go.uber.org/zap",
     "k8s.io/api/core/v1",

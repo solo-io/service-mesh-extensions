@@ -2,6 +2,7 @@ package test
 
 import (
 	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
+	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 )
 
 type TestChart struct {
@@ -16,7 +17,7 @@ const (
 )
 
 var (
-	MeshRef = &hubv1.ResourceRef{
+	MeshRef = &core.ResourceRef{
 		Name:      "name",
 		Namespace: "namespace",
 	}

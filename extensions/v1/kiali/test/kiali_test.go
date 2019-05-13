@@ -8,6 +8,7 @@ import (
 	"github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/test"
+	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 )
 
 var _ = Describe("kiali", func() {
@@ -37,7 +38,7 @@ var _ = Describe("kiali", func() {
 				Name: "kiali",
 				FlavorName: "istio",
 				InstallNamespace: "istio-system",
-				MeshRef: v1.ResourceRef{
+				MeshRef: core.ResourceRef{
 					Name: "istio",
 					Namespace: "istio-system",
 				},

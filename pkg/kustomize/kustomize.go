@@ -23,7 +23,7 @@ import (
 	"sigs.k8s.io/kustomize/pkg/types"
 )
 
-//go:generate mockgen -package=mocks -mock_names Loader=MockPluginLoader -destination=../../internal/mocks/loader_factory.go sigs.k8s.io/kustomize/pkg/plugins LoaderFactory
+//go:generate mockgen -package=mocks -mock_names Loader=MockPluginLoader -destination=../internal/mocks/loader_factory.go sigs.k8s.io/kustomize/pkg/plugins LoaderFactory
 
 var (
 	PluginTypeError = func(plugin plugins.NamedPlugin) error {
