@@ -57,9 +57,9 @@ versions:
       required: true
       default: "http://prometheus:9090"
     - name: meshProvider
-      description: |-
+      description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
-      default: supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}
+        Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
       required: true
     - name: serviceAccount.name
       description: |-
@@ -85,9 +85,9 @@ versions:
       required: true
       default: "http://prometheus:9090"
     - name: meshProvider
-      description: |-
+      description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
-      default: supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}
+        Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
       required: true
     - name: serviceAccount.name
       description: |-
