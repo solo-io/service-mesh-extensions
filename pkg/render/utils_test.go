@@ -2,6 +2,7 @@ package render_test
 
 import (
 	"context"
+	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 
@@ -278,5 +279,53 @@ var _ = Describe("utils", func() {
 			_, err := render.ComputeValueOverrides(context.TODO(), inputs)
 			Expect(err.Error()).To(ContainSubstring(render.UnableToParseParameterError(errors.Errorf(""), key, invalid).Error()))
 		})
+	})
+
+	Context("render templates in input values", func() {
+
+		inputs := render.ValuesInputs{
+			InstallNamespace: "test-ns",
+			MeshRef: core.ResourceRef{
+				Namespace: "mesh-ns",
+				Name:      "my-mesh",
+			},
+			Supergloo: render.SuperglooInfo{
+				Namespace:       "supergloo-system",
+				ClusterRoleName: "supergloo-crb",
+			},
+			UserDefinedValues: "top:\n  nested: {{ .InstallNamespace }}\n",
+			FlavorParams: map[string]string{
+				"my.app.cluster-role": "{{ .Supergloo.ClusterRoleName }}",
+				"my.app.mesh-ref":     "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
+				"unchanged":           "still-the-same",
+			},
+			SpecDefinedValues: "key: {{ .Supergloo.Namespace }}\n",
+		}
+
+		expected := render.ValuesInputs{
+			InstallNamespace: "test-ns",
+			MeshRef: core.ResourceRef{
+				Namespace: "mesh-ns",
+				Name:      "my-mesh",
+			},
+			Supergloo: render.SuperglooInfo{
+				Namespace:       "supergloo-system",
+				ClusterRoleName: "supergloo-crb",
+			},
+			UserDefinedValues: "top:\n  nested: test-ns\n",
+			FlavorParams: map[string]string{
+				"my.app.cluster-role": "supergloo-crb",
+				"my.app.mesh-ref":     "my-mesh.mesh-ns",
+				"unchanged":           "still-the-same",
+			},
+			SpecDefinedValues: "key: supergloo-system\n",
+		}
+
+		It("correctly renders input values", func() {
+			result, err := render.ExecInputValuesTemplates(inputs)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result).To(BeEquivalentTo(expected))
+		})
+
 	})
 })
