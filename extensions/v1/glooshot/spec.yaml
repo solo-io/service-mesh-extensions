@@ -1,7 +1,7 @@
 applicationCreator: Solo.io
 applicationMaintainer: Solo.io
 applicationProvider: Solo.io
-documentationUrl: https://www.glooshot.solo.io/v6
+documentationUrl: https://www.glooshot.solo.io
 logoUrl: https://s3.amazonaws.com/artifacts.solo.io/GlooShotLogo.png
 longDescription: |
   Glooshot allows you to run chaos engineering experiments in your service mesh.
@@ -12,8 +12,8 @@ shortDescription: |
 versions:
 - helmArchive:
     uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz
-#  requiredLabels:
-#    app: glooshot
+#  requiredLabels: # install everything for now, use valuesYaml to restrict components
+#    app: glooshot # later, we can use Kustomize to apply labels like this to Prometheus and other imported charts
   valuesYaml: |
     supergloo:
       enabled: false
@@ -28,16 +28,17 @@ versions:
               minVersion: "1.0.6"
               maxVersion: "1.0.6"
   version: "0.0.2"
-- helmArchive:
-    uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest6.tgz
-  requiredLabels:
-    app: glooshot
+- helmArchive: # this is identical to the above - will remove when UI allows single version,
+    # or when a new, real, version is created
+    uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz
+#  requiredLabels:
+#    app: glooshot
   valuesYaml: |
     supergloo:
       enabled: false
   datePublished: "2019-05-13T12:00:00Z"
   flavors:
-  - name: istiox
+  - name: istio-test
     description: "Install Glooshot to your Istio mesh"
     requirementSets:
     - meshRequirement:
@@ -45,4 +46,4 @@ versions:
         versions:
           minVersion: "1.0.6"
           maxVersion: "1.0.6"
-  version: "0.0.2x"
+  version: "0.0.2"
