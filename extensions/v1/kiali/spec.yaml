@@ -35,7 +35,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: fd1bd3cfe45e79d2780f2dbecdd9f67f2c6bedf0
+          ref: master
           directory: extensions/v1/kiali/overlays
     requirementSets:
     - meshRequirement:
@@ -58,14 +58,6 @@ versions:
   flavors:
   - name: istio
     description: "Install kiali to your istio mesh"
-    customizationLayers:
-    - kustomize:
-        github:
-          org: solo-io
-          repo: service-mesh-hub
-          ref: fd1bd3cfe45e79d2780f2dbecdd9f67f2c6bedf0
-          directory: extensions/v1/kiali/overlays
-        overlayPath: kiali-demo-secret
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
@@ -87,14 +79,6 @@ versions:
   flavors:
   - name: istio
     description: "Install kiali to your istio mesh"
-    customizationLayers:
-    - kustomize:
-        github:
-          org: solo-io
-          repo: service-mesh-hub
-          ref: fd1bd3cfe45e79d2780f2dbecdd9f67f2c6bedf0
-          directory: extensions/v1/kiali/overlays
-        overlayPath: kiali-demo-secret
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
