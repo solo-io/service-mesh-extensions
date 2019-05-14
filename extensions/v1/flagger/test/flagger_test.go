@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/solo-io/go-utils/installutils/kuberesource"
@@ -10,6 +11,7 @@ import (
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/test"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
+	appsv1 "k8s.io/api/apps/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
@@ -97,6 +99,27 @@ var _ = Describe("flagger", func() {
 			Expect(crb.Subjects[0].Kind).To(Equal("ServiceAccount"))
 			Expect(crb.Subjects[0].Name).To(Equal(name))
 			Expect(crb.Subjects[0].Namespace).To(Equal(meshNamespace))
+		})
+
+		It("the flagger pods get started with the expected arguments", func() {
+			flaggerDeployment := rendered.Filter(func(resource *unstructured.Unstructured) bool {
+				return !(resource.GetKind() == "Deployment" && resource.GetName() == name)
+			})
+
+			Expect(flaggerDeployment).To(HaveLen(1))
+
+			obj, err := kuberesource.ConvertUnstructured(flaggerDeployment[0])
+			Expect(err).NotTo(HaveOccurred())
+
+			deployment, ok := obj.(*appsv1.Deployment)
+			Expect(ok).To(BeTrue())
+
+			expectedMeshProviderArg := fmt.Sprintf("-mesh-provider=supergloo:%s.%s", meshName, meshNamespace)
+			expectedPrometheusArg := fmt.Sprintf("-metrics-server=http://prometheus.%s:9090", meshNamespace)
+			Expect(deployment.Spec.Template.Spec.Containers).To(HaveLen(1))
+			Expect(deployment.Spec.Template.Spec.Containers[0].Command).To(ContainElement(expectedMeshProviderArg))
+			Expect(deployment.Spec.Template.Spec.Containers[0].Command).To(ContainElement(expectedPrometheusArg))
+
 		})
 	})
 })
