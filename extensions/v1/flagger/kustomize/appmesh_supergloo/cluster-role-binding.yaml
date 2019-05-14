@@ -12,5 +12,5 @@ manifest: |
     name: {{ .Supergloo.ClusterRoleName }}
   subjects:
   - name: {{ .Custom.serviceAccount.name }}
-    namespace: {{ .InstallationNamespace }}
+    namespace: {{ .InstallNamespace }}
     kind: ServiceAccount

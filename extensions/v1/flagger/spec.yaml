@@ -30,13 +30,23 @@ versions:
         meshType: ISTIO
         versions:
           minVersion: "1.0.0"
-
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
   - name: appmesh
     description: "Install flagger to your AWS App Mesh"
     requirementSets:
     - meshRequirement:
         meshType: AWS_APP_MESH
-
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
   - name: istio-supergloo
     description: "Install flagger to your Istio mesh with supergloo as mesh provider"
     customizationLayers:
@@ -44,7 +54,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: master
+          ref: flagger-add-customization-layers # TODO: same problem with self-reference
           directory: extensions/v1/flagger/kustomize
         overlayPath: istio_supergloo
     requirementSets:
@@ -55,7 +65,7 @@ versions:
       description: |-
         The URL of the prometheus service that flagger will use to gather canary metrics.
       required: true
-      default: "http://{{ .Prometheus.ServiceName }}.{{ .Prometheus.ServiceNamespace }}:{{ .Prometheus.ServicePort }}"
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
     - name: meshProvider
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
@@ -65,7 +75,6 @@ versions:
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
-
   - name: appmesh-supergloo
     description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
     customizationLayers:
@@ -73,7 +82,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: master
+          ref: flagger-add-customization-layers # TODO: same problem with self-reference
           directory: extensions/v1/flagger/kustomize
         overlayPath: appmesh_supergloo
     requirementSets:
@@ -84,7 +93,7 @@ versions:
       description: |-
         The URL of the prometheus service that flagger will use to gather canary metrics.
       required: true
-      default: "http://{{ .Prometheus.ServiceName }}.{{ .Prometheus.ServiceNamespace }}:{{ .Prometheus.ServicePort }}"
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
     - name: meshProvider
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
