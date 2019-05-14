@@ -1,3 +1,13 @@
-package service_mesh_hub
+package main
 
-func main() {}
+import (
+	"github.com/solo-io/service-mesh-hub/pkg/cli"
+)
+
+/*
+smh
+*/
+
+func main() {
+	cli.CommandConfig.Run()
+}
