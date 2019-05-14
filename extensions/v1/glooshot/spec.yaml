@@ -1,7 +1,7 @@
 applicationCreator: Solo.io
 applicationMaintainer: Solo.io
 applicationProvider: Solo.io
-documentationUrl: https://www.glooshot.solo.io/v5
+documentationUrl: https://www.glooshot.solo.io/v6
 logoUrl: https://s3.amazonaws.com/artifacts.solo.io/GlooShotLogo.png
 longDescription: |
   Glooshot allows you to run chaos engineering experiments in your service mesh.
@@ -12,8 +12,8 @@ shortDescription: |
 versions:
 - helmArchive:
     uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz
-  requiredLabels:
-    app: glooshot
+#  requiredLabels:
+#    app: glooshot
   valuesYaml: |
     supergloo:
       enabled: false
