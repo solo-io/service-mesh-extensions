@@ -7,6 +7,7 @@ import (
 	"github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/options"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
+	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"sigs.k8s.io/yaml"
@@ -45,6 +46,10 @@ func validate(o *options.Options) error {
 		FlavorName: o.Validate.Flavor,
 		// TODO - support validation with these parameters
 		InstallNamespace: "default",
+		MeshRef: core.ResourceRef{
+			Namespace: "default",
+			Name:      "mock-mesh",
+		},
 		SpecDefinedValues: `
 kiali:
   enabled: true
