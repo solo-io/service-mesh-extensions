@@ -41,7 +41,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   annotations:
-    installationNamespace: {{ .InstallationNamespace }}
+    installNamespace: {{ .InstallNamespace }}
     superglooNamespace: {{ .SuperglooNamespace }}
     customValue: {{ .Custom.SomeValue }}
   name: {{ .MeshRef.Name }}
@@ -130,9 +130,9 @@ spec: {}
 			Expect(pod.Name).To(Equal(values.MeshRef.Name))
 			Expect(pod.Namespace).To(Equal(values.MeshRef.Namespace))
 			Expect(pod.Annotations).To(BeEquivalentTo(map[string]string{
-				"superglooNamespace":    values.SuperglooNamespace,
-				"installationNamespace": values.InstallationNamespace,
-				"customValue":           (values.Custom.(map[string]interface{})["SomeValue"]).(string),
+				"superglooNamespace": values.SuperglooNamespace,
+				"installNamespace":   values.InstallNamespace,
+				"customValue":        (values.Custom.(map[string]interface{})["SomeValue"]).(string),
 			}))
 		})
 	})
