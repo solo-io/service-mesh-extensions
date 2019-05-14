@@ -57,7 +57,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: flagger-add-customization-layers # TODO: same problem with self-reference
+          ref: temp-flagger-ref
           directory: extensions/v1/flagger/kustomize
         overlayPath: istio_supergloo
     requirementSets:
@@ -86,7 +86,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: flagger-add-customization-layers # TODO: same problem with self-reference
+          ref: temp-flagger-ref
           directory: extensions/v1/flagger/kustomize
         overlayPath: appmesh_supergloo
     requirementSets:
