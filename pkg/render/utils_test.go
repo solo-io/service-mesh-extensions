@@ -299,7 +299,7 @@ var _ = Describe("utils", func() {
 				"my.app.mesh-ref":     "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
 				"unchanged":           "still-the-same",
 			},
-			SpecDefinedValues: "key: {{ .Prometheus.ServiceName }}\n",
+			SpecDefinedValues: "key: {{ .Supergloo.Namespace }}\n",
 		}
 
 		expected := render.ValuesInputs{
@@ -318,7 +318,7 @@ var _ = Describe("utils", func() {
 				"my.app.mesh-ref":     "my-mesh.mesh-ns",
 				"unchanged":           "still-the-same",
 			},
-			SpecDefinedValues: "key: prometheus\n",
+			SpecDefinedValues: "key: supergloo-system\n",
 		}
 
 		It("correctly renders input values", func() {
