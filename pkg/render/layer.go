@@ -85,8 +85,7 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 		MeshRef            core.ResourceRef
 		SuperglooNamespace string
 
-		Supergloo  SuperglooInfo
-		Prometheus PrometheusInfo
+		Supergloo SuperglooInfo
 
 		// Custom values come from the parameters set on a flavor
 		Custom interface{}
@@ -104,7 +103,6 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 		MeshRef:            inputs.MeshRef,
 		SuperglooNamespace: inputs.SuperglooNamespace,
 		Supergloo:          inputs.Supergloo,
-		Prometheus:         inputs.Prometheus,
 		Custom:             customValues,
 	}, nil
 }

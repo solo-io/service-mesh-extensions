@@ -293,9 +293,6 @@ var _ = Describe("utils", func() {
 				Namespace:       "supergloo-system",
 				ClusterRoleName: "supergloo-crb",
 			},
-			Prometheus: render.PrometheusInfo{
-				ServiceName: "prometheus",
-			},
 			UserDefinedValues: "top:\n  nested: {{ .InstallNamespace }}\n",
 			FlavorParams: map[string]string{
 				"my.app.cluster-role": "{{ .Supergloo.ClusterRoleName }}",
@@ -314,9 +311,6 @@ var _ = Describe("utils", func() {
 			Supergloo: render.SuperglooInfo{
 				Namespace:       "supergloo-system",
 				ClusterRoleName: "supergloo-crb",
-			},
-			Prometheus: render.PrometheusInfo{
-				ServiceName: "prometheus",
 			},
 			UserDefinedValues: "top:\n  nested: test-ns\n",
 			FlavorParams: map[string]string{

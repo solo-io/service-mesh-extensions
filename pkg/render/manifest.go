@@ -38,12 +38,6 @@ type SuperglooInfo struct {
 	ClusterRoleName    string
 }
 
-type PrometheusInfo struct {
-	ServiceName      string
-	ServiceNamespace string
-	ServicePort      string
-}
-
 type ValuesInputs struct {
 	Name               string
 	InstallNamespace   string
@@ -55,9 +49,8 @@ type ValuesInputs struct {
 	FlavorParams      map[string]string
 	SpecDefinedValues string
 
-	// TODO: remove old values (e.g. SuperglooNamespace) after new ones have been wired on the marketplace side
-	Supergloo  SuperglooInfo
-	Prometheus PrometheusInfo
+	// TODO: remove old value (SuperglooNamespace) after new ones have been wired on the marketplace side
+	Supergloo SuperglooInfo
 }
 
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
