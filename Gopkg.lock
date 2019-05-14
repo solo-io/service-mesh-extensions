@@ -618,7 +618,7 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:6f1892116ea9a69aecd5495bf31fec6ce18ba636464e7124030c4a1572cac9d1"
+  digest = "1:ccd75efffd422c1c4259842c8b15bf1b0911a5c22ad3994bbfa156a6119da5b1"
   name = "github.com/solo-io/go-utils"
   packages = [
     "clicore/constants",
@@ -628,14 +628,14 @@
     "installutils",
     "installutils/helmchart",
     "installutils/kuberesource",
-    "manifesttestutils",
     "protoutils",
     "tarutils",
     "versionutils",
     "vfsutils",
   ]
   pruneopts = "UT"
-  revision = "cd60ef842e904cce089e2dca1073115da34d17b0"
+  revision = "d76508873757191ec9da527f3cfbdcd204781ad7"
+  version = "v0.8.7"
 
 [[projects]]
   digest = "1:b6c7e84a5d49dcadb67ebf89c4338a4f4348bc404ac5beaf6868b9775700b2a4"
@@ -1414,7 +1414,6 @@
     "github.com/solo-io/go-utils/installutils",
     "github.com/solo-io/go-utils/installutils/helmchart",
     "github.com/solo-io/go-utils/installutils/kuberesource",
-    "github.com/solo-io/go-utils/manifesttestutils",
     "github.com/solo-io/go-utils/protoutils",
     "github.com/solo-io/go-utils/tarutils",
     "github.com/solo-io/solo-kit/pkg/api/v1/resources/core",
