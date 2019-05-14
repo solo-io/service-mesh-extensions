@@ -102,32 +102,4 @@ var _ = Describe("kiali", func() {
 			testDemoSecret()
 		})
 	})
-
-	Context("0.9 with default values", func() {
-		BeforeEach(func() {
-			bindVersion("0.9")
-		})
-
-		It("has the correct number of resources", func() {
-			Expect(testManifest.NumResources()).To(Equal(7))
-		})
-
-		It("has a demo secret", func() {
-			testDemoSecret()
-		})
-	})
-
-	Context("0.6.0 with default values", func() {
-		BeforeEach(func() {
-			bindVersion("0.6.0")
-		})
-
-		It("has the correct number of resources", func() {
-			Expect(testManifest.NumResources()).To(Equal(7))
-		})
-
-		It("has a demo secret", func() {
-			testDemoSecret()
-		})
-	})
 })
