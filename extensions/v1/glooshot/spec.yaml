@@ -28,22 +28,3 @@ versions:
               minVersion: "1.0.6"
               maxVersion: "1.0.6"
   version: "0.0.2"
-- helmArchive: # this is identical to the above - will remove when UI allows single version,
-    # or when a new, real, version is created
-    uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz
-#  requiredLabels:
-#    app: glooshot
-  valuesYaml: |
-    supergloo:
-      enabled: false
-  datePublished: "2019-05-13T12:00:00Z"
-  flavors:
-  - name: istio-test
-    description: "Install Glooshot to your Istio mesh"
-    requirementSets:
-    - meshRequirement:
-        meshType: ISTIO
-        versions:
-          minVersion: "1.0.6"
-          maxVersion: "1.0.6"
-  version: "0.0.2"
