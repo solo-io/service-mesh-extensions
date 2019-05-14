@@ -23,6 +23,8 @@ versions:
     uri: https://storage.googleapis.com/solo-public-helm
   datePublished: "2019-01-09T15:04:06Z"
   flavors:
+  - name: vanilla
+    description: "Install gloo"
   - name: supergloo
     description: "Install gloo as an ingress to your mesh using supergloo"
     customizationLayers:
@@ -33,11 +35,4 @@ versions:
           ref: master
           directory: extensions/v1/gloo/overlays
         overlayPath: supergloo
-  version: "0.13.26"
-- manifestsArchive:
-    uri: https://storage.googleapis.com/solo-public-helm
-  datePublished: "2019-01-09T15:04:06Z"
-  flavors:
-  - name: vanilla
-    description: "Install gloo"
   version: "0.13.26"
