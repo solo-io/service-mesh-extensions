@@ -1,7 +1,7 @@
 applicationCreator: Solo.io
 applicationMaintainer: Solo.io
 applicationProvider: Solo.io
-documentationUrl: https://www.glooshot.solo.io
+documentationUrl: https://www.glooshot.solo.io/v1
 logoUrl: https://s3.amazonaws.com/artifacts.solo.io/GlooShotLogo.png
 longDescription: |
   Glooshot allows you to run chaos engineering experiments in your service mesh.
@@ -16,6 +16,14 @@ versions:
   flavors:
   - name: istio
     description: "Install Glooshot to your Istio mesh"
+    customizationLayers:
+      - kustomize:
+          github:
+            org: solo-io
+            repo: service-mesh-hub
+            ref: master
+            directory: extensions/v1/kiali/overlays
+          overlayPath: kiali-demo-secret
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
