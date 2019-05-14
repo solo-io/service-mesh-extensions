@@ -70,6 +70,7 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.String("values", inputs.SpecDefinedValues))
 		return "", err
 	}
+
 	paramValues, err := ConvertParamsToNestedMap(inputs.FlavorParams)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing install params",
