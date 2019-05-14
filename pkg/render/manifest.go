@@ -27,15 +27,15 @@ var (
 )
 
 type ValuesInputs struct {
-	Name               string
-	InstallNamespace   string
-	FlavorName         string
-	MeshRef            core.ResourceRef
-	SuperglooNamespace string
+	Name               string `json:"name"`
+	InstallNamespace   string `json:"installNamespace"`
+	FlavorName         string `json:"flavorName"`
+	MeshRef            core.ResourceRef `json:"meshRef"`
+	SuperglooNamespace string `json:"superglooNamespace"`
 
-	UserDefinedValues string
-	FlavorParams      map[string]string
-	SpecDefinedValues string
+	UserDefinedValues string `json:"name"`
+	FlavorParams      map[string]string `json:"flavorParams"`
+	SpecDefinedValues string `json:"specDefinedValues"`
 }
 
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {

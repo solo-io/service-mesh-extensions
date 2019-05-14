@@ -456,6 +456,14 @@
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "af06845cf3004701891bf4fdb884bfe4920b3727"
+  version = "v1.1.0"
+
+[[projects]]
   digest = "1:abf08734a6527df70ed361d7c369fb580e6840d8f7a6012e5f609fdfd93b4e48"
   name = "github.com/mitchellh/go-wordwrap"
   packages = ["."]
@@ -618,10 +626,12 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:ccd75efffd422c1c4259842c8b15bf1b0911a5c22ad3994bbfa156a6119da5b1"
+  digest = "1:49a4eb875c89fb738eb69c43cdefe937405c52deba3435b6415563fe43461fed"
   name = "github.com/solo-io/go-utils"
   packages = [
+    "clicore",
     "clicore/constants",
+    "clicore/internal/clibufferpool",
     "contextutils",
     "errors",
     "githubutils",
@@ -1408,6 +1418,7 @@
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/pkg/errors",
+    "github.com/solo-io/go-utils/clicore",
     "github.com/solo-io/go-utils/contextutils",
     "github.com/solo-io/go-utils/errors",
     "github.com/solo-io/go-utils/githubutils",
