@@ -19,29 +19,27 @@ repositoryUrl: https://github.com/solo-io/gloo
 shortDescription: |
   Gloo is a feature-rich, Kubernetes-native ingress controller, and next-generation API gateway.
 versions:
-  - manifestsArchive:
-      uri: https://storage.googleapis.com/solo-public-helms
-    datePublished: "2019-01-09T15:04:06Z"
-    flavors:
-      - name: supergloo
-        description: "Install gloo as an ingress to your mesh using supergloo"
-        customizationLayers:
-        - kustomize:
-            github:
-              org: solo-io
-              repo: service-mesh-hub
-              ref: master
-              directory: extensions/v1/gloo/overlays
-            overlayPath: supergloo
-        requirementSets:
-        - meshRequirement:
-            meshType: AWS_APP_MESH
-        - meshRequirement:
-            meshType: ISTIO
-            versions:
-              minVersion: "1.0.0"
-        - meshRequirement:
-            meshType: LINKERD
-            versions:
-              minVersion: "2"
-    version: "0.13.20"
+- manifestsArchive:
+    uri: https://storage.googleapis.com/solo-public-helm
+  datePublished: "2019-01-09T15:04:06Z"
+  flavors:
+  - name: supergloo
+    description: "Install gloo as an ingress to your mesh using supergloo"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1/gloo/overlays
+        overlayPath: supergloo
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
+          minVersion: "1.0.0"
+    - meshRequirement:
+        meshType: LINKERD
+        versions:
+          minVersion: "2"
+  version: "0.13.20"
