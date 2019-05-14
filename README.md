@@ -25,7 +25,7 @@ Here are two examples:
 GITHUB_TOKEN=`cat ~/github/token/file` go run main.go validate \
     --name glooshot \
     --flavor istio \
-    --version 0 \
+    --version 0.0.2 \
     --print-manifest
 ```
 
@@ -33,6 +33,6 @@ GITHUB_TOKEN=`cat ~/github/token/file` go run main.go validate \
 GITHUB_TOKEN=`cat ~/github/token/file` go run main.go validate \
     --name kiali \
     --flavor istio \
-    --version 0 \
+    --version 0.12 \
     --print-manifest
 ```

@@ -24,8 +24,8 @@ func Cmd(o *options.Options) *cobra.Command {
 	pflags := cmd.PersistentFlags()
 	pflags.StringVar(&o.Validate.ExtensionName, "name", options.ValidateDefaults.ExtensionName,
 		"name of the extension that will be validated")
-	pflags.IntVar(&o.Validate.VersionIndex, "version", options.ValidateDefaults.VersionIndex,
-		"index of the file resource to be validated")
+	pflags.StringVar(&o.Validate.Version, "version", options.ValidateDefaults.Version,
+		"specification version to be validated")
 	pflags.StringVar(&o.Validate.Flavor, "flavor", options.ValidateDefaults.Flavor,
 		"name of flavor to be validate")
 	pflags.BoolVar(&o.Validate.PrintManifest, "print-manifest", options.ValidateDefaults.PrintManifest,
@@ -52,11 +52,9 @@ func validate(o *options.Options) error {
 	if err != nil {
 		return err
 	}
-	vIndex := o.Validate.VersionIndex
-	if vIndex >= len(spec.Versions) {
-		return fmt.Errorf("must specify a valid version index, %v exceeds maximum version index: %v",
-			vIndex,
-			len(spec.Versions))
+	versionContent, err := getVersionContent(spec.Versions, o.Validate.Version)
+	if err != nil {
+		return err
 	}
 	inputValues := render.ValuesInputs{
 		Name:             o.Validate.ExtensionName,
@@ -66,7 +64,7 @@ func validate(o *options.Options) error {
 			Namespace: o.Validate.MeshNamespace,
 			Name:      o.Validate.MeshName,
 		},
-		SpecDefinedValues: spec.Versions[vIndex].ValuesYaml,
+		SpecDefinedValues: versionContent.ValuesYaml,
 		// TODO - support validation with these parameters
 		//SuperglooNamespace: "",
 		//UserDefinedValues:  "",
@@ -74,9 +72,9 @@ func validate(o *options.Options) error {
 		//SpecDefinedValues:  "",
 	}
 
-	resources, err := render.ComputeResourcesForApplication(o.Ctx, inputValues, spec.Versions[vIndex])
+	resources, err := render.ComputeResourcesForApplication(o.Ctx, inputValues, versionContent)
 	if err != nil {
-		return errors.Wrapf(err, "unable to compute resources on version %v", vIndex)
+		return errors.Wrapf(err, "unable to compute resources on version %v", o.Validate.Version)
 	}
 	if o.Validate.PrintManifest {
 		for _, r := range resources {
@@ -105,4 +103,13 @@ func LoadExtensionSpec(pathToSpec string) (*v1.ApplicationSpec, error) {
 		return nil, err
 	}
 	return &spec, nil
+}
+
+func getVersionContent(list []*v1.VersionedApplicationSpec, version string) (*v1.VersionedApplicationSpec, error) {
+	for _, content := range list {
+		if content.Version == version {
+			return content, nil
+		}
+	}
+	return nil, fmt.Errorf("could not find version %v in specification", version)
 }

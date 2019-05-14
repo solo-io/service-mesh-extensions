@@ -12,8 +12,6 @@ shortDescription: |
 versions:
 - helmArchive:
     uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz
-#  requiredLabels: # install everything for now, use valuesYaml to restrict components
-#    app: glooshot # later, we can use Kustomize to apply labels like this to Prometheus and other imported charts
   valuesYaml: |
     supergloo:
       enabled: false

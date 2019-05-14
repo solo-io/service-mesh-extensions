@@ -10,7 +10,7 @@ type Options struct {
 type Validate struct {
 	ManifestFilepath string
 	ExtensionName    string
-	VersionIndex     int
+	Version          string
 	Flavor           string
 	PrintManifest    bool
 	MeshName         string
@@ -21,7 +21,7 @@ type Validate struct {
 var ValidateDefaults = Validate{
 	ManifestFilepath: "",
 	ExtensionName:    "",
-	VersionIndex:     0,
+	Version:          "",
 	Flavor:           "",
 	PrintManifest:    false,
 	MeshName:         "mesh-name",
