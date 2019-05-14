@@ -35,9 +35,8 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: master
+          ref: temp-kiali-layer-ref # TODO: update with sha after master merge
           directory: extensions/v1/kiali/overlays
-        overlayPath: kiali-demo-secret
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
@@ -64,7 +63,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: master
+          ref: temp-kiali-layer-ref # TODO: update with sha after master merge
           directory: extensions/v1/kiali/overlays
         overlayPath: kiali-demo-secret
     requirementSets:
@@ -93,7 +92,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: master
+          ref: temp-kiali-layer-ref # TODO: update with sha after master merge
           directory: extensions/v1/kiali/overlays
         overlayPath: kiali-demo-secret
     requirementSets:

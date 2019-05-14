@@ -9,7 +9,7 @@ manifest: |
     namespace: {{ .SuperglooNamespace }}
   spec:
     gloo: {}
-    installationNamespace: {{ .InstallationNamespace }}
+    installationNamespace: {{ .InstallNamespace }}
     meshes:
     - name: {{ .MeshRef.Name }}
       namespace: {{ .MeshRef.Namespace }}
