@@ -33,11 +33,11 @@ versions:
           ref: master
           directory: extensions/v1/gloo/overlays
         overlayPath: supergloo
-    requirementSets:
-    - meshRequirement:
-        meshType: AWS_APP_MESH
-    - meshRequirement:
-        meshType: ISTIO
-    - meshRequirement:
-        meshType: LINKERD
-  version: "0.13.20"
+  version: "0.13.26"
+- manifestsArchive:
+    uri: https://storage.googleapis.com/solo-public-helm
+  datePublished: "2019-01-09T15:04:06Z"
+  flavors:
+  - name: vanilla
+    description: "Install gloo"
+  version: "0.13.26"
