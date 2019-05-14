@@ -22,6 +22,9 @@ versions:
     ref: "0.12.0"
     directory: charts/flagger
   datePublished: "2019-05-02T00:00:00Z"
+  valuesYaml: |-
+    serviceAccount:
+      name: flagger
   flavors:
   - name: istio
     description: "Install flagger to your Istio mesh"
@@ -75,6 +78,7 @@ versions:
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
+      default: flagger
   - name: appmesh-supergloo
     description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
     customizationLayers:
@@ -103,4 +107,5 @@ versions:
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
+      default: flagger
   version: "0.12.0"
