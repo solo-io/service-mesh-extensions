@@ -22,14 +22,20 @@ func Cmd(o *options.Options) *cobra.Command {
 		},
 	}
 	pflags := cmd.PersistentFlags()
-	pflags.StringVar(&o.Validate.ExtensionName, "name", "",
+	pflags.StringVar(&o.Validate.ExtensionName, "name", options.ValidateDefaults.ExtensionName,
 		"name of the extension that will be validated")
-	pflags.IntVar(&o.Validate.VersionIndex, "version", 0,
+	pflags.IntVar(&o.Validate.VersionIndex, "version", options.ValidateDefaults.VersionIndex,
 		"index of the file resource to be validated")
-	pflags.StringVar(&o.Validate.Flavor, "flavor", "",
+	pflags.StringVar(&o.Validate.Flavor, "flavor", options.ValidateDefaults.Flavor,
 		"name of flavor to be validate")
-	pflags.BoolVar(&o.Validate.Verbose, "verbose", false,
+	pflags.BoolVar(&o.Validate.PrintManifest, "print-manifest", options.ValidateDefaults.PrintManifest,
 		"if set, will print the manifest content")
+	pflags.StringVar(&o.Validate.InstallNamespace, "install-namespace", options.ValidateDefaults.InstallNamespace,
+		fmt.Sprintf("optional, namespace in which to install the app, defaults to placeholder value: %v", options.ValidateDefaults.InstallNamespace))
+	pflags.StringVar(&o.Validate.MeshName, "mesh-name", options.ValidateDefaults.MeshName,
+		fmt.Sprintf("optional, name of the associated mesh, defaults to placeholder value: %v", options.ValidateDefaults.MeshName))
+	pflags.StringVar(&o.Validate.MeshNamespace, "mesh-namespace", options.ValidateDefaults.MeshNamespace,
+		fmt.Sprintf("optional, namespace of the associated mesh, defaults to placeholder value: %v", options.ValidateDefaults.MeshNamespace))
 	return cmd
 }
 
@@ -41,53 +47,40 @@ func validate(o *options.Options) error {
 	if o.Validate.Flavor == "" {
 		return fmt.Errorf("no flavor specified")
 	}
-	inputValues := render.ValuesInputs{
-		Name:       o.Validate.ExtensionName,
-		FlavorName: o.Validate.Flavor,
-		// TODO - support validation with these parameters
-		InstallNamespace: "default",
-		MeshRef: core.ResourceRef{
-			Namespace: "default",
-			Name:      "mock-mesh",
-		},
-		SpecDefinedValues: `
-kiali:
-  enabled: true
-`,
-		//		SpecDefinedValues: `
-		//    customizationLayers:
-		//    - kustomize:
-		//        github:
-		//          org: solo-io
-		//          repo: service-mesh-hub
-		//          ref: master
-		//          directory: extensions/v1/kiali/overlays
-		//        overlayPath: kiali-demo-secret
-		//`,
-		//MeshRef:            core.ResourceRef{},
-		//SuperglooNamespace: "",
-		//UserDefinedValues:  "",
-		//FlavorParams:       nil,
-		//SpecDefinedValues:  "",
-	}
 	specFilepath := fmt.Sprintf("./extensions/v1/%v/spec.yaml", o.Validate.ExtensionName)
 	spec, err := LoadExtensionSpec(specFilepath)
 	if err != nil {
 		return err
 	}
-
-	if o.Validate.VersionIndex > len(spec.Versions) {
+	vIndex := o.Validate.VersionIndex
+	if vIndex >= len(spec.Versions) {
 		return fmt.Errorf("must specify a valid version index, %v exceeds maximum version index: %v",
-			o.Validate.VersionIndex,
+			vIndex,
 			len(spec.Versions))
 	}
-	resources, err := render.ComputeResourcesForApplication(o.Ctx, inputValues, spec.Versions[o.Validate.VersionIndex])
-	if err != nil {
-		return errors.Wrapf(err, "unable to compute resources on version %v", o.Validate.VersionIndex)
+	inputValues := render.ValuesInputs{
+		Name:             o.Validate.ExtensionName,
+		FlavorName:       o.Validate.Flavor,
+		InstallNamespace: o.Validate.InstallNamespace,
+		MeshRef: core.ResourceRef{
+			Namespace: o.Validate.MeshNamespace,
+			Name:      o.Validate.MeshName,
+		},
+		SpecDefinedValues: spec.Versions[vIndex].ValuesYaml,
+		// TODO - support validation with these parameters
+		//SuperglooNamespace: "",
+		//UserDefinedValues:  "",
+		//FlavorParams:       nil,
+		//SpecDefinedValues:  "",
 	}
-	if o.Validate.Verbose {
+
+	resources, err := render.ComputeResourcesForApplication(o.Ctx, inputValues, spec.Versions[vIndex])
+	if err != nil {
+		return errors.Wrapf(err, "unable to compute resources on version %v", vIndex)
+	}
+	if o.Validate.PrintManifest {
 		for _, r := range resources {
-			b := []byte{}
+			var b []byte
 			var err error
 			if b, err = r.MarshalJSON(); err != nil {
 				return errors.Wrapf(err, "unable to unmarshal unstructured resource")

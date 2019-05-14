@@ -8,3 +8,31 @@ service mesh extensions, solving problems related to enforcing dependency requir
 and customizing installation manifests based on what meshes have been deployed to the 
 cluster. 
 
+
+# Validate your extension before deploying
+
+
+If you are creating a new extension or modifying an existing one, you can verify that your specification
+will be accepted prior to submission using the following command line tool.
+
+Just specify the `--name`, `--flavor`, and `--version`.
+
+If you want to see a preview of the corresponding chart, pass the `--print-manifest` flag.
+
+Here are two examples:
+
+```bash
+GITHUB_TOKEN=`cat ~/github/token/file` go run main.go validate \
+    --name glooshot \
+    --flavor istio \
+    --version 0 \
+    --print-manifest
+```
+
+```bash
+GITHUB_TOKEN=`cat ~/github/token/file` go run main.go validate \
+    --name kiali \
+    --flavor istio \
+    --version 0 \
+    --print-manifest
+```

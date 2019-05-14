@@ -12,19 +12,27 @@ type Validate struct {
 	ExtensionName    string
 	VersionIndex     int
 	Flavor           string
-	Verbose          bool
+	PrintManifest    bool
+	MeshName         string
+	MeshNamespace    string
+	InstallNamespace string
+}
+
+var ValidateDefaults = Validate{
+	ManifestFilepath: "",
+	ExtensionName:    "",
+	VersionIndex:     0,
+	Flavor:           "",
+	PrintManifest:    false,
+	MeshName:         "mesh-name",
+	MeshNamespace:    "default",
+	InstallNamespace: "default",
 }
 
 func InitializeOptions(ctx context.Context) *Options {
 	opts := &Options{
-		Ctx: ctx,
-		Validate: Validate{
-			Verbose:          false,
-			ManifestFilepath: "",
-			ExtensionName:    "",
-			VersionIndex:     0,
-			Flavor:           "",
-		},
+		Ctx:      ctx,
+		Validate: ValidateDefaults,
 	}
 	return opts
 }
