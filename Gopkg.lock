@@ -638,14 +638,15 @@
     "installutils",
     "installutils/helmchart",
     "installutils/kuberesource",
+    "manifesttestutils",
     "protoutils",
     "tarutils",
     "versionutils",
     "vfsutils",
   ]
   pruneopts = "UT"
-  revision = "d76508873757191ec9da527f3cfbdcd204781ad7"
-  version = "v0.8.7"
+  revision = "8d919b2b1c938cc3a99c769fd48e5b6597946dcb"
+  version = "v0.8.8"
 
 [[projects]]
   digest = "1:b6c7e84a5d49dcadb67ebf89c4338a4f4348bc404ac5beaf6868b9775700b2a4"
@@ -1425,6 +1426,7 @@
     "github.com/solo-io/go-utils/installutils",
     "github.com/solo-io/go-utils/installutils/helmchart",
     "github.com/solo-io/go-utils/installutils/kuberesource",
+    "github.com/solo-io/go-utils/manifesttestutils",
     "github.com/solo-io/go-utils/protoutils",
     "github.com/solo-io/go-utils/tarutils",
     "github.com/solo-io/solo-kit/pkg/api/v1/resources/core",

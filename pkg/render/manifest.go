@@ -1,7 +1,9 @@
 package render
 
 import (
+	"bytes"
 	"context"
+	"text/template"
 
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
@@ -24,21 +26,39 @@ var (
 	FailedToConvertManifestsError = func(err error) error {
 		return errors.Wrapf(err, "error converting manifests to raw resources")
 	}
+
+	FailedRenderValueTemplatesError = func(err error) error {
+		return errors.Wrapf(err, "error rendering input value templates")
+	}
 )
 
-type ValuesInputs struct {
-	Name               string `json:"name"`
-	InstallNamespace   string `json:"installNamespace"`
-	FlavorName         string `json:"flavorName"`
-	MeshRef            core.ResourceRef `json:"meshRef"`
-	SuperglooNamespace string `json:"superglooNamespace"`
+type SuperglooInfo struct {
+	Namespace          string
+	ServiceAccountName string
+	ClusterRoleName    string
+}
 
-	UserDefinedValues string `json:"name"`
-	FlavorParams      map[string]string `json:"flavorParams"`
-	SpecDefinedValues string `json:"specDefinedValues"`
+type ValuesInputs struct {
+	Name               string
+	InstallNamespace   string
+	FlavorName         string
+	MeshRef            core.ResourceRef
+	SuperglooNamespace string
+
+	UserDefinedValues string
+	FlavorParams      map[string]string
+	SpecDefinedValues string
+
+	// TODO: remove old value (SuperglooNamespace) after new ones have been wired on the marketplace side
+	Supergloo SuperglooInfo
 }
 
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
+	inputs, err := ExecInputValuesTemplates(inputs)
+	if err != nil {
+		return nil, FailedRenderValueTemplatesError(err)
+	}
+
 	manifests, err := GetManifestsFromApplicationSpec(ctx, inputs, spec)
 	if err != nil {
 		return nil, err
@@ -70,6 +90,7 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.String("values", inputs.SpecDefinedValues))
 		return "", err
 	}
+
 	paramValues, err := ConvertParamsToNestedMap(inputs.FlavorParams)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing install params",
@@ -77,6 +98,7 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.Any("params", inputs.FlavorParams))
 		return "", err
 	}
+
 	userValues, err := ConvertYamlStringToNestedMap(inputs.UserDefinedValues)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing user values yaml",
@@ -84,6 +106,7 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.Any("params", inputs.UserDefinedValues))
 		return "", err
 	}
+
 	valuesMap := CoalesceValuesMap(ctx, specValues, paramValues)
 	valuesMap = CoalesceValuesMap(ctx, valuesMap, userValues)
 	values, err := ConvertNestedMapToYaml(valuesMap)
@@ -213,4 +236,39 @@ func getManifestsFromArchive(ctx context.Context, spec *hubv1.VersionedApplicati
 		return nil, wrapped
 	}
 	return manifests, nil
+}
+
+// The SpecDefinedValues, UserDefinedValues, and FlavorParams inputs can contain template
+// actions (text delimited by "{{" and "}}" ). This function renders the contents of these
+// parameters using the data contained in 'input' and updates 'input' with the results.
+func ExecInputValuesTemplates(inputs ValuesInputs) (ValuesInputs, error) {
+
+	// Render the helm values string that comes from the extension spec
+	buf := new(bytes.Buffer)
+	tpl := template.Must(template.New("specValues").Parse(inputs.SpecDefinedValues))
+	if err := tpl.Execute(buf, inputs); err != nil {
+		return ValuesInputs{}, err
+	}
+	inputs.SpecDefinedValues = buf.String()
+	buf.Reset()
+
+	// Render the helm values string that comes from the user provided overrides
+	tpl = template.Must(template.New("userValues").Parse(inputs.UserDefinedValues))
+	if err := tpl.Execute(buf, inputs); err != nil {
+		return ValuesInputs{}, err
+	}
+	inputs.UserDefinedValues = buf.String()
+	buf.Reset()
+
+	// Render the values of the flavor parameters
+	for paramName, paramValue := range inputs.FlavorParams {
+		t := template.Must(template.New(paramName).Parse(paramValue))
+		if err := t.Execute(buf, inputs); err != nil {
+			return ValuesInputs{}, err
+		}
+		inputs.FlavorParams[paramName] = buf.String()
+		buf.Reset()
+	}
+
+	return inputs, nil
 }
