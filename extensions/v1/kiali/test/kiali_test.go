@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/solo-io/go-utils/manifesttestutils"
@@ -17,13 +18,12 @@ var _ = Describe("kiali", func() {
 		namespace = "istio-system"
 		name      = "kiali"
 		meshName  = "istio"
-
 	)
 
 	var (
 		spec       *v1.ApplicationSpec
 		versionMap map[string]*v1.VersionedApplicationSpec
-		labels     = map[string]string {
+		labels     = map[string]string{
 			"app": "kiali",
 		}
 	)
@@ -66,10 +66,10 @@ var _ = Describe("kiali", func() {
 
 		It("has a demo secret", func() {
 			rb := ResourceBuilder{
-				Name: name,
+				Name:      name,
 				Namespace: namespace,
-				Data: map[string]string {
-					"username": "admin",
+				Data: map[string]string{
+					"username":   "admin",
 					"passphrase": "admin",
 				},
 				Labels: labels,

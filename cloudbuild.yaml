@@ -1,13 +1,24 @@
 steps:
+# Can create a dep cache by running 'gcloud builds submit . --config=cloudbuild-cache.yaml'
+# These two steps should populate the cache
+- name: gcr.io/cloud-builders/gsutil
+  entrypoint: 'bash'
+  args: ['-c', 'mkdir -p ./gopath/pkg/dep && gsutil cat gs://solo-public-cache/service-mesh-hub/service-mesh-hub-gocache.tar.gz | tar -xzf -']
+  id: 'download-untar-dep-cache'
+  waitFor: ['check-spelling']
+
 # Run dep to set up the project so it can be built and tested
 # Dep modifies workspace so that the code is moved into the PROJECT_ROOT
 # All steps after this must set GOPATH
 - name: 'gcr.io/$PROJECT_ID/dep:0.1.8'
   args: ['ensure']
   env:
-  - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
-  - 'GIT_SSH_CONFIG=FALSE'
+  - 'PROJECT_ROOT=github.com/solo-io/sm-marketplace'
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
   id: 'dep'
+  waitFor: ['download-untar-dep-cache']
 
 - name: 'gcr.io/$PROJECT_ID/ginkgo:0.1.8'
   env:
@@ -23,3 +34,8 @@ secrets:
 - kmsKeyName: projects/gloo-ee/locations/global/keyRings/build/cryptoKeys/build-key
   secretEnv:
     GITHUB_TOKEN: CiQAwdWthrSJ1uI5Ao/LnmX8OzXmA5TNCtDpeV6JdNouaGh5vpwSUQD5SXFIkCBvnu/wYDSGwgWNJaQV75wP/kDephn5GGuGCe0EGFXXE54zyH8iHRL45Uq0s39SoHEyYoZXF2Qla8IbKGAKswPRViYSChPthQILdA==
+
+timeout: 3000s
+tags: ['service-mesh-hub']
+options:
+  machineType: 'N1_HIGHCPU_32'
