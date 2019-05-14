@@ -39,7 +39,7 @@
 
 [[override]]
   name = "sigs.k8s.io/kustomize"
-  branch = "loader-interface"
+  revision = "92897c7d33b87b00b516d3b13f4cf7b774f70677"
   source = "https://github.com/solo-io/kustomize.git"
 
 [[override]]
