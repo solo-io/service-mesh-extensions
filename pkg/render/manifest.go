@@ -26,6 +26,18 @@ var (
 	}
 )
 
+type SuperglooInfo struct {
+	Namespace          string
+	ServiceAccountName string
+	ClusterRoleName    string
+}
+
+type PrometheusInfo struct {
+	ServiceName      string
+	ServiceNamespace string
+	ServicePort      string
+}
+
 type ValuesInputs struct {
 	Name               string
 	InstallNamespace   string
@@ -36,6 +48,10 @@ type ValuesInputs struct {
 	UserDefinedValues string
 	FlavorParams      map[string]string
 	SpecDefinedValues string
+
+	// TODO: remove old values after new ones work
+	Supergloo  SuperglooInfo
+	Prometheus PrometheusInfo
 }
 
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {

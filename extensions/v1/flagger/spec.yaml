@@ -55,11 +55,12 @@ versions:
       description: |-
         The URL of the prometheus service that flagger will use to gather canary metrics.
       required: true
-      default: "http://prometheus:9090"
+      default: "http://{{ .Prometheus.ServiceName }}.{{ .Prometheus.ServiceNamespace }}:{{ .Prometheus.ServicePort }}"
     - name: meshProvider
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
+      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
       required: true
     - name: serviceAccount.name
       description: |-
@@ -83,11 +84,12 @@ versions:
       description: |-
         The URL of the prometheus service that flagger will use to gather canary metrics.
       required: true
-      default: "http://prometheus:9090"
+      default: "http://{{ .Prometheus.ServiceName }}.{{ .Prometheus.ServiceNamespace }}:{{ .Prometheus.ServicePort }}"
     - name: meshProvider
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
+      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
       required: true
     - name: serviceAccount.name
       description: |-
