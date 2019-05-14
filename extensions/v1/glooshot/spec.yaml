@@ -2,7 +2,7 @@ applicationCreator: Solo.io
 applicationMaintainer: Solo.io
 applicationProvider: Solo.io
 documentationUrl: https://www.glooshot.solo.io
-logoUrl: https://avatars0.githubusercontent.com/u/36001875?s=200&v=4
+logoUrl: https://s3.amazonaws.com/artifacts.solo.io/GlooShotLogo.png
 longDescription: |
   Glooshot allows you to run chaos engineering experiments in your service mesh.
 name: glooshot
