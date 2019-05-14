@@ -635,7 +635,8 @@
     "vfsutils",
   ]
   pruneopts = "UT"
-  revision = "cd60ef842e904cce089e2dca1073115da34d17b0"
+  revision = "8d919b2b1c938cc3a99c769fd48e5b6597946dcb"
+  version = "v0.8.8"
 
 [[projects]]
   digest = "1:b6c7e84a5d49dcadb67ebf89c4338a4f4348bc404ac5beaf6868b9775700b2a4"
