@@ -1,7 +1,7 @@
 applicationCreator: Solo.io
 applicationMaintainer: Solo.io
 applicationProvider: Solo.io
-documentationUrl: https://www.glooshot.solo.io/v4
+documentationUrl: https://www.glooshot.solo.io/v5
 logoUrl: https://s3.amazonaws.com/artifacts.solo.io/GlooShotLogo.png
 longDescription: |
   Glooshot allows you to run chaos engineering experiments in your service mesh.
@@ -11,7 +11,7 @@ shortDescription: |
   Glooshot allows you to run chaos engineering experiments in your service mesh.
 versions:
 - manifestsArchive:
-    uri: https://storage.cloud.google.com/glooshot-helm-test/charts/glooshot-helmtest6.tgz
+    uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz
   requiredLabels:
     app: glooshot
   valuesYaml: |
@@ -27,9 +27,9 @@ versions:
             versions:
               minVersion: "1.0.6"
               maxVersion: "1.0.6"
-  version: "0.0.2x"
+  version: "0.0.2"
 - manifestsArchive:
-    uri: https://storage.cloud.google.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz
+    uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest6.tgz
   requiredLabels:
     app: glooshot
   valuesYaml: |
@@ -37,7 +37,7 @@ versions:
       enabled: false
   datePublished: "2019-05-13T12:00:00Z"
   flavors:
-  - name: istio
+  - name: istiox
     description: "Install Glooshot to your Istio mesh"
     requirementSets:
     - meshRequirement:
@@ -45,4 +45,4 @@ versions:
         versions:
           minVersion: "1.0.6"
           maxVersion: "1.0.6"
-  version: "0.0.2"
+  version: "0.0.2x"
