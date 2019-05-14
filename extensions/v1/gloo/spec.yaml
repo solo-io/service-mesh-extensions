@@ -35,11 +35,9 @@ versions:
         overlayPath: supergloo
     requirementSets:
     - meshRequirement:
+        meshType: AWS_APP_MESH
+    - meshRequirement:
         meshType: ISTIO
-        versions:
-          minVersion: "1.0.0"
     - meshRequirement:
         meshType: LINKERD
-        versions:
-          minVersion: "2"
   version: "0.13.20"
