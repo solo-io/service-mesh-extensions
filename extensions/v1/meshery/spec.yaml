@@ -1,0 +1,32 @@
+applicationCreator: layer5io
+applicationMaintainer: layer5io
+applicationProvider: layer5io
+documentationUrl: https://layer5.io/meshery/
+logoUrl: https://camo.githubusercontent.com/cf4d39c1cb285c66948a865718bb90df4056b439/68747470733a2f2f6c61796572352e696f2f6173736574732f696d616765732f637562652d73682d736d616c6c2e706e67
+longDescription: |
+  Functionality
+  Service Mesh Playground
+
+  Multi-mesh Performance Benchmark
+  Meshery is intended to be a vendor and project-neutral utility for uniformly benchmarking the performance of service meshes. Between service mesh and proxy projects (and surprisingly, within a single project), a number of different tools and results exist.
+
+  Multi-mesh Functionalty Playground
+  A service mesh playground to faciliate learning about functionality of different service meshes. Meshery incorporates a visual interface for manipulating traffic routing rules. Sample applications will be included in Meshery.
+name: meshery
+repositoryUrl: https://github.com/layer5io/meshery
+shortDescription: |
+  A service mesh playground to faciliate learning about functionality and performance of different service meshes. Meshery incorporates the collection and display of metrics from applications running in the playground.
+versions:
+- manifestsArchive:
+    uri: https://storage.googleapis.com/sm-marketplace-registry/meshery-0.1.0.tar.gz
+  datePublished: "2019-05-13T15:04:06Z"
+  flavors:
+  - name: istio
+    description: "Install meshery to your Istio mesh"
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
+          minVersion: "1.0.0"
+          maxVersion: "1.0.7"
+  version: "0.1.0"
