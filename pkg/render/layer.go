@@ -77,11 +77,18 @@ func ApplyLayers(ctx context.Context, inputs ValuesInputs, installedFlavor *hubv
 
 func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 
+	// TODO: get rid of this and just use the ValuesInputs type
 	type manifestRenderValues struct {
-		MeshRef               core.ResourceRef
-		SuperglooNamespace    string
-		InstallationNamespace string
-		// Custom values come from the parameters set on a  flavor
+		Name               string
+		InstallNamespace   string
+		FlavorName         string
+		MeshRef            core.ResourceRef
+		SuperglooNamespace string
+
+		Supergloo  SuperglooInfo
+		Prometheus PrometheusInfo
+
+		// Custom values come from the parameters set on a flavor
 		Custom interface{}
 	}
 
@@ -91,9 +98,13 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 	}
 
 	return manifestRenderValues{
-		MeshRef:               inputs.MeshRef,
-		SuperglooNamespace:    inputs.SuperglooNamespace,
-		InstallationNamespace: inputs.InstallNamespace,
-		Custom:                customValues,
+		Name:               inputs.Name,
+		InstallNamespace:   inputs.InstallNamespace,
+		FlavorName:         inputs.FlavorName,
+		MeshRef:            inputs.MeshRef,
+		SuperglooNamespace: inputs.SuperglooNamespace,
+		Supergloo:          inputs.Supergloo,
+		Prometheus:         inputs.Prometheus,
+		Custom:             customValues,
 	}, nil
 }
