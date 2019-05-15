@@ -4,16 +4,7 @@ applicationProvider: Solo-io
 documentationUrl: https://gloo.solo.io/
 logoUrl: https://storage.googleapis.com/sm-marketplace-registry/gloo-no-text.svg.png
 longDescription: |
-  Features
-  Dynamic Load Balancing - Load balance traffic across multiple upstream services.
-  Health Checks - Active and passive monitoring of your upstream services.
-  SSL - Highly customizable options for adding SSL encryption to upstream services with full support for SNI.
-  Automated API Translation - Automatically transform client requests to upstream API calls using Gloo’s Function Discovery.
-  Failure Recovery - Gloo is completely stateless and will immediately return to the desired configuration at boot time.
-  Scalability - Gloo acts as a control plane for Envoy, allowing Envoy instances and Gloo instances to be scaled independently. Both Gloo and Envoy are stateless.
-  Performance - Gloo leverages Envoy for its high performance and low footprint.
-  JSON-to-gRPC transcoding - Connect JSON clients to gRPC services.
-  Istio, Linkerd and AppMesh supported
+  Gloo is a feature-rich, Kubernetes-native ingress controller, and next-generation API gateway. Gloo is exceptional in its function-level routing; its support for legacy apps, microservices and serverless; its discovery capabilities; its numerous features; and its tight integration with leading open-source projects. Gloo is uniquely designed to support hybrid applications, in which multiple technologies, architectures, protocols, and clouds can coexist.
 name: gloo
 repositoryUrl: https://github.com/solo-io/gloo
 shortDescription: |
