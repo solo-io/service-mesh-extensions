@@ -41,7 +41,7 @@ ensure consistency within a given API version, all of the application specs for 
 in it's corresponding extensions folder.
 
 To find out more about the structure of a mesh extension folder such as `gloo` or `flagger` above
-see our documentation [here]()
+see our documentation [here](api/v1/registry.proto)
 
 #### pkg
 
