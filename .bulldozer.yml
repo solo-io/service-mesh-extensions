@@ -1,0 +1,10 @@
+version: 1
+merge:
+  blacklist:
+    labels: ["do not merge", "wait for merge", "work in progress"]
+    comment_substrings: ["==DO_NOT_MERGE=="]
+  method: squash
+  options:
+    squash:
+      body: summarize_commits
+  delete_after_merge: false
