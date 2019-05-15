@@ -15,18 +15,15 @@ import (
 var _ = Describe("gloo extension test", func() {
 
 	const (
-		namespace = "gloo-system"
-		name      = "gloo"
+		superglooNamesapce = "sm-marketplace"
+		namespace          = "gloo-system"
+		name               = "gloo"
 	)
 
 	var (
 		spec       *v1.ApplicationSpec
 		versionMap map[string]*v1.VersionedApplicationSpec
-		labels     = map[string]string{
-			"app": name,
-		}
 	)
-
 
 	BeforeEach(func() {
 		spec = test.LoadExtensionSpec("../spec.yaml")
@@ -36,62 +33,60 @@ var _ = Describe("gloo extension test", func() {
 		}
 	})
 
-
-	Context("linkerd", func() {
-		const (
-			meshName  = "linkerd"
-		)
-	})
-
 	Context("istio", func() {
 		const (
-			meshName  = "istio"
+			meshName = "istio"
 		)
 
-		Context("0.13.26 with default values", func() {
-			var (
-				version      *v1.VersionedApplicationSpec
-				inputs       render.ValuesInputs
-				testManifest TestManifest
-			)
-
-			BeforeEach(func() {
-				version = versionMap["0.13.26"]
-				inputs = render.ValuesInputs{
-					Name:             name,
-					FlavorName:       meshName,
-					InstallNamespace: namespace,
+		var (
+			version      *v1.VersionedApplicationSpec
+			inputs       render.ValuesInputs
+			testManifest TestManifest
+			testInput = func(flavorName string) render.ValuesInputs {
+				return render.ValuesInputs{
+					Name:               name,
+					FlavorName:         flavorName,
+					InstallNamespace:   namespace,
+					SuperglooNamespace: superglooNamesapce,
 					MeshRef: core.ResourceRef{
 						Name:      meshName,
 						Namespace: namespace,
 					},
 					SpecDefinedValues: version.ValuesYaml,
 				}
+			}
+		)
+
+		Context("0.13.26 with supergloo overlay", func() {
+			BeforeEach(func() {
+				version = versionMap["0.13.26"]
+				inputs = testInput("supergloo")
 				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 				Expect(err).NotTo(HaveOccurred())
 				testManifest = NewTestManifestWithResources(rendered)
 			})
 
-			FIt("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(7))
+			It("has the correct number of resources", func() {
+				Expect(testManifest.NumResources()).To(Equal(16))
 			})
 
-			It("has a demo secret", func() {
-				rb := ResourceBuilder{
-					Name:      name,
-					Namespace: namespace,
-					Data: map[string]string{
-						"username":   "admin",
-						"passphrase": "admin",
-					},
-					Labels: labels,
-				}
-				testManifest.ExpectSecret(rb.GetSecret())
+			It("has a mesh ingress", func() {
+				testManifest.ExpectCustomResource("MeshIngress", superglooNamesapce, name)
+			})
+		})
+		Context("0.13.26 with vanilla overlay", func() {
+			BeforeEach(func() {
+				version = versionMap["0.13.26"]
+				inputs = testInput("vanilla")
+				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
+				Expect(err).NotTo(HaveOccurred())
+				testManifest = NewTestManifestWithResources(rendered)
+			})
+
+			It("has the correct number of resources", func() {
+				Expect(testManifest.NumResources()).To(Equal(15))
 			})
 		})
 	})
-
-
-
 
 })

@@ -20,7 +20,7 @@ shortDescription: |
   Gloo is a feature-rich, Kubernetes-native ingress controller, and next-generation API gateway.
 versions:
 - helmArchive:
-    uri: https://console.cloud.google.com/storage/browser/solo-public-helm
+    uri: https://storage.googleapis.com/solo-public-helm/charts/gloo-0.13.26.tgz
   datePublished: "2019-01-09T15:04:06Z"
   flavors:
   - name: vanilla

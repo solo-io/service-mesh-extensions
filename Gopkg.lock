@@ -626,7 +626,7 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:6c63722cdb556625385ee5fa660870d9dd212b61f78f2d1fc83bb4799d4a9cfb"
+  digest = "1:381cd6a6e4d7e0eea033720f9648d634ebf79ec8e24bdea06786a837271761f4"
   name = "github.com/solo-io/go-utils"
   packages = [
     "clicore",
@@ -645,8 +645,8 @@
     "vfsutils",
   ]
   pruneopts = "UT"
-  revision = "8d919b2b1c938cc3a99c769fd48e5b6597946dcb"
-  version = "v0.8.8"
+  revision = "cb0beeaaec5cf2c4293c41c78b7575d8648b6e1e"
+  version = "v0.8.9"
 
 [[projects]]
   digest = "1:b6c7e84a5d49dcadb67ebf89c4338a4f4348bc404ac5beaf6868b9775700b2a4"
@@ -1347,7 +1347,6 @@
   revision = "8fab8cb257d50c8cf94ec9771e74826edbb68fb5"
 
 [[projects]]
-  branch = "loader-interface"
   digest = "1:1fb309965ffdc014ee0cec62a331824eac65f0c7b8c03ddaccafa389ea422f28"
   name = "sigs.k8s.io/kustomize"
   packages = [
@@ -1433,6 +1432,7 @@
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
     "go.uber.org/zap",
+    "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
     "k8s.io/api/rbac/v1",
     "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured",

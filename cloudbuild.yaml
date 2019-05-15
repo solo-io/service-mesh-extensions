@@ -25,7 +25,7 @@ steps:
   - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
   - 'GOPATH=/workspace/gopath'
   dir: './gopath/src/github.com/solo-io/service-mesh-hub'
-  args: ['-r', '-failFast', '-race']
+  args: ['-r', '-p', '-failFast', '-race']
   secretEnv: ['GITHUB_TOKEN']
   waitFor: ['dep']
   id: 'test'
