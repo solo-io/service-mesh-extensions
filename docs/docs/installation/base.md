@@ -7,7 +7,7 @@ weight: 1
 The Service Mesh Hub is easy to install with `kubectl`.
 
 ```bash
-kubectl apply -f https://github.com/solo-io/service-mesh-hub/install/service-mesh-hub.yaml
+kubectl apply -f https://raw.githubusercontent.com/solo-io/service-mesh-hub/master/install/service-mesh-hub.yaml
 ```
 
 This will create the `sm-marketplace` namespace and install the necessary resources there.
