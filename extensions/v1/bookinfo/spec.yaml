@@ -1,0 +1,44 @@
+applicationCreator: Istio
+applicationMaintainer: Solo.io
+applicationProvider: Solo.io
+documentationUrl: https://www.glooshot.solo.io
+logoUrl: https://s3.amazonaws.com/artifacts.solo.io/GlooShotLogo.png
+longDescription: |
+  A simple book info app for testing out service mesh featurs.
+name: bookinfo
+repositoryUrl: github.com/solo-io/glooshot
+shortDescription: |
+  A simple book info app for testing out service mesh featurs.
+versions:
+- githubChart:
+    org: solo-io
+    repo: glooshot
+    ref: bookchart
+    directory: examples/bookinfo
+  datePublished: "2019-05-13T12:00:00Z"
+  flavors:
+    - name: chaos-demo
+      description: "Reviews:v4 is an example of an app that is vulnerable to cascading failure."
+      requirementSets:
+        - meshRequirement:
+            meshType: ISTIO
+            versions:
+              minVersion: "1.0.6"
+              maxVersion: "1.0.6"
+  version: "0.0.2"
+- githubChart:
+    org: solo-io
+    repo: supergloo
+    ref: 615bcdb08e8c0c9d29fbe06f2faa2f69d9c343b9
+    directory: examples/bookinfo
+  datePublished: "2019-05-01T12:00:00Z"
+  flavors:
+    - name: supergloo-demo
+      description: "Updated to support Supergloo tutorials."
+      requirementSets:
+        - meshRequirement:
+            meshType: ISTIO
+            versions:
+              minVersion: "1.0.6"
+              maxVersion: "1.0.6"
+  version: "0.0.1"
