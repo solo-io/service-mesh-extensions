@@ -8,9 +8,14 @@ longDescription: |
 
   A service mesh can now provide these services on a platform level and frees the application writers from those tasks. Routing decisions are done at the mesh level.
 
-  Kiali works with Istio to visualise the service mesh topology, features like circuit breakers or request rates.
+  Kiali works with Istio to visualize the service mesh topology, features like circuit breakers or request rates.
 
   Kiali also includes Jaeger Tracing to provide distributed tracing out of the box.
+
+  To try, run the following commands
+  * kubectl port-forward --namespace <install namespace> deployment/kiali 20001:20001
+  * open http://localhost:20001
+  * username - admin / password - admin
 name: kiali
 repositoryUrl: github.com/kiali/kiali
 shortDescription: |
