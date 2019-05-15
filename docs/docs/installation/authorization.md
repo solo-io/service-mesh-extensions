@@ -9,11 +9,11 @@ you may encounter rate limiting issues.
 
 You can resolve this by creating a Kubernetes secret with a valid Github token.
 
-## Get a Github token
+### Get a Github token
 
 If you do not already have a Github token, you can acquire one as described in the [Github docs](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line)
 
-## Create a Kubernetes secret
+### Create a Kubernetes secret
 
 With your token, run the following command to create a secret:
 ```bash
@@ -27,7 +27,7 @@ kubectl create secret generic github-token \
     --from-literal=token=<token-value>
 ```
 
-## Restart the Service Mesh Hub pods
+### Restart the Service Mesh Hub pods
 
 Now that you have created the necessary secret, you need to restart the Service Mesh Hub pods so they can
 use it.
