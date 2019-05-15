@@ -1,5 +1,5 @@
 ---
-title: Contributing to the service-mesh-hub
+title: Contributing to the Service Mesh Hub
 menuTitle: Contributing
 weight: 3
 ---
