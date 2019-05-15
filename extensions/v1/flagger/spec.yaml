@@ -50,6 +50,11 @@ versions:
         The URL of the prometheus service that flagger will use to gather canary metrics.
       required: true
       default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
+    - name: meshProvider
+      description: >
+        This value tells flagger which mesh type will be used to shift traffic between services.
+      default: "appmesh"
+      required: true
   - name: istio-supergloo
     description: "Install flagger to your Istio mesh with supergloo as mesh provider"
     customizationLayers:
