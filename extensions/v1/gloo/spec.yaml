@@ -22,9 +22,25 @@ versions:
 - helmArchive:
     uri: https://storage.googleapis.com/solo-public-helm/charts/gloo-0.13.26.tgz
   datePublished: "2019-01-09T15:04:06Z"
+  valuesYaml: |-
+    crds:
+      create: false
   flavors:
   - name: vanilla
     description: "Install gloo"
+    customizationLayers:
+    - kustomize:
+        github:
+          org: solo-io
+          repo: service-mesh-hub
+          ref: master
+          directory: extensions/v1/gloo/overlays
+        overlayPath: vanilla
+    parameters:
+    - name: crds.create
+      description: |-
+        Whether or not to create gloo crds.
+      default: "false"
   - name: supergloo
     description: "Install gloo as an ingress to your mesh using supergloo"
     customizationLayers:
@@ -35,4 +51,9 @@ versions:
           ref: master
           directory: extensions/v1/gloo/overlays
         overlayPath: supergloo
+    parameters:
+    - name: crds.create
+      description: |-
+        Whether or not to create gloo crds.
+      default: "false"
   version: "0.13.26"

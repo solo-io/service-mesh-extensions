@@ -1,0 +1,4 @@
+bases:
+  - ./../base
+generators:
+  - custom-resources.yaml

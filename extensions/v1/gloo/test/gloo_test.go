@@ -74,7 +74,7 @@ var _ = Describe("gloo extension test", func() {
 				testManifest.ExpectCustomResource("MeshIngress", superglooNamesapce, name)
 			})
 		})
-		Context("0.13.26 with vanilla overlay", func() {
+		FContext("0.13.26 with vanilla overlay", func() {
 			BeforeEach(func() {
 				version = versionMap["0.13.26"]
 				inputs = testInput("vanilla")
