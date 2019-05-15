@@ -626,7 +626,7 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:49a4eb875c89fb738eb69c43cdefe937405c52deba3435b6415563fe43461fed"
+  digest = "1:6c63722cdb556625385ee5fa660870d9dd212b61f78f2d1fc83bb4799d4a9cfb"
   name = "github.com/solo-io/go-utils"
   packages = [
     "clicore",
@@ -1434,6 +1434,7 @@
     "github.com/spf13/cobra",
     "go.uber.org/zap",
     "k8s.io/api/core/v1",
+    "k8s.io/api/rbac/v1",
     "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/util/yaml",

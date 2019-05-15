@@ -17,40 +17,73 @@ shortDescription: |
   Flagger is a Kubernetes operator that automates the promotion of canary deployments.
 versions:
 - githubChart:
-    org: weaverworks
+    org: weaveworks
     repo: flagger
     ref: "0.12.0"
     directory: charts/flagger
   datePublished: "2019-05-02T00:00:00Z"
+  valuesYaml: |-
+    serviceAccount:
+      name: flagger
   flavors:
   - name: istio
     description: "Install flagger to your Istio mesh"
-    customizationLayers:
-    - kustomize:
-        github:
-          org: solo-io
-          repo: service-mesh-hub
-          ref: master
-          directory: extensions/v1
-        overlayPath: overlays/istio
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
         versions:
           minVersion: "1.0.0"
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
   - name: appmesh
     description: "Install flagger to your AWS App Mesh"
+    requirementSets:
+    - meshRequirement:
+        meshType: AWS_APP_MESH
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
+    - name: meshProvider
+      description: >
+        This value tells flagger which mesh type will be used to shift traffic between services.
+      default: "appmesh"
+      required: true
+  - name: istio-supergloo
+    description: "Install flagger to your Istio mesh with supergloo as mesh provider"
     customizationLayers:
     - kustomize:
         github:
           org: solo-io
           repo: service-mesh-hub
           ref: master
-          directory: extensions/v1
-        overlayPath: overlays/app_mesh
+          directory: extensions/v1/flagger/kustomize
+        overlayPath: istio_supergloo
     requirementSets:
     - meshRequirement:
-        meshType: AWS_APP_MESH
+        meshType: ISTIO
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
+    - name: meshProvider
+      description: >
+        This value configures flagger to delegate the configuration of the selected mesh to supergloo.
+        Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
+      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+      required: true
+    - name: serviceAccount.name
+      description: |-
+        The name of the service account that will be created and assigned to flagger pods.
+      default: flagger
   - name: appmesh-supergloo
     description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
     customizationLayers:
@@ -59,9 +92,25 @@ versions:
           org: solo-io
           repo: service-mesh-hub
           ref: master
-          directory: extensions/v1
-        overlayPath: overlays/app_mesh_supergloo
+          directory: extensions/v1/flagger/kustomize
+        overlayPath: appmesh_supergloo
     requirementSets:
     - meshRequirement:
         meshType: AWS_APP_MESH
+    parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
+    - name: meshProvider
+      description: >
+        This value configures flagger to delegate the configuration of the selected mesh to supergloo.
+        Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
+      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+      required: true
+    - name: serviceAccount.name
+      description: |-
+        The name of the service account that will be created and assigned to flagger pods.
+      default: flagger
   version: "0.12.0"
