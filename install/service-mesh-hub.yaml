@@ -1,0 +1,589 @@
+---
+# Source: sm-marketplace/templates/0-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sm-marketplace
+  labels:
+    app: sm-marketplace
+  annotations:
+    "helm.sh/hook": pre-install
+---
+# Source: sm-marketplace/charts/supergloo/templates/4-sidecar-injector-configmap.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sidecar-injection-resources
+  namespace: sm-marketplace
+  labels:
+    app: supergloo
+    supergloo: sidecar-injection
+data:
+  secret.tpl: |-
+    
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: {{ .Name }}
+      namespace: {{ .Namespace }}
+      labels:
+        app: sidecar-injector
+    type: Opaque
+    data:
+      cert.pem: {{ .ServerCert }}
+      key.pem: {{ .ServerCertKey }}
+    
+  deployment.tpl: |-
+    
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    metadata:
+      name: {{ .Name }}
+      namespace: {{ .Namespace }}
+      labels:
+        app: sidecar-injector
+    spec:
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: sidecar-injector
+        spec:
+          serviceAccountName: supergloo
+          containers:
+            - name: sidecar-injector
+              image: {{ .Image.Name }}:{{ .Image.Tag }}
+              imagePullPolicy: {{ .Image.PullPolicy }}
+              env:
+                - name: TLS_CERT_PATH
+                  value: "/etc/webhook/cert.pem"
+                - name: TLS_KEY_PATH
+                  value: "/etc/webhook/key.pem"
+              volumeMounts:
+                - name: webhook-certs
+                  mountPath: /etc/webhook/
+                  readOnly: true
+          volumes:
+            - name: webhook-certs
+              secret:
+                secretName: {{ .Name }}
+    
+  service.tpl: |-
+    
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: {{ .Name }}
+      namespace: {{ .Namespace }}
+      labels:
+        app: sidecar-injector
+    spec:
+      ports:
+        - port: 443
+          targetPort: 443
+      selector:
+        app: sidecar-injector
+    
+  config-map.tpl: |-
+    
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: {{ .Name }}
+      namespace: {{ .Namespace }}
+      labels:
+        app: sidecar-injector
+    data:
+      aws-app-mesh-patch.yaml: |
+        {{`
+
+        containers:
+          - name: envoy
+            image: 111345817488.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-envoy:v1.8.0.2-beta
+            securityContext:
+              runAsUser: 1337
+            env:
+              - name: "APPMESH_VIRTUAL_NODE_NAME"
+                value: "mesh/{{- .MeshName -}}/virtualNode/{{- .VirtualNodeName -}}"
+              - name: "ENVOY_LOG_LEVEL"
+                value: "debug"
+              - name: "AWS_REGION"
+                value: "{{- .AwsRegion -}}"
+        initContainers:
+          - name: proxyinit
+            image: 111345817488.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-proxy-route-manager:latest
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+            env:
+              - name: "APPMESH_START_ENABLED"
+                value: "1"
+              - name: "APPMESH_IGNORE_UID"
+                value: "1337"
+              - name: "APPMESH_ENVOY_INGRESS_PORT"
+                value: "15000"
+              - name: "APPMESH_ENVOY_EGRESS_PORT"
+                value: "15001"
+              - name: "APPMESH_APP_PORTS"
+                value: "{{- .AppPort -}}"
+              - name: "APPMESH_EGRESS_IGNORED_IP"
+                value: "169.254.169.254"
+
+        `}}
+    
+  mutating-webhook-configuration.tpl: |-
+    
+    apiVersion: admissionregistration.k8s.io/v1beta1
+    kind: MutatingWebhookConfiguration
+    metadata:
+      name: {{ .Name }}
+      namespace: {{ .Namespace }}
+      labels:
+        app: sidecar-injector
+    webhooks:
+      - name: {{ .Name }}.{{ .Namespace }}.svc  # must be a domain with at least three segments separated by dots
+        clientConfig:
+          service:
+            name: {{ .Name }}
+            namespace: {{ .Namespace }}
+            path: "/pods/inject-sidecar"
+          caBundle: {{ .CaBundle }}
+        rules:
+          - operations: [ "CREATE" ]
+            apiGroups: [""]
+            apiVersions: ["v1"]
+            resources: ["pods"]
+    
+---
+# Source: sm-marketplace/templates/11-operator-configmap.yaml
+
+# configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: operator-config
+  namespace: sm-marketplace
+  labels:
+    app: sm-marketplace
+    sm-marketplace: operator
+data:
+  refreshRate: 1s
+---
+# Source: sm-marketplace/templates/5-apiserver-configmap.yaml
+# configmap
+# File must end with newline
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apiserver-config
+  namespace: sm-marketplace
+  labels:
+    app: sm-marketplace
+    sm-marketplace: apiserver
+data:
+  config.yaml: |
+    registries:
+    - name: default
+      github:
+        org: solo-io
+        repo: service-mesh-hub
+        ref: master
+        directory: extensions/v1
+
+---
+# Source: sm-marketplace/charts/supergloo/templates/0-serviceaccounts.yaml
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: supergloo
+  namespace: sm-marketplace
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: discovery
+  namespace: sm-marketplace
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: mesh-discovery
+  namespace: sm-marketplace
+---
+# Source: sm-marketplace/templates/12-operator-service-account.yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: sm-marketplace
+    sm-marketplace: operator
+  name: smm-operator
+  namespace: sm-marketplace
+---
+# Source: sm-marketplace/templates/4.5-apiserver-service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: sm-marketplace
+    sm-marketplace: apiserver
+  name: smm-apiserver
+  namespace: sm-marketplace
+---
+# Source: sm-marketplace/templates/100-sm-marketplace-crds.yaml
+
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: applicationstates.marketplace.solo.io
+  annotations:
+    "helm.sh/hook": crd-install
+  labels:
+    app: sm-marketplace
+spec:
+  group: marketplace.solo.io
+  names:
+    kind: ApplicationState
+    listKind: ApplicationStateList
+    plural: applicationstates
+    shortNames:
+    - appstate
+  scope: Namespaced
+  version: v1
+
+---
+# Source: sm-marketplace/charts/supergloo/templates/1-clusterrole.yaml
+
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: discovery
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "pods", "services", "secrets", "endpoints", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "create"]
+  - apiGroups: ["gloo.solo.io"]
+    resources: ["settings", "upstreams"]
+    verbs: ["*"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mesh-discovery
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "pods", "services", "secrets", "endpoints", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["authentication.istio.io"]
+    resources: ["meshpolicies"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "create"]
+  - apiGroups: ["supergloo.solo.io"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["gloo.solo.io"]
+    resources: ["settings", "upstreams"]
+    verbs: ["*"]
+
+---
+# Source: sm-marketplace/charts/supergloo/templates/2-clusterrole-binding.yaml
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: supergloo-role-binding
+subjects:
+- kind: ServiceAccount
+  name: supergloo
+  namespace: sm-marketplace
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: discovery-role-binding
+subjects:
+- kind: ServiceAccount
+  name: discovery
+  namespace: sm-marketplace
+roleRef:
+  kind: ClusterRole
+  name: discovery
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mesh-discovery-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: mesh-discovery
+    namespace: sm-marketplace
+roleRef:
+  kind: ClusterRole
+  name: mesh-discovery
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Source: sm-marketplace/templates/23-clusterrolebinding-sm-marketplace.yaml
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: smm-apiserver-role-binding
+  labels:
+    app: sm-marketplace
+    sm-marketplace: rbac
+subjects:
+- kind: ServiceAccount
+  name: smm-apiserver
+  namespace: sm-marketplace
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: sm-marketplace/templates/24-clusterrolebinding-sm-operator.yaml
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: smm-operator-role-binding
+  labels:
+    app: sm-marketplace
+    sm-marketplace: rbac
+subjects:
+- kind: ServiceAccount
+  name: smm-operator
+  namespace: sm-marketplace
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: sm-marketplace/templates/4-apiserver-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sm-marketplace
+    sm-marketplace: apiserver
+  name: smm-apiserver
+  namespace: sm-marketplace
+spec:
+  ports:
+  - name: static
+    port: 8080
+    protocol: TCP
+  selector:
+    app: sm-marketplace
+    sm-marketplace: apiserver
+  type: NodePort
+
+---
+# Source: sm-marketplace/charts/supergloo/templates/3-deployment.yaml
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: supergloo
+  namespace: sm-marketplace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      supergloo: supergloo
+  template:
+    metadata:
+      labels:
+        supergloo: supergloo
+        app: supergloo
+    spec:
+      serviceAccountName: supergloo
+      containers:
+        - image: "quay.io/solo-io/supergloo:0.3.20"
+          imagePullPolicy:  Always
+          name: supergloo
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: START_STATS_SERVER
+              value: "true"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: supergloo
+    supergloo: discovery
+  name: discovery
+  namespace: sm-marketplace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      supergloo: discovery
+  template:
+    metadata:
+      labels:
+        supergloo: discovery
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9091"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: discovery
+      containers:
+        - image: "quay.io/solo-io/discovery:0.13.21"
+          imagePullPolicy: Always
+          name: discovery
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: START_STATS_SERVER
+            value: "true"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mesh-discovery
+  namespace: sm-marketplace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      supergloo: supergloo
+  template:
+    metadata:
+      labels:
+        supergloo: supergloo
+        app: supergloo
+    spec:
+      serviceAccountName: mesh-discovery
+      containers:
+        - image: "quay.io/solo-io/mesh-discovery:0.3.20"
+          imagePullPolicy:  Always
+          name: mesh-discovery
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: START_STATS_SERVER
+              value: "true"
+
+---
+---
+# Source: sm-marketplace/templates/10-operator-deployment.yaml
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: sm-marketplace
+    sm-marketplace: operator
+  name: smm-operator
+  namespace: sm-marketplace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-marketplace
+      sm-marketplace: operator
+  template:
+    metadata:
+      labels:
+        app: sm-marketplace
+        sm-marketplace: operator
+    spec:
+      serviceAccountName: smm-operator
+      containers:
+      - image: "quay.io/solo-io/smm-operator:0.1.18"
+        imagePullPolicy: Always
+        name: smm-operator
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: github-token
+                key: token
+                optional: true
+---
+# Source: sm-marketplace/templates/3-apiserver-deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: sm-marketplace
+    sm-marketplace: apiserver
+  name: smm-apiserver
+  namespace: sm-marketplace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-marketplace
+      sm-marketplace: apiserver
+  template:
+    metadata:
+      labels:
+        app: sm-marketplace
+        sm-marketplace: apiserver
+    spec:
+      serviceAccountName: smm-apiserver
+      containers:
+      - image: "quay.io/solo-io/smm-apiserver:0.1.18"
+        imagePullPolicy: Always
+        name: smm-apiserver
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-token
+              key: token
+              optional: true
+        - name: GRPC_PORT
+          value: "10101"
+      - image: "quay.io/solo-io/smm-ui:0.1.18"
+        imagePullPolicy: Always
+        name: smm-ui
+      - image: "quay.io/solo-io/smm-envoy:0.1.18"
+        imagePullPolicy: Always
+        name: smm-envoy
+
+
+---
+# Source: sm-marketplace/templates/22-clusterrole-sm-marketplace.yaml
+
+---
+# Source: sm-marketplace/templates/30-ingress-sm-marketplace.yaml
+
