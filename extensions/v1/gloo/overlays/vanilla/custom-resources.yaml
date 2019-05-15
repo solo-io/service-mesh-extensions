@@ -1,0 +1,71 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: gateways.gateway.solo.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: gateway.solo.io
+  names:
+    kind: Gateway
+    listKind: GatewayList
+    plural: gateways
+    shortNames:
+    - gw
+    singular: gateway
+  scope: Namespaced
+  version: v1
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: virtualservices.gateway.solo.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: gateway.solo.io
+  names:
+    kind: VirtualService
+    listKind: VirtualServiceList
+    plural: virtualservices
+    shortNames:
+    - vs
+    singular: virtualservice
+  scope: Namespaced
+  version: v1
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: proxies.gloo.solo.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: gloo.solo.io
+  names:
+    kind: Proxy
+    listKind: ProxyList
+    plural: proxies
+    shortNames:
+    - px
+    singular: proxy
+  scope: Namespaced
+  version: v1
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: upstreamgroups.gloo.solo.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: gloo.solo.io
+  names:
+    kind: UpstreamGroup
+    listKind: UpstreamGroupList
+    plural: upstreamgroups
+    shortNames:
+    - ug
+    singular: upstreamgroup
+  scope: Namespaced
+  version: v1
