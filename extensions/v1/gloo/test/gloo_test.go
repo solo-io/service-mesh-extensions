@@ -67,7 +67,7 @@ var _ = Describe("gloo extension test", func() {
 			})
 
 			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(16))
+				Expect(testManifest.NumResources()).To(Equal(14))
 			})
 
 			It("has a mesh ingress", func() {
@@ -84,7 +84,7 @@ var _ = Describe("gloo extension test", func() {
 			})
 
 			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(15))
+				Expect(testManifest.NumResources()).To(Equal(13))
 			})
 		})
 	})
