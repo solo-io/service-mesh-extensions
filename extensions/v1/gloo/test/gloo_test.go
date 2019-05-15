@@ -67,14 +67,14 @@ var _ = Describe("gloo extension test", func() {
 			})
 
 			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(16))
+				Expect(testManifest.NumResources()).To(Equal(14))
 			})
 
 			It("has a mesh ingress", func() {
 				testManifest.ExpectCustomResource("MeshIngress", superglooNamesapce, name)
 			})
 		})
-		FContext("0.13.26 with vanilla overlay", func() {
+		Context("0.13.26 with vanilla overlay", func() {
 			BeforeEach(func() {
 				version = versionMap["0.13.26"]
 				inputs = testInput("vanilla")
@@ -84,7 +84,7 @@ var _ = Describe("gloo extension test", func() {
 			})
 
 			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(15))
+				Expect(testManifest.NumResources()).To(Equal(13))
 			})
 		})
 	})

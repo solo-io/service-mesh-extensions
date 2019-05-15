@@ -48,7 +48,7 @@ versions:
         github:
           org: solo-io
           repo: service-mesh-hub
-          ref: master
+          ref: gloo-extension
           directory: extensions/v1/gloo/overlays
         overlayPath: supergloo
     parameters:
