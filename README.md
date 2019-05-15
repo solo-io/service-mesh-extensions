@@ -35,7 +35,7 @@ The corresponding `.go` files contain generated go representations of the protob
 The extensions folder is the main extension registry and the service-mesh-hub. What this means is that
 by default the service-mesh-hub will use this folder to search for available/installable meshes.
 This folder is where developers will define their application specs which tell the service-mesh-hub
-operator how to install the application. For more information on this spec see [here](). The v1 in this case
+operator how to install the application. For more information on this spec see [here](api/v1/registry.proto). The v1 in this case
 corresponds to the version of the API. As the service-mesh-hub progresses the APIs may change, so to
 ensure consistency within a given API version, all of the application specs for that version will be kept
 in it's corresponding extensions folder.
