@@ -9,6 +9,7 @@ name: glooshot
 repositoryUrl: github.com/solo-io/glooshot
 shortDescription: |
   Glooshot allows you to run chaos engineering experiments in your service mesh.
+type: EXTENSION
 versions:
 - helmArchive:
     uri: https://storage.googleapis.com/glooshot-helm-test/charts/glooshot-helmtest7.tgz

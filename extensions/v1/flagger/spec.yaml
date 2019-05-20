@@ -15,6 +15,7 @@ name: flagger
 repositoryUrl: github.com/weaveworks/flagger
 shortDescription: |
   Flagger is a Kubernetes operator that automates the promotion of canary deployments.
+type: EXTENSION
 versions:
 - githubChart:
     org: weaveworks
