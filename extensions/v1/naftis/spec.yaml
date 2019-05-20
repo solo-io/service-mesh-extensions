@@ -16,6 +16,7 @@ name: naftis
 repositoryUrl: https://github.com/XiaoMi/naftis
 shortDescription: |
   Naftis is a web-based dashboard for Istio. It helps user manage their Istio tasks more easily. Using Naftis we can custom our own task templates, then build task from them and execute it.
+type: EXTENSION
 versions:
 - helmArchive:
     uri: https://github.com/XiaoMi/naftis/releases/download/0.1.4-rc6/manifest.tar.gz

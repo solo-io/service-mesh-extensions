@@ -20,6 +20,7 @@ name: kiali
 repositoryUrl: github.com/kiali/kiali
 shortDescription: |
   Kiali provides answers to the questions: What microservices are part of my Istio service mesh and how are they connected?
+type: EXTENSION
 versions:
 - githubChart:
     org: istio
