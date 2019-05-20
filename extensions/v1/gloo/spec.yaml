@@ -9,7 +9,6 @@ name: gloo
 repositoryUrl: https://github.com/solo-io/gloo
 shortDescription: |
   Gloo is a feature-rich, Kubernetes-native ingress controller, and next-generation API gateway.
-type: EXTENSION
 versions:
 - helmArchive:
     uri: https://storage.googleapis.com/solo-public-helm/charts/gloo-0.13.26.tgz

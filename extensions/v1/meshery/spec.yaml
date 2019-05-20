@@ -16,7 +16,6 @@ name: meshery
 repositoryUrl: https://github.com/layer5io/meshery
 shortDescription: |
   A service mesh playground to faciliate learning about functionality and performance of different service meshes. Meshery incorporates the collection and display of metrics from applications running in the playground.
-type: EXTENSION
 versions:
 - manifestsArchive:
     uri: https://storage.googleapis.com/sm-marketplace-registry/meshery-0.1.0.tar.gz
