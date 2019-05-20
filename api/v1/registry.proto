@@ -12,7 +12,6 @@ import "github.com/solo-io/solo-kit/api/v1/ref.proto";
 // application, and a list of versions. For each version, there is information about how to install the application
 // (for example, a Helm chart location), and the requirements for installation.
 message ApplicationSpec {
-    ApplicationType type = 1;
     string name = 2;
     string logo_url = 3;
     string short_description = 4;
@@ -130,11 +129,6 @@ message MeshRequirement {
     MeshType mesh_type = 1;
     // Range of allowed versions. If empty, any version is allowed.
     AllowedVersions versions = 2;
-}
-
-enum ApplicationType {
-    EXTENSION = 0;
-    DEMO = 1;
 }
 
 enum MeshType {
