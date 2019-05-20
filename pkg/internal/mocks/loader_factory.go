@@ -5,9 +5,8 @@
 package mocks
 
 import (
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 	ifc "sigs.k8s.io/kustomize/pkg/ifc"
 	resource "sigs.k8s.io/kustomize/pkg/resource"
 	transformers "sigs.k8s.io/kustomize/pkg/transformers"
