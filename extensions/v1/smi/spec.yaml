@@ -1,0 +1,20 @@
+applicationCreator: SMI
+logoUrl: https://storage.googleapis.com/sm-marketplace-registry/smi-icon.png
+longDescription: |
+  The Service Mesh Interface (SMI) is a specification for service meshes that run on Kubernetes. It defines a common standard that can be implemented by a variety of providers. This allows for both standardization for end-users and innovation by providers of Service Mesh Technology. It enables flexibility and interoperability.
+name: smi
+shortDescription: |
+  The Service Mesh Interface (SMI) is a specification for service meshes that run on Kubernetes. It defines a common standard that can be implemented by a variety of providers.
+versions:
+- manifestsArchive:
+    uri: https://storage.googleapis.com/sm-marketplace-registry/smi.tar.gz
+  flavors:
+  - name: istio
+    description: "Install smi to your istio mesh"
+    requirementSets:
+    - meshRequirement:
+        meshType: ISTIO
+        versions:
+          minVersion: "1.0.2"
+          maxVersion: "1.1.6"
+  version: "0.0.1"
