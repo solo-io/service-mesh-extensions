@@ -519,7 +519,7 @@ spec:
     spec:
       serviceAccountName: smm-operator
       containers:
-      - image: "quay.io/solo-io/smm-operator:0.1.22"
+      - image: "quay.io/solo-io/smm-operator:0.1.25"
         imagePullPolicy: Always
         name: smm-operator
         env:
@@ -557,7 +557,7 @@ spec:
     spec:
       serviceAccountName: smm-apiserver
       containers:
-      - image: "quay.io/solo-io/smm-apiserver:0.1.22"
+      - image: "quay.io/solo-io/smm-apiserver:0.1.25"
         imagePullPolicy: Always
         name: smm-apiserver
         env:
@@ -573,10 +573,10 @@ spec:
               optional: true
         - name: GRPC_PORT
           value: "10101"
-      - image: "quay.io/solo-io/smm-ui:0.1.22"
+      - image: "quay.io/solo-io/smm-ui:0.1.25"
         imagePullPolicy: Always
         name: smm-ui
-      - image: "quay.io/solo-io/smm-envoy:0.1.22"
+      - image: "quay.io/solo-io/smm-envoy:0.1.25"
         imagePullPolicy: Always
         name: smm-envoy
 
