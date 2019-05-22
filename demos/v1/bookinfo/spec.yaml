@@ -1,4 +1,5 @@
 applicationCreator: istio
+type: DEMO
 logoUrl: https://avatars3.githubusercontent.com/u/23534644?s=200&v=4
 longDescription: |
   The canonical testing application for istio.
