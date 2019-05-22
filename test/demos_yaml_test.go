@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/solo-io/service-mesh-hub/api/v1"
 	"io/ioutil"
 	"path/filepath"
 
@@ -28,6 +29,7 @@ var _ = Describe("Demos Yaml Test", func() {
 				specPath := filepath.Join(rootDir, demo.Name(), specYamlFilename)
 				spec := LoadApplicationSpec(specPath)
 				Expect(spec.Name).To(BeEquivalentTo(demo.Name()))
+				Expect(spec.Type).To(BeEquivalentTo(v1.ApplicationType_DEMO))
 			})
 		}
 	})
