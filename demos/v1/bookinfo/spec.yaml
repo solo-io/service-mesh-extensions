@@ -1,0 +1,14 @@
+applicationCreator: istio
+logoUrl: https://avatars3.githubusercontent.com/u/23534644?s=200&v=4
+longDescription: |
+  The canonical testing application for istio.
+name: bookinfo
+shortDescription: |
+  The canonical testing application for istio.
+versions:
+- manifestsArchive:
+    uri: https://storage.googleapis.com/sm-marketplace-registry/bookinfo.tar.gz
+  flavors:
+  - name: default
+    description: "Install bookinfo"
+  version: "1.13.0"
