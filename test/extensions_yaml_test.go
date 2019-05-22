@@ -26,7 +26,7 @@ var _ = Describe("Extensions Yaml Test", func() {
 			It(fmt.Sprintf("extensions/v1/%s/spec.yaml is valid", extension.Name()), func() {
 				Expect(extension.IsDir()).To(BeTrue())
 				specPath := filepath.Join(rootDir, extension.Name(), specYamlFilename)
-				spec := LoadExtensionSpec(specPath)
+				spec := LoadApplicationSpec(specPath)
 				Expect(spec.Name).To(BeEquivalentTo(extension.Name()))
 			})
 		}

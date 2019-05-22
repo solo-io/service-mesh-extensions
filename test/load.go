@@ -9,7 +9,7 @@ import (
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 )
 
-func LoadExtensionSpec(pathToSpec string) *v1.ApplicationSpec {
+func LoadApplicationSpec(pathToSpec string) *v1.ApplicationSpec {
 	bytes, err := ioutil.ReadFile(pathToSpec)
 	Expect(err).NotTo(HaveOccurred())
 	var spec v1.ApplicationSpec

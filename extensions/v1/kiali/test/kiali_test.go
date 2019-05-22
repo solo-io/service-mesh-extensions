@@ -30,7 +30,7 @@ var _ = Describe("kiali", func() {
 	)
 
 	BeforeEach(func() {
-		spec = test.LoadExtensionSpec("../spec.yaml")
+		spec = test.LoadApplicationSpec("../spec.yaml")
 		versionMap = make(map[string]*v1.VersionedApplicationSpec)
 		for _, version := range spec.Versions {
 			versionMap[version.Version] = version
