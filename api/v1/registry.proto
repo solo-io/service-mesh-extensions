@@ -16,6 +16,7 @@ message ApplicationSpec {
     string name = 2;
     string logo_url = 3;
     string short_description = 4;
+    // Note that long description will be overwritten by the content of description.md if provided.
     string long_description = 5;
     string documentation_url = 6;
     string repository_url = 7;
