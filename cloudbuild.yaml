@@ -45,9 +45,9 @@ steps:
   args: ['ensure']
   env:
   - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
+#  volumes:
+#  - name: 'ssh'
+#    path: /root/.ssh
   id: 'dep'
  # waitFor: ['download-untar-dep-cache', 'configure-git']
 
