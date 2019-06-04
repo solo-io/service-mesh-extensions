@@ -7,13 +7,11 @@ name: istio
 shortDescription: |
   Connect, secure, control, and observe services.
 versions:
-- manifestsArchive:
-    uri: https://storage.googleapis.com/sm-marketplace-registry/smi.tar.gz
+- version: "1.1.7"
   flavors:
   - name: istio
     description: "Install istio control plane to a namespace"
-  version: "1.1.7"
-- installationSteps:
+  installationSteps:
     steps:
     - githubChart:
         directory: install/kubernetes/helm/istio-init
