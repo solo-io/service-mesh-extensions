@@ -2,15 +2,16 @@ package loader
 
 import (
 	"context"
+	"path/filepath"
+
 	"github.com/ghodss/yaml"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/solo-io/go-utils/installutils"
 	"github.com/solo-io/go-utils/installutils/helmchart"
-	"github.com/solo-io/service-mesh-hub/pkg/internal/test"
 	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
+	"github.com/solo-io/service-mesh-hub/pkg/internal/test"
 	"github.com/spf13/afero"
-	"path/filepath"
 	"sigs.k8s.io/kustomize/pkg/types"
 )
 

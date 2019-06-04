@@ -2,14 +2,15 @@ package validate
 
 import (
 	"fmt"
+	"io/ioutil"
+
 	"github.com/pkg/errors"
 	"github.com/solo-io/go-utils/protoutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/options"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 	"sigs.k8s.io/yaml"
 )
 

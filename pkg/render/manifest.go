@@ -5,6 +5,8 @@ import (
 	"context"
 	"text/template"
 
+	"k8s.io/helm/pkg/manifest"
+
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
 	"github.com/solo-io/go-utils/contextutils"
@@ -119,21 +121,27 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 
 func GetManifestsFromApplicationSpec(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (helmchart.Manifests, error) {
 	var manifests helmchart.Manifests
-	switch spec.GetInstallationSpec().(type) {
+	switch installationSpec := spec.GetInstallationSpec().(type) {
 	case *hubv1.VersionedApplicationSpec_GithubChart:
-		githubManifests, err := getManifestsFromGithub(ctx, spec, inputs)
+		githubManifests, err := getManifestsFromGithub(ctx, installationSpec.GithubChart, inputs)
 		if err != nil {
 			return nil, err
 		}
 		manifests = githubManifests
 	case *hubv1.VersionedApplicationSpec_HelmArchive:
-		helmManifests, err := getManifestsFromHelm(ctx, spec, inputs)
+		helmManifests, err := getManifestsFromHelm(ctx, installationSpec.HelmArchive, inputs)
 		if err != nil {
 			return nil, err
 		}
 		manifests = helmManifests
 	case *hubv1.VersionedApplicationSpec_ManifestsArchive:
-		archiveManifests, err := getManifestsFromArchive(ctx, spec, inputs)
+		archiveManifests, err := getManifestsFromArchive(ctx, installationSpec.ManifestsArchive, inputs)
+		if err != nil {
+			return nil, err
+		}
+		manifests = archiveManifests
+	case *hubv1.VersionedApplicationSpec_InstallationSteps:
+		archiveManifests, err := getManifestsFromSteps(ctx, installationSpec.InstallationSteps, inputs)
 		if err != nil {
 			return nil, err
 		}
@@ -165,8 +173,7 @@ func FilterByLabel(ctx context.Context, spec *hubv1.VersionedApplicationSpec, re
 	return resources
 }
 
-func getManifestsFromHelm(ctx context.Context, spec *hubv1.VersionedApplicationSpec, inputs ValuesInputs) (helmchart.Manifests, error) {
-	helmInstallSpec := spec.GetHelmArchive()
+func getManifestsFromHelm(ctx context.Context, helmInstallSpec *hubv1.TgzLocation, inputs ValuesInputs) (helmchart.Manifests, error) {
 	values, err := ComputeValueOverrides(ctx, inputs)
 	if err != nil {
 		return nil, err
@@ -192,8 +199,7 @@ func getManifestsFromHelm(ctx context.Context, spec *hubv1.VersionedApplicationS
 	return manifests, nil
 }
 
-func getManifestsFromGithub(ctx context.Context, spec *hubv1.VersionedApplicationSpec, inputs ValuesInputs) (helmchart.Manifests, error) {
-	githubInstallSpec := spec.GetGithubChart()
+func getManifestsFromGithub(ctx context.Context, githubInstallSpec *hubv1.GithubRepositoryLocation, inputs ValuesInputs) (helmchart.Manifests, error) {
 	ref := helmchart.GithubChartRef{
 		Owner:          githubInstallSpec.Org,
 		Repo:           githubInstallSpec.Repo,
@@ -223,8 +229,7 @@ func getManifestsFromGithub(ctx context.Context, spec *hubv1.VersionedApplicatio
 	return manifests, nil
 }
 
-func getManifestsFromArchive(ctx context.Context, spec *hubv1.VersionedApplicationSpec, inputs ValuesInputs) (helmchart.Manifests, error) {
-	manifestsArchive := spec.GetManifestsArchive()
+func getManifestsFromArchive(ctx context.Context, manifestsArchive *hubv1.TgzLocation, inputs ValuesInputs) (helmchart.Manifests, error) {
 	manifests, err := installutils.GetManifestsFromRemoteTar(manifestsArchive.GetUri())
 	if err != nil {
 		wrapped := FailedToRenderManifestsError(err)
@@ -235,6 +240,80 @@ func getManifestsFromArchive(ctx context.Context, spec *hubv1.VersionedApplicati
 			zap.String("namespace", inputs.InstallNamespace))
 		return nil, wrapped
 	}
+	return manifests, nil
+}
+
+const InstallationStepLabel = "service-mesh-hub.solo.io/installation_step"
+
+func getManifestsFromSteps(ctx context.Context, steps *hubv1.InstallationSteps, inputs ValuesInputs) (helmchart.Manifests, error) {
+	if len(steps.Steps) == 0 {
+		return nil, errors.Errorf("must provide at least one installation step")
+	}
+	var combinedManifests []manifest.Manifest
+	var uniqueStepNames []string
+	for _, step := range steps.Steps {
+		if step.Name == "" {
+			return nil, errors.Errorf("step must be named")
+		}
+		for _, name := range uniqueStepNames {
+			if step.Name == name {
+				return nil, errors.Errorf("step names must be unique; %v dupliated", name)
+			}
+		}
+		uniqueStepNames = append(uniqueStepNames, step.Name)
+
+		manifests, err := getManifestsFromInstallationStep(ctx, inputs, step)
+		if err != nil {
+			return nil, err
+		}
+		resources, err := manifests.ResourceList()
+		if err != nil {
+			return nil, err
+		}
+		for _, resource := range resources {
+			labels := resource.GetLabels()
+			if labels == nil {
+				labels = make(map[string]string)
+			}
+			labels[InstallationStepLabel] = step.Name
+			resource.SetLabels(labels)
+		}
+
+		manifests, err := helmchart.ManifestsFromResources(resources)
+		if err != nil {
+			return nil, err
+		}
+
+		combinedManifests = append(combinedManifests, manifests...)
+	}
+	return combinedManifests, nil
+}
+
+func getManifestsFromInstallationStep(ctx context.Context, inputs ValuesInputs, step *hubv1.InstallationSteps_Step) (helmchart.Manifests, error) {
+	var manifests helmchart.Manifests
+	switch installationSpec := step.Step.(type) {
+	case *hubv1.InstallationSteps_Step_GithubChart:
+		githubManifests, err := getManifestsFromGithub(ctx, installationSpec.GithubChart, inputs)
+		if err != nil {
+			return nil, err
+		}
+		manifests = githubManifests
+	case *hubv1.InstallationSteps_Step_HelmArchive:
+		helmManifests, err := getManifestsFromHelm(ctx, installationSpec.HelmArchive, inputs)
+		if err != nil {
+			return nil, err
+		}
+		manifests = helmManifests
+	case *hubv1.InstallationSteps_Step_ManifestsArchive:
+		archiveManifests, err := getManifestsFromArchive(ctx, installationSpec.ManifestsArchive, inputs)
+		if err != nil {
+			return nil, err
+		}
+		manifests = archiveManifests
+	default:
+		return nil, MissingInstallSpecError
+	}
+
 	return manifests, nil
 }
 

@@ -5,10 +5,11 @@
 package mocks
 
 import (
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	helmchart "github.com/solo-io/go-utils/installutils/helmchart"
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
-	reflect "reflect"
 )
 
 // MockLoader is a mock of Loader interface

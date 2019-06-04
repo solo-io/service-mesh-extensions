@@ -63,6 +63,10 @@ message VersionedApplicationSpec {
 // for use when an installation spec contains multiple steps
 message InstallationSteps {
     message Step {
+        // name of the installation step
+        // each step must be uniquely named
+        string name = 4;
+
         oneof step {
             // A github directory containing a helm chart
             GithubRepositoryLocation github_chart = 1;
