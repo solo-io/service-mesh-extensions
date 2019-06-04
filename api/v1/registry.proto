@@ -45,6 +45,8 @@ message VersionedApplicationSpec {
         TgzLocation helm_archive = 14;
         // A location of a tgz containing one or more yaml manifests
         TgzLocation manifests_archive = 15;
+        // a series of installation manifests or charts
+        InstallationSteps installation_steps = 16;
     }
 
     // Optional default values yaml; if none provided, chart default will be used
@@ -56,6 +58,23 @@ message VersionedApplicationSpec {
 
     // Mesh-specific modifications to the extension installation manifest.
     repeated Flavor flavors = 40;
+}
+
+// for use when an installation spec contains multiple steps
+message InstallationSteps {
+    message Step {
+        oneof step {
+            // A github directory containing a helm chart
+            GithubRepositoryLocation github_chart = 1;
+            // A location of a tgz containing a helm chart
+            TgzLocation helm_archive = 2;
+            // A location of a tgz containing one or more yaml manifests
+            TgzLocation manifests_archive = 3;
+        }
+    }
+
+    // an ordered list of installation steps
+    repeated Step steps = 1;
 }
 
 // A flavor represents a particular variant of an extension.
