@@ -257,7 +257,7 @@ func getManifestsFromSteps(ctx context.Context, steps *hubv1.InstallationSteps, 
 		}
 		for _, name := range uniqueStepNames {
 			if step.Name == name {
-				return nil, errors.Errorf("step names must be unique; %v dupliated", name)
+				return nil, errors.Errorf("step names must be unique; %v duplicated", name)
 			}
 		}
 		uniqueStepNames = append(uniqueStepNames, step.Name)
@@ -266,6 +266,7 @@ func getManifestsFromSteps(ctx context.Context, steps *hubv1.InstallationSteps, 
 		if err != nil {
 			return nil, err
 		}
+		// add labels for step to every resource in the manifests
 		resources, err := manifests.ResourceList()
 		if err != nil {
 			return nil, err
@@ -279,7 +280,7 @@ func getManifestsFromSteps(ctx context.Context, steps *hubv1.InstallationSteps, 
 			resource.SetLabels(labels)
 		}
 
-		manifests, err := helmchart.ManifestsFromResources(resources)
+		manifests, err = helmchart.ManifestsFromResources(resources)
 		if err != nil {
 			return nil, err
 		}
