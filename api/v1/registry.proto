@@ -154,6 +154,7 @@ message MeshRequirement {
 enum ApplicationType {
     EXTENSION = 0;
     DEMO = 1;
+    MESH = 2;
 }
 
 enum MeshType {
