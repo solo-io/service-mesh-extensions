@@ -626,7 +626,7 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:1bacd63c2d6bbbbd4c96846262357dd3090dbcb841015fe91886094508a84fbb"
+  digest = "1:bab5dbe8bed302a7916471fe5460d5f477e4a2a438584e3ce2b77629a981f1a5"
   name = "github.com/solo-io/go-utils"
   packages = [
     "clicore",
@@ -645,8 +645,8 @@
     "vfsutils",
   ]
   pruneopts = "UT"
-  revision = "fb63c1bde288b73ef7368bdfd570e4177c12674e"
-  version = "v0.8.19"
+  revision = "7bce93b3ce1d25c598225bbf9d5878f0aa98bd5c"
+  version = "v0.8.20"
 
 [[projects]]
   digest = "1:b6c7e84a5d49dcadb67ebf89c4338a4f4348bc404ac5beaf6868b9775700b2a4"
