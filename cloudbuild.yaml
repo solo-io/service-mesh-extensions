@@ -1,41 +1,9 @@
 steps:
-# Setup SSH
-# These are required before dep
-- name: gcr.io/cloud-builders/gcloud
-  args:
-  - kms
-  - decrypt
-  - --ciphertext-file=ci/id_rsa.enc
-  - --plaintext-file=/root/.ssh/id_rsa
-  - --location=global
-  - --keyring=build
-  - --key=build-key
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
-  id: 'get-ssh-key'
-- name: 'gcr.io/cloud-builders/git'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    chmod 600 /root/.ssh/id_rsa
-    cat <<EOF >/root/.ssh/config
-    Hostname github.com
-    IdentityFile /root/.ssh/id_rsa
-    EOF
-    mv ./ci/github_known_hosts /root/.ssh/known_hosts
-    git config --global url."ssh://git@github.com/solo-io".insteadOf https://github.com/solo-io
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
-  id: 'configure-git'
-
 # Can create a dep cache by running 'gcloud builds submit . --config=cloudbuild-cache.yaml'
 # These two steps should populate the cache
 - name: gcr.io/cloud-builders/gsutil
   entrypoint: 'bash'
-  args: ['-c', 'mkdir -p ./gopath/pkg/dep && gsutil cat gs://gloo-ee-cache/service-mesh-hub/service-mesh-hub-dep.tar.gz | tar -xzf -']
+  args: ['-c', 'mkdir -p ./gopath/pkg/dep && gsutil cat gs://solo-public-cache/service-mesh-hub/service-mesh-hub-dep.tar.gz | tar -xzf -']
   id: 'download-untar-dep-cache'
 
 # Run dep to set up the project so it can be built and tested
@@ -45,11 +13,8 @@ steps:
   args: ['ensure']
   env:
   - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
   id: 'dep'
-  waitFor: ['download-untar-dep-cache', 'configure-git']
+  waitFor: ['download-untar-dep-cache']
 
 - name: 'gcr.io/$PROJECT_ID/ginkgo:0.1.8'
   env:
@@ -62,9 +27,9 @@ steps:
   id: 'test'
 
 secrets:
-- kmsKeyName: projects/gloo-ee/locations/global/keyRings/build/cryptoKeys/build-key
+- kmsKeyName: projects/solo-public/locations/global/keyRings/build/cryptoKeys/build-key
   secretEnv:
-    GITHUB_TOKEN: CiQAwdWthrSJ1uI5Ao/LnmX8OzXmA5TNCtDpeV6JdNouaGh5vpwSUQD5SXFIkCBvnu/wYDSGwgWNJaQV75wP/kDephn5GGuGCe0EGFXXE54zyH8iHRL45Uq0s39SoHEyYoZXF2Qla8IbKGAKswPRViYSChPthQILdA==
+    GITHUB_TOKEN: CiQABlzmSYYiveU0gTxGH2139eaBUedjV3vNCxQmJU+nRPlfQ/YSUQCCPGSGzbGp49fwDYuefAx9V94b8mivdp9AqB7zQAa07VtGJmrGdg9ZuhKGFrrgqxwABE0LLVNHyngCSHYSYMH8Vn/mRtT7wQuEHBlKVGtqPw==
 
 timeout: 3000s
 tags: ['service-mesh-hub']
