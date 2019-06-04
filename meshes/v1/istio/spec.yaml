@@ -18,8 +18,10 @@ versions:
         org: istio
         ref: 1.1.7
         repo: istio
+      name: istio-init
     - githubChart:
         directory: install/kubernetes/helm/istio
         org: istio
         ref: 1.1.7
         repo: istio
+      name: istio
