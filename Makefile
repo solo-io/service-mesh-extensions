@@ -6,6 +6,7 @@ generated-code:
 .PHONY: update-deps
 update-deps:
 	go get github.com/golang/mock/gomock
+	go get github.com/golang/mock/mockgen # fix vendoring problem also surfaced here: https://github.com/openshift/openshift-azure/issues/1582
 	go install github.com/golang/mock/mockgen
 	go get -u github.com/gogo/protobuf/gogoproto
 	go get -u github.com/gogo/protobuf/protoc-gen-gogo
