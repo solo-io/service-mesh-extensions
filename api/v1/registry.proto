@@ -54,13 +54,18 @@ message VersionedApplicationSpec {
 
     // Optional filter on the resources that should be considered part of the install, to handle cases
     // where a single chart can be used to deploy many applications (i.e. Istio chart deploys Kiali)
-    map<string, string> required_labels = 31;
+    map<stri¡ng, string> required_labels = 31;
 
     // Mesh-specific modifications to the extension installation manifest.
     repeated Flavor flavors = 40;
 }
 
-// for use when an installation spec contains multiple steps
+// InstallationSteps specify an installation procedure for Applications composed of multiple manifests.
+// It may be desirable or necessary for an Application to be installed in stages, e.g. to run a pre-installation
+// job or container before deploying other components.
+// Resources will be applied to the Kubernetes cluster in the order they appear in the installation steps.
+// Resources created from each step will be labeled with the step from which they were created.
+// Finally, after each step is applied, any resources created by Flavor customizations will be created last.
 message InstallationSteps {
     message Step {
         // name of the installation step
