@@ -5,14 +5,11 @@ generated-code:
 
 .PHONY: update-deps
 update-deps:
+	go get github.com/golang/mock/gomock
+	go install github.com/golang/mock/mockgen
 	go get -u github.com/gogo/protobuf/gogoproto
 	go get -u github.com/gogo/protobuf/protoc-gen-gogo
 	go get -u github.com/solo-io/solo-kit
-
-.PHONY: install-mockgen
-install-mockgen:
-	go get github.com/golang/mock/gomock
-	go install github.com/golang/mock/mockgen
 
 #----------------------------------------------------------------------------------
 # Docs
