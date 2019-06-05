@@ -466,7 +466,12 @@ func _VersionedApplicationSpec_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-// for use when an installation spec contains multiple steps
+// InstallationSteps specify an installation procedure for Applications composed of multiple manifests.
+// It may be desirable or necessary for an Application to be installed in stages, e.g. to run a pre-installation
+// job or container before deploying other components.
+// Resources will be applied to the Kubernetes cluster in the order they appear in the installation steps.
+// Resources created from each step will be labeled with the step from which they were created.
+// Finally, after each step is applied, any resources created by Flavor customizations will be created last.
 type InstallationSteps struct {
 	// an ordered list of installation steps
 	Steps                []*InstallationSteps_Step `protobuf:"bytes,1,rep,name=steps,proto3" json:"steps,omitempty"`

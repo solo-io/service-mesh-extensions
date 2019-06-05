@@ -54,7 +54,7 @@ message VersionedApplicationSpec {
 
     // Optional filter on the resources that should be considered part of the install, to handle cases
     // where a single chart can be used to deploy many applications (i.e. Istio chart deploys Kiali)
-    map<stri¡ng, string> required_labels = 31;
+    map<string, string> required_labels = 31;
 
     // Mesh-specific modifications to the extension installation manifest.
     repeated Flavor flavors = 40;
