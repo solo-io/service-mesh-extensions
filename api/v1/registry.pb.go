@@ -86,10 +86,11 @@ func (MeshType) EnumDescriptor() ([]byte, []int) {
 // application, and a list of versions. For each version, there is information about how to install the application
 // (for example, a Helm chart location), and the requirements for installation.
 type ApplicationSpec struct {
-	Type                  ApplicationType             `protobuf:"varint,1,opt,name=type,proto3,enum=hub.solo.io.ApplicationType" json:"type,omitempty"`
-	Name                  string                      `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	LogoUrl               string                      `protobuf:"bytes,3,opt,name=logo_url,json=logoUrl,proto3" json:"logo_url,omitempty"`
-	ShortDescription      string                      `protobuf:"bytes,4,opt,name=short_description,json=shortDescription,proto3" json:"short_description,omitempty"`
+	Type             ApplicationType `protobuf:"varint,1,opt,name=type,proto3,enum=hub.solo.io.ApplicationType" json:"type,omitempty"`
+	Name             string          `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	LogoUrl          string          `protobuf:"bytes,3,opt,name=logo_url,json=logoUrl,proto3" json:"logo_url,omitempty"`
+	ShortDescription string          `protobuf:"bytes,4,opt,name=short_description,json=shortDescription,proto3" json:"short_description,omitempty"`
+	// Note that long description will be overwritten by the content of description.md if provided.
 	LongDescription       string                      `protobuf:"bytes,5,opt,name=long_description,json=longDescription,proto3" json:"long_description,omitempty"`
 	DocumentationUrl      string                      `protobuf:"bytes,6,opt,name=documentation_url,json=documentationUrl,proto3" json:"documentation_url,omitempty"`
 	RepositoryUrl         string                      `protobuf:"bytes,7,opt,name=repository_url,json=repositoryUrl,proto3" json:"repository_url,omitempty"`

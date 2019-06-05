@@ -5,9 +5,8 @@
 package mocks
 
 import (
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 	resmap "sigs.k8s.io/kustomize/pkg/resmap"
 )
 

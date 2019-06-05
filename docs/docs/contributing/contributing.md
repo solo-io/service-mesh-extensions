@@ -17,6 +17,7 @@ this doc will explain in slightly more detail the structure of an individual ext
 
 ```
 gloo
+├── description.md
 ├── overlays
 │   ├── supergloo
 │   │   ├── kustomization.yaml
@@ -30,7 +31,9 @@ gloo
     └── gloo_test.go
 ```
 
-Above is the structure of the v1 Gloo extension. There are three main sections to an extension.
+Above is the structure of the v1 Gloo extension. There are four main sections to an extension.
+1) description.md
+    * the long description of an extension, rendered on the extension's install page
 1) overlays
 	* kustomization style yaml which can be applied to an extension manifest after it has been rendered
 2) spec.yaml
@@ -38,7 +41,7 @@ Above is the structure of the v1 Gloo extension. There are three main sections t
 3) test
 	* unit tests to check the correctness of a given application spec.
 
-For more detailed information on the first 2 categories please see [here](../extensions).
+For more detailed information on overlays and spec.yaml please see [here](../extensions).
 
 ##### Testing
 For testing we use the go testing library `ginkgo`. The application spec tests are unit style tests, so they are
