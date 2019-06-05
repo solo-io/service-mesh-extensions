@@ -2,14 +2,15 @@ package validate
 
 import (
 	"fmt"
+	"io/ioutil"
+
 	"github.com/pkg/errors"
 	"github.com/solo-io/go-utils/protoutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/options"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 	"sigs.k8s.io/yaml"
 )
 
@@ -22,8 +23,11 @@ func Cmd(o *options.Options) *cobra.Command {
 		},
 	}
 	pflags := cmd.PersistentFlags()
-	pflags.StringVar(&o.Validate.ExtensionName, "name", options.ValidateDefaults.ExtensionName,
-		"name of the extension that will be validated")
+	pflags.StringVar(&o.Validate.ApplicationType, "type", options.ValidateDefaults.ApplicationName,
+		fmt.Sprintf("type of the application that will be validated. Available: %v, %v, %v",
+			v1.ApplicationType_EXTENSION.String(), v1.ApplicationType_DEMO.String(), v1.ApplicationType_MESH.String()))
+	pflags.StringVar(&o.Validate.ApplicationName, "name", options.ValidateDefaults.ApplicationName,
+		"name of the application that will be validated")
 	pflags.StringVar(&o.Validate.Version, "version", options.ValidateDefaults.Version,
 		"specification version to be validated")
 	pflags.StringVar(&o.Validate.Flavor, "flavor", options.ValidateDefaults.Flavor,
@@ -39,15 +43,28 @@ func Cmd(o *options.Options) *cobra.Command {
 	return cmd
 }
 
+// map the manifest type to the directory
+var directoryNamaes = map[string]string{
+	v1.ApplicationType_EXTENSION.String(): "extensions",
+	v1.ApplicationType_DEMO.String():      "demos",
+	v1.ApplicationType_MESH.String():      "meshes",
+}
+
 func validate(o *options.Options) error {
 
-	if o.Validate.ExtensionName == "" {
+	if o.Validate.ApplicationName == "" {
 		return fmt.Errorf("no extension name specified")
+	}
+	appDir, ok := directoryNamaes[o.Validate.ApplicationType]
+	if !ok {
+		return fmt.Errorf("must provide a valid application type with --type; available options: "+
+			"%v, %v, %v", v1.ApplicationType_EXTENSION.String(), v1.ApplicationType_DEMO.String(), v1.ApplicationType_MESH.String())
 	}
 	if o.Validate.Flavor == "" {
 		return fmt.Errorf("no flavor specified")
 	}
-	specFilepath := fmt.Sprintf("./extensions/v1/%v/spec.yaml", o.Validate.ExtensionName)
+
+	specFilepath := fmt.Sprintf("./%v/v1/%v/spec.yaml", appDir, o.Validate.ApplicationName)
 	spec, err := LoadExtensionSpec(specFilepath)
 	if err != nil {
 		return err
@@ -57,7 +74,7 @@ func validate(o *options.Options) error {
 		return err
 	}
 	inputValues := render.ValuesInputs{
-		Name:             o.Validate.ExtensionName,
+		Name:             o.Validate.ApplicationName,
 		FlavorName:       o.Validate.Flavor,
 		InstallNamespace: o.Validate.InstallNamespace,
 		MeshRef: core.ResourceRef{
