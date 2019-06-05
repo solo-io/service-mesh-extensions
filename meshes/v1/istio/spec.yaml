@@ -1,0 +1,27 @@
+applicationCreator: Istio
+type: MESH
+logoUrl: https://avatars3.githubusercontent.com/u/23534644?s=200&v=4
+longDescription: |
+  Istio makes it easy to create a network of deployed services with load balancing, service-to-service authentication, monitoring, and more, with few or no code changes in service code. You add Istio support to services by deploying a special sidecar proxy throughout your environment that intercepts all network communication between microservices, then configure and manage Istio using its control plane functionality.
+name: istio
+shortDescription: |
+  Connect, secure, control, and observe services.
+versions:
+- version: "1.1.7"
+  flavors:
+  - name: vanilla
+    description: "Install istio control plane to a namespace"
+  installationSteps:
+    steps:
+    - githubChart:
+        directory: install/kubernetes/helm/istio-init
+        org: istio
+        ref: 1.1.7
+        repo: istio
+      name: istio-init
+    - githubChart:
+        directory: install/kubernetes/helm/istio
+        org: istio
+        ref: 1.1.7
+        repo: istio
+      name: istio

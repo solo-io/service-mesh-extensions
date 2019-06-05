@@ -1,6 +1,10 @@
 package options
 
-import "context"
+import (
+	"context"
+
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
+)
 
 type Options struct {
 	Ctx      context.Context
@@ -9,7 +13,8 @@ type Options struct {
 
 type Validate struct {
 	ManifestFilepath string
-	ExtensionName    string
+	ApplicationName  string
+	ApplicationType  string
 	Version          string
 	Flavor           string
 	PrintManifest    bool
@@ -20,7 +25,8 @@ type Validate struct {
 
 var ValidateDefaults = Validate{
 	ManifestFilepath: "",
-	ExtensionName:    "",
+	ApplicationName:  "",
+	ApplicationType:  v1.ApplicationType_EXTENSION.String(),
 	Version:          "",
 	Flavor:           "",
 	PrintManifest:    false,
