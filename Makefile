@@ -1,11 +1,15 @@
 .PHONY: generated-code
 generated-code:
+	protoc --gogo_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp:. -I$(GOPATH)/src -I$(GOPATH)/src/github.com/gogo/protobuf -I$(GOPATH)/src/github.com/gogo/protobuf/protobuf -I$(GOPATH)/src/github.com/solo-io/service-mesh-hub api/v1/registry.proto
 	go generate ./...
-	protoc --gogo_out=. -I$(GOPATH)/src -I$(GOPATH)/src/github.com/gogo/protobuf -I$(GOPATH)/src/github.com/solo-io/service-mesh-hub api/v1/registry.proto
+	gofmt -w pkg test
+	goimports -w pkg test
 
 .PHONY: update-deps
 update-deps:
-	go get -u github.com/golang/mock/gomock
+	go get golang.org/x/tools/cmd/goimports
+	go get github.com/golang/mock/gomock
+	go get github.com/golang/mock/mockgen # fix vendoring problem also surfaced here: https://github.com/openshift/openshift-azure/issues/1582
 	go install github.com/golang/mock/mockgen
 	go get -u github.com/gogo/protobuf/gogoproto
 	go get -u github.com/gogo/protobuf/protoc-gen-gogo
