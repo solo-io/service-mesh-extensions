@@ -16,7 +16,7 @@ steps:
   id: 'dep'
   waitFor: ['download-untar-dep-cache']
 
-- name: 'gcr.io/$PROJECT_ID/go-make:dev'
+- name: 'gcr.io/$PROJECT_ID/go-make:0.1.11'
   entrypoint: 'bash'
   args: ['ci/check-code-and-docs-gen.sh']
   env:
