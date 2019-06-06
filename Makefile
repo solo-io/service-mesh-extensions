@@ -1,6 +1,6 @@
 .PHONY: generated-code
 generated-code:
-	protoc --gogo_out=. -I$(GOPATH)/src -I$(GOPATH)/src/github.com/gogo/protobuf -I$(GOPATH)/src/github.com/golang/protobuf/ptypes/timestamp -I$(GOPATH)/src/github.com/solo-io/service-mesh-hub api/v1/registry.proto
+	protoc --gogo_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp:. -I$(GOPATH)/src -I$(GOPATH)/src/github.com/gogo/protobuf -I$(GOPATH)/src/github.com/gogo/protobuf/protobuf -I$(GOPATH)/src/github.com/solo-io/service-mesh-hub api/v1/registry.proto
 	go generate ./...
 
 .PHONY: update-deps
