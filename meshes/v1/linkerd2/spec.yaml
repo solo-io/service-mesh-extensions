@@ -1,0 +1,101 @@
+applicationCreator: Bouyant
+type: MESH
+logoUrl: https://i2.wp.com/kubedex.com/wp-content/uploads/2018/09/linkerd.png?fit=436%2C404&ssl=1
+longDescription: |
+  A service mesh for Kubernetes and beyond. Cloud Native Computing Foundation (cncf.io) project.
+name: linkerd2
+shortDescription: |
+  A service mesh for Kubernetes and beyond. Cloud Native Computing Foundation (cncf.io) project.
+repositoryUrl: github.com/weaveworks/flagger
+versions:
+- version: "stable-2.3.1"
+  githubChart:
+    directory: chart
+    org: linkerd
+    ref: stable-2.3.1
+    repo: linkerd2
+  flavors:
+  - name: vanilla
+    description: "Install Linkerd2 control plane to a namespace"
+  valuesYaml: |
+    CliVersion: linkerd/cli stable-2.3.1
+    Configs:
+      Global: '{"linkerdNamespace":"linkerd","cniEnabled":false,"version":"stable-2.3.1","autoInjectContext":null}'
+      Install: '{"uuid":"d52c060e-47c9-4060-9867-edbfbd066822","cliVersion":"stable-2.3.1","flags":[]}'
+      Proxy: '{"proxyImage":{"imageName":"gcr.io/linkerd-io/proxy","pullPolicy":"IfNotPresent"},"proxyInitImage":{"imageName":"gcr.io/linkerd-io/proxy-init","pullPolicy":"IfNotPresent"},"controlPort":{"port":4190},"ignoreInboundPorts":[],"ignoreOutboundPorts":[],"inboundPort":{"port":4143},"adminPort":{"port":4191},"outboundPort":{"port":4140},"resource":{"requestCpu":"","requestMemory":"","limitCpu":"","limitMemory":""},"proxyUid":"2102","logLevel":{"level":"warn,linkerd2_proxy=info"},"disableExternalProfiles":true,"proxyVersion":"stable-2.3.1","proxyInitImageVersion":"v1.0.0"}'
+    ControllerComponentLabel: linkerd.io/control-plane-component
+    ControllerImage: gcr.io/linkerd-io/controller:stable-2.3.1
+    ControllerLogLevel: info
+    ControllerReplicas: 1
+    ControllerUID: 2103
+    CreatedByAnnotation: linkerd.io/created-by
+    DestinationResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+    EnableH2Upgrade: true
+    GrafanaImage: gcr.io/linkerd-io/grafana:stable-2.3.1
+    GrafanaResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+    ImagePullPolicy: IfNotPresent
+    Namespace: linkerd
+    NoInitContainer: false
+    PrometheusImage: prom/prometheus:v2.7.1
+    PrometheusLogLevel: info
+    PrometheusResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+    ProxyContainerName: linkerd-proxy
+    ProxyInjectAnnotation: linkerd.io/inject
+    ProxyInjectDisabled: disabled
+    ProxyInjector:
+    ProxyInjectorResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+    PublicAPIResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+    SPValidatorResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+    TapResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+    UUID: d52c060e-47c9-4060-9867-edbfbd066822
+    WebImage: gcr.io/linkerd-io/web:stable-2.3.1
+    WebResources:
+      CPU:
+        Limit: ""
+        Request: ""
+      Memory:
+        Limit: ""
+        Request: ""
+
