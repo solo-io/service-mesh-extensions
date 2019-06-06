@@ -2,9 +2,10 @@ package test
 
 import (
 	"fmt"
-	"github.com/solo-io/service-mesh-hub/api/v1"
 	"io/ioutil"
 	"path/filepath"
+
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
