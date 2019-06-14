@@ -65,6 +65,7 @@ type ValuesInputs struct {
 	Supergloo          SuperglooInfo
 }
 
+// TODO: needs a way to load custom flavors 
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
 	inputs, err := ExecInputValuesTemplates(inputs)
 	if err != nil {
