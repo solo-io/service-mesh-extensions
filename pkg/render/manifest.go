@@ -32,6 +32,12 @@ var (
 	FailedRenderValueTemplatesError = func(err error) error {
 		return errors.Wrapf(err, "error rendering input value templates")
 	}
+
+	IncorrectNumberOfInputLayersError = errors.Errorf("incorrect number of input layers")
+
+	UnexpectedInputLayerIdError = errors.Errorf("unexpected input layer id")
+
+	InvalidLayerConfigError = errors.Errorf("invalid layer config")
 )
 
 type SuperglooInfo struct {
@@ -40,19 +46,23 @@ type SuperglooInfo struct {
 	ClusterRoleName    string
 }
 
+type LayerInput struct {
+	Id      string
+	Option  *hubv1.LayerOption
+}
+
 type ValuesInputs struct {
 	Name               string
 	InstallNamespace   string
 	FlavorName         string
+	Layers             []LayerInput
 	MeshRef            core.ResourceRef
-	SuperglooNamespace string
 
-	UserDefinedValues string
-	FlavorParams      map[string]string
-	SpecDefinedValues string
+	UserDefinedValues  string
+	FlavorParams       map[string]string
+	SpecDefinedValues  string
 
-	// TODO: remove old value (SuperglooNamespace) after new ones have been wired on the marketplace side
-	Supergloo SuperglooInfo
+	Supergloo          SuperglooInfo
 }
 
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
@@ -70,8 +80,11 @@ func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, sp
 	if err != nil {
 		return nil, err
 	}
+	if err := ValidateInputsAgainstFlavor(inputs, installedFlavor); err != nil {
+		return nil, err
+	}
 
-	rawResources, err := ApplyLayers(ctx, inputs, installedFlavor, manifests)
+	rawResources, err := ApplyLayers(ctx, inputs, manifests)
 	if err != nil {
 		return nil, err
 	}
@@ -79,18 +92,62 @@ func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, sp
 	return FilterByLabel(ctx, spec, rawResources), nil
 }
 
+func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) error {
+	if len(inputs.Layers) != len(flavor.CustomizationLayers) {
+		return IncorrectNumberOfInputLayersError
+	}
+
+	for i, inputLayer := range inputs.Layers {
+		actualLayer := flavor.CustomizationLayers[i]
+		if inputLayer.Id != actualLayer.Id {
+			return UnexpectedInputLayerIdError
+		}
+
+		if inputLayer.Option == nil && !actualLayer.Optional {
+			return InvalidLayerConfigError
+		}
+
+		found := false
+		for _, option := range actualLayer.Options {
+			if option.Equal(inputLayer.Option) {
+				found = true
+			}
+		}
+		if !found {
+			return InvalidLayerConfigError
+		}
+	}
+	return nil
+}
+
 /*
- Coalesces spec values yaml, params, and user-defined values yaml.
- User defined values override params which override spec values.
+ Coalesces spec values yaml, layer values, params, and user-defined values yaml.
+ User defined values override params which override layer values which override spec values.
  If there is an error parsing, it is logged and propagated.
 */
 func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, error) {
+	valuesMap := make(map[string]interface{})
+
 	specValues, err := ConvertYamlStringToNestedMap(inputs.SpecDefinedValues)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing spec values yaml",
 			zap.Error(err),
 			zap.String("values", inputs.SpecDefinedValues))
 		return "", err
+	}
+	valuesMap = CoalesceValuesMap(ctx, valuesMap, specValues)
+
+	for _, layerInput := range inputs.Layers {
+		if layerInput.Option != nil && layerInput.Option.HelmValues != "" {
+			layerValues, err := ConvertYamlStringToNestedMap(layerInput.Option.HelmValues)
+			if err != nil {
+				contextutils.LoggerFrom(ctx).Errorw("Error parsing layer values yaml",
+					zap.Error(err),
+					zap.String("values", layerInput.Option.HelmValues))
+				return "", err
+			}
+			valuesMap = CoalesceValuesMap(ctx, valuesMap, layerValues)
+		}
 	}
 
 	paramValues, err := ConvertParamsToNestedMap(inputs.FlavorParams)
@@ -100,6 +157,7 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.Any("params", inputs.FlavorParams))
 		return "", err
 	}
+	valuesMap = CoalesceValuesMap(ctx, valuesMap, paramValues)
 
 	userValues, err := ConvertYamlStringToNestedMap(inputs.UserDefinedValues)
 	if err != nil {
@@ -108,9 +166,8 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.Any("params", inputs.UserDefinedValues))
 		return "", err
 	}
-
-	valuesMap := CoalesceValuesMap(ctx, specValues, paramValues)
 	valuesMap = CoalesceValuesMap(ctx, valuesMap, userValues)
+
 	values, err := ConvertNestedMapToYaml(valuesMap)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw(err.Error(), zap.Error(err), zap.Any("valuesMap", valuesMap))

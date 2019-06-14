@@ -2,8 +2,8 @@ package render
 
 import (
 	"context"
-
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
+	"k8s.io/helm/pkg/releaseutil"
 
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
 
@@ -13,7 +13,6 @@ import (
 	"github.com/solo-io/go-utils/errors"
 	"github.com/solo-io/go-utils/installutils/helmchart"
 	"github.com/solo-io/go-utils/installutils/kuberesource"
-	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/spf13/afero"
 )
 
@@ -22,21 +21,12 @@ const (
 )
 
 var (
-	UnknownLayerTypeError = func(layer *hubv1.Layer) error {
-		return errors.Errorf("unknown layer type specified %T", layer.GetType())
-	}
 	FailedToCalculateValues = func(err error) error {
 		return errors.Wrapf(err, "failed to calculate values for layer rendering")
 	}
 )
 
-func ApplyLayers(ctx context.Context, inputs ValuesInputs, installedFlavor *hubv1.Flavor, manifests helmchart.Manifests) (kuberesource.UnstructuredResources, error) {
-
-	if installedFlavor.CustomizationLayers == nil || len(installedFlavor.CustomizationLayers) == 0 {
-		return GetResourcesFromManifests(ctx, manifests)
-	} else if len(installedFlavor.CustomizationLayers) >= 2 {
-		return nil, ExpectedAtMostError("customization", 1, len(installedFlavor.CustomizationLayers))
-	}
+func ApplyLayers(ctx context.Context, inputs ValuesInputs, manifests helmchart.Manifests) (kuberesource.UnstructuredResources, error) {
 
 	fs := afero.NewOsFs()
 	execDir, err := afero.TempDir(fs, "", layerDirPrefix)
@@ -49,23 +39,22 @@ func ApplyLayers(ctx context.Context, inputs ValuesInputs, installedFlavor *hubv
 		return nil, FailedToCalculateValues(err)
 	}
 
-	layer := installedFlavor.CustomizationLayers[0]
-	var layerEngine kustomize.LayerEngine
-	switch layerType := layer.GetType().(type) {
-	case *hubv1.Layer_Kustomize:
-		kustomizeLoader := loader.NewKustomizeLoader(ctx, fs)
-		layerEngine, err = kustomize.NewKustomizer(kustomizeLoader, manifests, layerType.Kustomize,
-			plugins.NewManifestRenderPlugin(values))
-		if err != nil {
-			return nil, err
-		}
-	default:
-		return nil, UnknownLayerTypeError(layer)
-	}
+	kustomizeLoader := loader.NewKustomizeLoader(ctx, fs)
+	var manifestBytes []byte
+	for _, layerInput := range inputs.Layers {
+		if layerInput.Option != nil && layerInput.Option.Kustomize != nil {
+			layerEngine, err := kustomize.NewKustomizer(kustomizeLoader, manifests, layerInput.Option.Kustomize,
+				plugins.NewManifestRenderPlugin(values))
+			if err != nil {
+				return nil, err
+			}
+			manifestBytes, err := layerEngine.Run(execDir)
+			if err != nil {
+				return nil, err
+			}
+			manifests = helmchart.Manifests{{Head: &releaseutil.SimpleHead{}, Content: string(manifestBytes)}}
 
-	manifestBytes, err := layerEngine.Run(execDir)
-	if err != nil {
-		return nil, err
+		}
 	}
 
 	resources, err := YamlToResources(manifestBytes)
@@ -83,7 +72,6 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 		InstallNamespace   string
 		FlavorName         string
 		MeshRef            core.ResourceRef
-		SuperglooNamespace string
 
 		Supergloo SuperglooInfo
 
@@ -101,7 +89,6 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 		InstallNamespace:   inputs.InstallNamespace,
 		FlavorName:         inputs.FlavorName,
 		MeshRef:            inputs.MeshRef,
-		SuperglooNamespace: inputs.SuperglooNamespace,
 		Supergloo:          inputs.Supergloo,
 		Custom:             customValues,
 	}, nil
