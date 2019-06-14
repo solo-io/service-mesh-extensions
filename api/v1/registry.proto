@@ -101,6 +101,25 @@ message Flavor {
     repeated Parameter parameters = 5;
 }
 
+// An extension to an application. An application can be rendered with a custom flavor, or with a built in
+// flavor. The registry name is used by the
+message CustomFlavor {
+    // Reference to the version of the application this custom flavor is extending
+    AppVersionRef ref = 1;
+    // Full definition of the custom flavor
+    Flavor flavor = 2;
+}
+
+// A reference to an application in a registry
+message AppVersionRef {
+    // A unique identify for the registry containing the original application.
+    string registry_name = 1;
+    // The name of the application. Should match an application spec's "name" property.
+    string app_name = 2;
+    // The version of the application. Should match the "version" field on one of the versioned application specs for the referenced application.
+    string version = 3;
+}
+
 // Parameters represent values that are used to configure the installation of an extension.
 message Parameter {
     // Identifier of the parameter
@@ -111,17 +130,36 @@ message Parameter {
     string value = 3;
     // Default value of the parameter
     string default = 4;
-    // Indicates whether a value for the parameter is required for the installation of the extension to be performed.
+    // Indicates whether a value for the parameter is required for the installation of the extension
+    // to be performed.
     bool required = 5;
+    string display_name = 6;
 }
 
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
 // the rendered extension installation manifest.
 message Layer {
-    // The actual implementation of the layer
-    oneof type {
-        Kustomize kustomize = 1;
-    }
+    // A unique identifier for the layer, i.e. "mtls"
+    string id = 1;
+    // A user-friendly name of the layer, i.e. "Mutual TLS Settings"
+    string display_name = 2;
+    // If true, this layer can be flagged on or off for rendering.
+    bool optional = 3;
+    // One or more variants for this configuration layer, one of which will be chosen by the user.
+    repeated LayerOption options = 4;
+}
+
+// One option for configuring a layer. At least one of the kustomize or helm values should be set, or the layer
+// would be a no-op during rendering.
+message LayerOption {
+    // A user-friendly name
+    string display_name = 1;
+    // A user-friendly description
+    string description = 2;
+    // A kustomize overlay
+    Kustomize kustomize = 3;
+    // A set of value overrides
+    string helmValues = 4;
 }
 
 // Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
