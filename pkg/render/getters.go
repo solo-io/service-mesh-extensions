@@ -15,6 +15,10 @@ var (
 	NoFlavorFoundError = func(name string) error {
 		return errors.Errorf("could not find flavor with name: %s", name)
 	}
+
+	UnexpectedFlavorError = func(expected, actual string) error {
+		return errors.Errorf("user selected flavor %s, but renderer was provided flavor %s", expected, actual)
+	}
 )
 
 func GetInstalledFlavor(name string, flavors []*v1.Flavor) (*v1.Flavor, error) {

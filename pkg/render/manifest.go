@@ -65,35 +65,22 @@ type ValuesInputs struct {
 	Supergloo          SuperglooInfo
 }
 
-// TODO: needs a way to load custom flavors 
+// Deprecated: use ManifestRenderer.ComputeResourcesForApplication instead, to allow for custom flavors
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
-	inputs, err := ExecInputValuesTemplates(inputs)
-	if err != nil {
-		return nil, FailedRenderValueTemplatesError(err)
-	}
-
-	manifests, err := GetManifestsFromApplicationSpec(ctx, inputs, spec)
-	if err != nil {
-		return nil, err
-	}
-
 	installedFlavor, err := GetInstalledFlavor(inputs.FlavorName, spec.Flavors)
 	if err != nil {
 		return nil, err
 	}
-	if err := ValidateInputsAgainstFlavor(inputs, installedFlavor); err != nil {
-		return nil, err
-	}
 
-	rawResources, err := ApplyLayers(ctx, inputs, manifests)
-	if err != nil {
-		return nil, err
-	}
-
-	return FilterByLabel(ctx, spec, rawResources), nil
+	renderer := NewManifestRenderer()
+	return renderer.ComputeResourcesForApplication(ctx, inputs, spec, installedFlavor)
 }
 
 func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) error {
+	if flavor.GetName() != inputs.FlavorName {
+		return UnexpectedFlavorError(inputs.FlavorName, flavor.GetName())
+	}
+
 	if len(inputs.Layers) != len(flavor.CustomizationLayers) {
 		return IncorrectNumberOfInputLayersError
 	}
@@ -118,6 +105,7 @@ func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) erro
 			return InvalidLayerConfigError
 		}
 	}
+
 	return nil
 }
 

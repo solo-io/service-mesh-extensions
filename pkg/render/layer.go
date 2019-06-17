@@ -56,7 +56,9 @@ func ApplyLayers(ctx context.Context, inputs ValuesInputs, manifests helmchart.M
 
 		}
 	}
-
+	if manifestBytes == nil {
+		manifestBytes = []byte(manifests.CombinedString())
+	}
 	resources, err := YamlToResources(manifestBytes)
 	if err != nil {
 		return nil, err
