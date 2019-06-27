@@ -1,8 +1,5 @@
 
-
-<h1 align="center">
-    <img src="https://gloo.solo.io/img/Gloo-01.png" alt="Gloo" width="200" height="242">
-  <br>
+<h1>
   An Envoy-Powered API Gateway
 </h1>
 
