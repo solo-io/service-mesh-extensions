@@ -21,7 +21,7 @@ metadata:
     supergloo: sidecar-injection
 data:
   secret.tpl: |-
-
+    
     apiVersion: v1
     kind: Secret
     metadata:
@@ -33,9 +33,9 @@ data:
     data:
       cert.pem: {{ .ServerCert }}
       key.pem: {{ .ServerCertKey }}
-
+    
   deployment.tpl: |-
-
+    
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -68,9 +68,9 @@ data:
             - name: webhook-certs
               secret:
                 secretName: {{ .Name }}
-
+    
   service.tpl: |-
-
+    
     apiVersion: v1
     kind: Service
     metadata:
@@ -84,9 +84,9 @@ data:
           targetPort: 443
       selector:
         app: sidecar-injector
-
+    
   config-map.tpl: |-
-
+    
     apiVersion: v1
     kind: ConfigMap
     metadata:
@@ -132,9 +132,9 @@ data:
                 value: "169.254.169.254"
 
         `}}
-
+    
   mutating-webhook-configuration.tpl: |-
-
+    
     apiVersion: admissionregistration.k8s.io/v1beta1
     kind: MutatingWebhookConfiguration
     metadata:
@@ -155,7 +155,7 @@ data:
             apiGroups: [""]
             apiVersions: ["v1"]
             resources: ["pods"]
-
+    
 ---
 # Source: sm-marketplace/templates/11-operator-configmap.yaml
 
@@ -185,12 +185,22 @@ metadata:
 data:
   config.yaml: |
     registries:
-    - name: default
+    - name: hub-extensions
       github:
         org: solo-io
         repo: service-mesh-hub
         ref: master
         directory: extensions/v1
+    - name: hub-demos
+      github:
+        org: solo-io
+        repo: service-mesh-hub
+        ref: master
+        directory: demos/v1
+    blacklistedNamespaces:
+    - kube-system
+    - kube-public
+    - sm-marketplace
 
 ---
 # Source: sm-marketplace/charts/supergloo/templates/0-serviceaccounts.yaml
@@ -265,36 +275,36 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: discovery
 rules:
-- apiGroups: [""]
-  resources: ["configmaps", "pods", "services", "secrets", "endpoints", "namespaces"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["apiextensions.k8s.io"]
-  resources: ["customresourcedefinitions"]
-  verbs: ["get", "create"]
-- apiGroups: ["gloo.solo.io"]
-  resources: ["settings", "upstreams"]
-  verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["configmaps", "pods", "services", "secrets", "endpoints", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "create"]
+  - apiGroups: ["gloo.solo.io"]
+    resources: ["settings", "upstreams"]
+    verbs: ["*"]
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: mesh-discovery
 rules:
-- apiGroups: [""]
-  resources: ["configmaps", "pods", "services", "secrets", "endpoints", "namespaces"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["authentication.istio.io"]
-  resources: ["meshpolicies"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["apiextensions.k8s.io"]
-  resources: ["customresourcedefinitions"]
-  verbs: ["get", "create"]
-- apiGroups: ["supergloo.solo.io"]
-  resources: ["*"]
-  verbs: ["*"]
-- apiGroups: ["gloo.solo.io"]
-  resources: ["settings", "upstreams"]
-  verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["configmaps", "pods", "services", "secrets", "endpoints", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["authentication.istio.io"]
+    resources: ["meshpolicies"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "create"]
+  - apiGroups: ["supergloo.solo.io"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["gloo.solo.io"]
+    resources: ["settings", "upstreams"]
+    verbs: ["*"]
 
 ---
 # Source: sm-marketplace/charts/supergloo/templates/2-clusterrole-binding.yaml
@@ -331,9 +341,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: mesh-discovery-role-binding
 subjects:
-- kind: ServiceAccount
-  name: mesh-discovery
-  namespace: sm-marketplace
+  - kind: ServiceAccount
+    name: mesh-discovery
+    namespace: sm-marketplace
 roleRef:
   kind: ClusterRole
   name: mesh-discovery
@@ -416,16 +426,16 @@ spec:
     spec:
       serviceAccountName: supergloo
       containers:
-      - image: "quay.io/solo-io/supergloo:0.3.20"
-        imagePullPolicy:  Always
-        name: supergloo
-        env:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: START_STATS_SERVER
-          value: "true"
+        - image: "quay.io/solo-io/supergloo:0.3.20"
+          imagePullPolicy:  Always
+          name: supergloo
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: START_STATS_SERVER
+              value: "true"
 
 ---
 apiVersion: extensions/v1beta1
@@ -452,16 +462,16 @@ spec:
     spec:
       serviceAccountName: discovery
       containers:
-      - image: "quay.io/solo-io/discovery:0.13.21"
-        imagePullPolicy: Always
-        name: discovery
-        env:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: START_STATS_SERVER
-          value: "true"
+        - image: "quay.io/solo-io/discovery:0.13.21"
+          imagePullPolicy: Always
+          name: discovery
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: START_STATS_SERVER
+            value: "true"
 
 ---
 apiVersion: extensions/v1beta1
@@ -482,16 +492,16 @@ spec:
     spec:
       serviceAccountName: mesh-discovery
       containers:
-      - image: "quay.io/solo-io/mesh-discovery:0.3.20"
-        imagePullPolicy:  Always
-        name: mesh-discovery
-        env:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: START_STATS_SERVER
-          value: "true"
+        - image: "quay.io/solo-io/mesh-discovery:0.3.20"
+          imagePullPolicy:  Always
+          name: mesh-discovery
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: START_STATS_SERVER
+              value: "true"
 
 ---
 ---
@@ -519,20 +529,20 @@ spec:
     spec:
       serviceAccountName: smm-operator
       containers:
-      - image: "quay.io/solo-io/smm-operator:0.1.25"
+      - image: "quay.io/solo-io/smm-operator:0.2.0"
         imagePullPolicy: Always
         name: smm-operator
         env:
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: GITHUB_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: github-token
-              key: token
-              optional: true
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: github-token
+                key: token
+                optional: true
 ---
 # Source: sm-marketplace/templates/3-apiserver-deployment.yaml
 apiVersion: extensions/v1beta1
@@ -557,7 +567,7 @@ spec:
     spec:
       serviceAccountName: smm-apiserver
       containers:
-      - image: "quay.io/solo-io/smm-apiserver:0.1.25"
+      - image: "quay.io/solo-io/smm-apiserver:0.2.0"
         imagePullPolicy: Always
         name: smm-apiserver
         env:
@@ -573,12 +583,18 @@ spec:
               optional: true
         - name: GRPC_PORT
           value: "10101"
-      - image: "quay.io/solo-io/smm-ui:0.1.25"
+      - image: "quay.io/solo-io/smm-ui:0.2.0"
         imagePullPolicy: Always
         name: smm-ui
-      - image: "quay.io/solo-io/smm-envoy:0.1.25"
+      - image: "quay.io/solo-io/smm-envoy:0.2.0"
         imagePullPolicy: Always
         name: smm-envoy
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          periodSeconds: 10
+          initialDelaySeconds: 5
 
 
 ---
