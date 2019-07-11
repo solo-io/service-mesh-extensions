@@ -456,6 +456,14 @@
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:6ff1026b8d873d074ddec82ad60bb0eb537dc013f456ef26b63d30beba2f99e7"
+  name = "github.com/microcosm-cc/bluemonday"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "506f3da9b7c86d737e91f16b7431df8635871552"
+  version = "v1.0.2"
+
+[[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
   name = "github.com/mitchellh/go-homedir"
   packages = ["."]
@@ -1426,9 +1434,11 @@
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/google/go-github/github",
     "github.com/helm/helm/pkg/strvals",
+    "github.com/microcosm-cc/bluemonday",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/pkg/errors",
+    "github.com/russross/blackfriday",
     "github.com/solo-io/go-utils/clicore",
     "github.com/solo-io/go-utils/contextutils",
     "github.com/solo-io/go-utils/errors",
@@ -1439,10 +1449,12 @@
     "github.com/solo-io/go-utils/manifesttestutils",
     "github.com/solo-io/go-utils/protoutils",
     "github.com/solo-io/go-utils/tarutils",
+    "github.com/solo-io/go-utils/vfsutils",
     "github.com/solo-io/solo-kit/pkg/api/v1/resources/core",
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
     "go.uber.org/zap",
+    "golang.org/x/oauth2",
     "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
     "k8s.io/api/rbac/v1",
@@ -1450,6 +1462,7 @@
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/util/yaml",
     "k8s.io/helm/pkg/manifest",
+    "k8s.io/helm/pkg/releaseutil",
     "sigs.k8s.io/kustomize/k8sdeps/kunstruct",
     "sigs.k8s.io/kustomize/k8sdeps/kv/plugin",
     "sigs.k8s.io/kustomize/k8sdeps/transformer",

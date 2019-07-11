@@ -28,6 +28,10 @@ message ApplicationSpec {
     repeated VersionedApplicationSpec versions = 12;
 }
 
+message ApplicationSpecs {
+    repeated ApplicationSpec specs = 1;
+}
+
 
 // Represents a specific version of an extension.
 message VersionedApplicationSpec {
