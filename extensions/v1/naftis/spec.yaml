@@ -22,7 +22,7 @@ versions:
   datePublished: "2019-01-09T15:04:06Z"
   flavors:
   - name: istio
-    description: "Install Xiaomi to your Istio mesh"
+    description: "Install Naftis to your Istio mesh"
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
