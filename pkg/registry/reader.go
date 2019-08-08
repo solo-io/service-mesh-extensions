@@ -20,7 +20,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/solo-io/go-utils/contextutils"
 	"github.com/solo-io/go-utils/protoutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"go.uber.org/zap"
 )
 

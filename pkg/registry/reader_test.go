@@ -3,7 +3,7 @@ package registry_test
 import (
 	"context"
 
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/registry"
 
 	"github.com/pkg/errors"
