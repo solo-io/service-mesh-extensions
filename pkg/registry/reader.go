@@ -44,7 +44,7 @@ var (
 	}
 
 	FailedToGetSpecsFromGithubError = func(err error) error {
-		return errors.Wrap(err, "Failed to get extension specs from github")
+		return errors.Wrap(err, "Failed to get application specs from github")
 	}
 )
 
@@ -110,7 +110,7 @@ func (r *GithubSpecReader) GetSpecs() ([]*v1.ApplicationSpec, error) {
 	token, found := os.LookupEnv(githubToken)
 	if !found {
 		client = github.NewClient(nil)
-		contextutils.LoggerFrom(r.ctx).Warnw(fmt.Sprintf("Could not find %s in environment. The hub will fail to load extensions from private registries, and may be rate limited.", githubToken))
+		contextutils.LoggerFrom(r.ctx).Warnw(fmt.Sprintf("Could not find %s in environment. The hub will fail to load applications from private registries, and may be rate limited.", githubToken))
 	} else {
 		ts := oauth2.StaticTokenSource(
 			&oauth2.Token{AccessToken: token},

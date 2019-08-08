@@ -31,9 +31,9 @@ func Cmd(o *options.Options) *cobra.Command {
 	pflags.StringVarP(&o.Registry.GithubRegistry.Directory, "registry-directory", "", options.RegistryDefaults.GithubRegistry.Directory,
 		"directory of github registry")
 	pflags.StringVarP(&o.InstallSpecFile, "install-spec-file", "i", "",
-		"install spec to generate manifests from")
+		"optional install spec to generate manifests from")
 	pflags.StringVarP(&o.ManifestFile, "manifest-file", "m", "",
-		"destination for rendered manifest")
+		"optional destination for rendered manifest, otherwise print to stdout")
 	return cmd
 }
 
