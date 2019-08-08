@@ -19,7 +19,7 @@ shortDescription: |
   Kubernetes-based platform to build, deploy, and manage modern serverless workloads.
 versions:
 - manifestsArchive:
-    uri: https://storage.googleapis.com/sm-marketplace-registry/serving-0.8.9.tar.gz
+    uri: https://storage.googleapis.com/sm-marketplace-registry/serving-0.8.0.tar.gz
   flavors:
   - name: istio
     description: "Install Knative using Istio as the Knative Gateway"
@@ -30,7 +30,7 @@ versions:
           minVersion: "1.1.0"
   version: "0.8.0-istio"
 - manifestsArchive:
-    uri: https://storage.googleapis.com/sm-marketplace-registry/serving-0.8.9-core.tar.gz
+    uri: https://storage.googleapis.com/sm-marketplace-registry/serving-core-0.8.0.tar.gz
   flavors:
   - name: gloo
     description: |
