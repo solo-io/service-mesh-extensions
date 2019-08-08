@@ -19,7 +19,6 @@ generated-code:
 update-deps:
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/golang/mock/gomock
-	go get -t github.com/AlecAivazis/survey/v2
 	go get github.com/golang/mock/mockgen # fix vendoring problem also surfaced here: https://github.com/openshift/openshift-azure/issues/1582
 	go install github.com/golang/mock/mockgen
 	go get -u github.com/gogo/protobuf/gogoproto
