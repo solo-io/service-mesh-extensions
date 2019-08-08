@@ -1,11 +1,9 @@
 package main
 
-import (
-	"github.com/solo-io/service-mesh-hub/pkg/cli"
-)
+import "github.com/solo-io/service-mesh-hub/pkg/cli"
 
 /*
-smh
+hubctl
 */
 
 func main() {

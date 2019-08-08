@@ -17,13 +17,13 @@ import (
 func Cmd(o *options.Options) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validate",
-		Short: "validate a manifest file",
+		Short: "validate a local spec file",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return validate(o)
 		},
 	}
 	pflags := cmd.PersistentFlags()
-	pflags.StringVar(&o.Validate.ApplicationType, "type", options.ValidateDefaults.ApplicationName,
+	pflags.StringVar(&o.Validate.ApplicationType, "type", options.ValidateDefaults.ApplicationType,
 		fmt.Sprintf("type of the application that will be validated. Available: %v, %v, %v",
 			v1.ApplicationType_EXTENSION.String(), v1.ApplicationType_DEMO.String(), v1.ApplicationType_MESH.String()))
 	pflags.StringVar(&o.Validate.ApplicationName, "name", options.ValidateDefaults.ApplicationName,

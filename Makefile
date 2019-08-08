@@ -1,3 +1,13 @@
+#----------------------------------------------------------------------------------
+# Base
+#----------------------------------------------------------------------------------
+
+ROOTDIR := $(shell pwd)
+OUTPUT_DIR ?= $(ROOTDIR)/_output
+VERSION ?= $(shell echo $(TAGGED_VERSION) | cut -c 2-)
+LDFLAGS := "-X github.com/solo-io/service-mesh-hub/pkg/internal/version.Version=$(VERSION)"
+GCFLAGS := all="-N -l"
+
 .PHONY: generated-code
 generated-code:
 	protoc --gogo_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp:. -I$(GOPATH)/src -I$(GOPATH)/src/github.com/gogo/protobuf -I$(GOPATH)/src/github.com/gogo/protobuf/protobuf -I$(GOPATH)/src/github.com/solo-io/service-mesh-hub api/v1/registry.proto
@@ -9,11 +19,36 @@ generated-code:
 update-deps:
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/golang/mock/gomock
+	go get -t github.com/AlecAivazis/survey/v2
 	go get github.com/golang/mock/mockgen # fix vendoring problem also surfaced here: https://github.com/openshift/openshift-azure/issues/1582
 	go install github.com/golang/mock/mockgen
 	go get -u github.com/gogo/protobuf/gogoproto
 	go get -u github.com/gogo/protobuf/protoc-gen-gogo
 	go get -u github.com/solo-io/solo-kit
+
+#----------------------------------------------------------------------------------
+# hubctl
+#----------------------------------------------------------------------------------
+CLI_DIR=./pkg/cli
+
+$(OUTPUT_DIR)/hubctl: $(SOURCES)
+	go build -ldflags=$(LDFLAGS) -gcflags=$(GCFLAGS) -o $@ $(CLI_DIR)/cmd/main.go
+
+$(OUTPUT_DIR)/hubctl-linux-amd64: $(SOURCES)
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags=$(LDFLAGS) -gcflags=$(GCFLAGS) -o $@ $(CLI_DIR)/cmd/main.go
+
+$(OUTPUT_DIR)/hubctl-darwin-amd64: $(SOURCES)
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin go build -ldflags=$(LDFLAGS) -gcflags=$(GCFLAGS) -o $@ $(CLI_DIR)/cmd/main.go
+
+.PHONY: hubctl
+hubctl: $(OUTPUT_DIR)/hubctl
+.PHONY: hubctl-linux-amd64
+hubctl-linux-amd64: $(OUTPUT_DIR)/hubctl-linux-amd64
+.PHONY: hubctl-darwin-amd64
+hubctl-darwin-amd64: $(OUTPUT_DIR)/hubctl-darwin-amd64
+
+.PHONY: build-cli
+build-cli: hubctl-linux-amd64 hubctl-darwin-amd64
 
 #----------------------------------------------------------------------------------
 # Docs
