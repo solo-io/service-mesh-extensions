@@ -29,12 +29,3 @@ versions:
         versions:
           minVersion: "1.1.0"
   version: "0.8.0-istio"
-- manifestsArchive:
-    uri: https://storage.googleapis.com/sm-marketplace-registry/serving-core-0.8.0.tar.gz
-  flavors:
-  - name: gloo
-    description: |
-      Install Knative using Gloo as the Knative Gateway.
-
-      Note: This flavor of Knative will not serve traffic unless Gloo is installed in your cluster.
-  version: "0.8.0-gloo"
