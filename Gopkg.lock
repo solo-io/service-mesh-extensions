@@ -428,6 +428,14 @@
   version = "v1.1.6"
 
 [[projects]]
+  branch = "master"
+  digest = "1:400e113a367b511b9b09ca642ee11d9885485a93838526d697033af334a2fdde"
+  name = "github.com/kballard/go-shellquote"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "95032a82bc518f77982ea72343cc1ade730072f0"
+
+[[projects]]
   digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
   name = "github.com/konsorten/go-windows-terminal-sequences"
   packages = ["."]
@@ -448,12 +456,44 @@
   revision = "1ea4449da9834f4d333f1cc461c374aea217d249"
 
 [[projects]]
+  digest = "1:7c084e0e780596dd2a7e20d25803909a9a43689c153de953520dfbc0b0e51166"
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8029fb3788e5a4a9c00e415f586a6d033f5d38b3"
+  version = "v0.1.2"
+
+[[projects]]
+  digest = "1:9b90c7639a41697f3d4ad12d7d67dfacc9a7a4a6e0bbfae4fc72d0da57c28871"
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "1311e847b0cb909da63b5fecfb5370aa66236465"
+  version = "v0.0.8"
+
+[[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
   pruneopts = "UT"
   revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c"
   version = "v1.0.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:2b32af4d2a529083275afc192d1067d8126b578c7a9613b26600e4df9c735155"
+  name = "github.com/mgutz/ansi"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9520e82c474b0a04dd04f8a40959027271bab992"
+
+[[projects]]
+  digest = "1:6ff1026b8d873d074ddec82ad60bb0eb537dc013f456ef26b63d30beba2f99e7"
+  name = "github.com/microcosm-cc/bluemonday"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "506f3da9b7c86d737e91f16b7431df8635871552"
+  version = "v1.0.2"
 
 [[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
@@ -910,6 +950,18 @@
   pruneopts = "UT"
   revision = "25c4f928eaa6d96443009bd842389fb4fa48664e"
   version = "v1.20.1"
+
+[[projects]]
+  digest = "1:5cbcd7b7842e62d419d8e6fdaef4f95785e248337a565c25cbae238a585ac4e2"
+  name = "gopkg.in/AlecAivazis/survey.v1"
+  packages = [
+    ".",
+    "core",
+    "terminal",
+  ]
+  pruneopts = "UT"
+  revision = "3db8b5dd7b2875d268abf7c1feb59bd929f6b838"
+  version = "v1.8.5"
 
 [[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
@@ -1426,9 +1478,11 @@
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/google/go-github/github",
     "github.com/helm/helm/pkg/strvals",
+    "github.com/microcosm-cc/bluemonday",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/pkg/errors",
+    "github.com/russross/blackfriday",
     "github.com/solo-io/go-utils/clicore",
     "github.com/solo-io/go-utils/contextutils",
     "github.com/solo-io/go-utils/errors",
@@ -1439,10 +1493,13 @@
     "github.com/solo-io/go-utils/manifesttestutils",
     "github.com/solo-io/go-utils/protoutils",
     "github.com/solo-io/go-utils/tarutils",
+    "github.com/solo-io/go-utils/vfsutils",
     "github.com/solo-io/solo-kit/pkg/api/v1/resources/core",
     "github.com/spf13/afero",
     "github.com/spf13/cobra",
     "go.uber.org/zap",
+    "golang.org/x/oauth2",
+    "gopkg.in/AlecAivazis/survey.v1",
     "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
     "k8s.io/api/rbac/v1",

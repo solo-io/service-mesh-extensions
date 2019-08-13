@@ -62,19 +62,17 @@ If you want to see a preview of the corresponding chart, pass the `--print-manif
 Here are two examples:
 
 ```bash
-GITHUB_TOKEN=`cat ~/github/token/file` go run main.go validate \
+GITHUB_TOKEN=`cat ~/github/token/file` go run pkg/cli/cmd/main.go validate \
     --name glooshot \
     --flavor istio \
     --version 0.0.2 \
-    --type EXTENSION \
     --print-manifest
 ```
 
 ```bash
-GITHUB_TOKEN=`cat ~/github/token/file` go run main.go validate \
+GITHUB_TOKEN=`cat ~/github/token/file` go run pkg/cli/cmd/main.go validate \
     --name kiali \
     --flavor istio \
     --version 0.12 \
-    --type EXTENSION \
     --print-manifest
 ```
