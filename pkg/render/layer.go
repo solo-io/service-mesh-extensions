@@ -2,6 +2,7 @@ package render
 
 import (
 	"context"
+
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 	"k8s.io/helm/pkg/releaseutil"
 
@@ -70,10 +71,10 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 
 	// TODO: get rid of this and just use the ValuesInputs type
 	type manifestRenderValues struct {
-		Name               string
-		InstallNamespace   string
-		FlavorName         string
-		MeshRef            core.ResourceRef
+		Name             string
+		InstallNamespace string
+		FlavorName       string
+		MeshRef          core.ResourceRef
 
 		Supergloo SuperglooInfo
 
@@ -87,11 +88,11 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 	}
 
 	return manifestRenderValues{
-		Name:               inputs.Name,
-		InstallNamespace:   inputs.InstallNamespace,
-		FlavorName:         inputs.FlavorName,
-		MeshRef:            inputs.MeshRef,
-		Supergloo:          inputs.Supergloo,
-		Custom:             customValues,
+		Name:             inputs.Name,
+		InstallNamespace: inputs.InstallNamespace,
+		FlavorName:       inputs.FlavorName,
+		MeshRef:          inputs.MeshRef,
+		Supergloo:        inputs.Supergloo,
+		Custom:           customValues,
 	}, nil
 }

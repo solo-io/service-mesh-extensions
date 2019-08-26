@@ -47,22 +47,22 @@ type SuperglooInfo struct {
 }
 
 type LayerInput struct {
-	Id      string
-	Option  *hubv1.LayerOption
+	Id     string
+	Option *hubv1.LayerOption
 }
 
 type ValuesInputs struct {
-	Name               string
-	InstallNamespace   string
-	FlavorName         string
-	Layers             []LayerInput
-	MeshRef            core.ResourceRef
+	Name             string
+	InstallNamespace string
+	FlavorName       string
+	Layers           []LayerInput
+	MeshRef          core.ResourceRef
 
-	UserDefinedValues  string
-	FlavorParams       map[string]string
-	SpecDefinedValues  string
+	UserDefinedValues string
+	FlavorParams      map[string]string
+	SpecDefinedValues string
 
-	Supergloo          SuperglooInfo
+	Supergloo SuperglooInfo
 }
 
 // Deprecated: use ManifestRenderer.ComputeResourcesForApplication instead, to allow for custom flavors
