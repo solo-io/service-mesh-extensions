@@ -13,6 +13,8 @@ longDescription: |
   * Scaling automatically and sizing workloads based on demand
   * Binding running services to eventing ecosystems
   * Developers on Knative can use familiar idioms, languages, and frameworks to deploy functions, applications, or containers workloads.
+
+  > Warning: Knative installation will not work properly unless Istio is installed to the `istio-system` namespace.
 name: knative
 repositoryUrl: github.com/knative/serving
 shortDescription: |
@@ -29,3 +31,4 @@ versions:
         versions:
           minVersion: "1.1.0"
   version: "0.8.0-istio"
+  respectManifestNamespaces: true
