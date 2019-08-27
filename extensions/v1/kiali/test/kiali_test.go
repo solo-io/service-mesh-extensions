@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/solo-io/go-utils/manifesttestutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/test"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
@@ -44,7 +44,7 @@ var _ = Describe("kiali", func() {
 				Namespace: namespace,
 			},
 		}
-		labels     = map[string]string {
+		labels = map[string]string{
 			"app": "kiali",
 		}
 	})
@@ -59,10 +59,10 @@ var _ = Describe("kiali", func() {
 
 	testDemoSecret := func() {
 		rb := ResourceBuilder{
-			Name: name,
+			Name:      name,
 			Namespace: namespace,
-			Data: map[string]string {
-				"username": "admin",
+			Data: map[string]string{
+				"username":   "admin",
 				"passphrase": "admin",
 			},
 			Labels: labels,
@@ -73,11 +73,11 @@ var _ = Describe("kiali", func() {
 	Context("0.16 with default values", func() {
 		BeforeEach(func() {
 			bindVersion("0.16")
-			labels = map[string]string {
-				"chart": "kiali",
+			labels = map[string]string{
+				"chart":    "kiali",
 				"heritage": "Tiller",
-				"release": "kiali",
-				"app": "kiali",
+				"release":  "kiali",
+				"app":      "kiali",
 			}
 		})
 
