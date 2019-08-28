@@ -100,27 +100,6 @@ message Flavor {
     repeated Layer customization_layers = 3;
     // The flavor is considered applicable if any of the specified requirement sets is satisfied.
     repeated RequirementSet requirement_sets = 4;
-    // Optional set of parameters to be used during installation.
-    repeated Parameter parameters = 5;
-}
-
-// An extension to an application. An application can be rendered with a custom flavor, or with a built in
-// flavor. The registry name is used by the
-message CustomFlavor {
-    // Reference to the version of the application this custom flavor is extending
-    AppVersionRef ref = 1;
-    // Full definition of the custom flavor
-    Flavor flavor = 2;
-}
-
-// A reference to an application in a registry
-message AppVersionRef {
-    // A unique identify for the registry containing the original application.
-    string registry_name = 1;
-    // The name of the application. Should match an application spec's "name" property.
-    string app_name = 2;
-    // The version of the application. Should match the "version" field on one of the versioned application specs for the referenced application.
-    string version = 3;
 }
 
 // Parameters represent values that are used to configure the installation of an extension.
@@ -136,6 +115,7 @@ message Parameter {
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
     bool required = 5;
+    // User-friendly display name of the parameter
     string display_name = 6;
 }
 
@@ -150,6 +130,8 @@ message Layer {
     bool optional = 3;
     // One or more variants for this configuration layer, one of which will be chosen by the user.
     repeated LayerOption options = 4;
+    // Optional set of parameters to be applied to the layer.
+    repeated Parameter parameters = 5;
 }
 
 // One option for configuring a layer. At least one of the kustomize or helm values should be set, or the layer
@@ -230,4 +212,9 @@ message TgzLocation {
 message AllowedVersions {
     string min_version = 2;
     string max_version = 3;
+}
+
+message FlavorTwo {
+    repeated Layer layers = 1;
+    repeated RequirementSet requirement_sets = 2;
 }
