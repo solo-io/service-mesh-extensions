@@ -47,8 +47,9 @@ type SuperglooInfo struct {
 }
 
 type LayerInput struct {
-	Id     string
-	Option *hubv1.LayerOption
+	Id       string
+	Option   *hubv1.LayerOption
+	OptionId string
 }
 
 type ValuesInputs struct {
@@ -59,7 +60,7 @@ type ValuesInputs struct {
 	MeshRef          core.ResourceRef
 
 	UserDefinedValues string
-	FlavorParams      map[string]string
+	Params            map[string]string
 	SpecDefinedValues string
 
 	Supergloo SuperglooInfo
@@ -139,11 +140,11 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 		}
 	}
 
-	paramValues, err := ConvertParamsToNestedMap(inputs.FlavorParams)
+	paramValues, err := ConvertParamsToNestedMap(inputs.Params)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing install params",
 			zap.Error(err),
-			zap.Any("params", inputs.FlavorParams))
+			zap.Any("params", inputs.Params))
 		return "", err
 	}
 	valuesMap = CoalesceValuesMap(ctx, valuesMap, paramValues)
@@ -364,7 +365,7 @@ func getManifestsFromInstallationStep(ctx context.Context, inputs ValuesInputs, 
 	return manifests, nil
 }
 
-// The SpecDefinedValues, UserDefinedValues, and FlavorParams inputs can contain template
+// The SpecDefinedValues, UserDefinedValues, and Params inputs can contain template
 // actions (text delimited by "{{" and "}}" ). This function renders the contents of these
 // parameters using the data contained in 'input' and updates 'input' with the results.
 func ExecInputValuesTemplates(inputs ValuesInputs) (ValuesInputs, error) {
@@ -387,12 +388,12 @@ func ExecInputValuesTemplates(inputs ValuesInputs) (ValuesInputs, error) {
 	buf.Reset()
 
 	// Render the values of the flavor parameters
-	for paramName, paramValue := range inputs.FlavorParams {
+	for paramName, paramValue := range inputs.Params {
 		t := template.Must(template.New(paramName).Parse(paramValue))
 		if err := t.Execute(buf, inputs); err != nil {
 			return ValuesInputs{}, err
 		}
-		inputs.FlavorParams[paramName] = buf.String()
+		inputs.Params[paramName] = buf.String()
 		buf.Reset()
 	}
 

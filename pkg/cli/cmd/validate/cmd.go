@@ -85,7 +85,7 @@ func validate(o *options.Options) error {
 		// TODO - support validation with these parameters
 		//SuperglooNamespace: "",
 		//UserDefinedValues:  "",
-		//FlavorParams:       nil,
+		//Params:       nil,
 		//SpecDefinedValues:  "",
 	}
 

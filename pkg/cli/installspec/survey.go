@@ -42,13 +42,13 @@ func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationS
 		return nil, err
 	}
 	values.FlavorName = flavor.Name
-	values.FlavorParams = make(map[string]string)
+	values.Params = make(map[string]string)
 	for _, param := range flavor.GetParameters() {
 		val, err := selectParam(param)
 		if err != nil {
 			return nil, err
 		}
-		values.FlavorParams[param.Name] = val
+		values.Params[param.Name] = val
 	}
 	return &values, nil
 }

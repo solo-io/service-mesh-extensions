@@ -210,7 +210,7 @@ var _ = Describe("utils", func() {
 		It("works", func() {
 			inputs := render.ValuesInputs{
 				UserDefinedValues: "foo: bar",
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"baz1.baz2": "baz3",
 				},
 				SpecDefinedValues: "goo: hoo",
@@ -221,7 +221,7 @@ var _ = Describe("utils", func() {
 
 		It("prefers flavor params to spec values", func() {
 			inputs := render.ValuesInputs{
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"foo": "bar",
 				},
 				SpecDefinedValues: "foo: baz",
@@ -233,7 +233,7 @@ var _ = Describe("utils", func() {
 		It("prefers user params to flavor params", func() {
 			inputs := render.ValuesInputs{
 				UserDefinedValues: "foo: bar",
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"foo": "baz",
 				},
 			}
@@ -251,7 +251,7 @@ var _ = Describe("utils", func() {
 			str := "invalidYaml"
 			inputs := render.ValuesInputs{
 				UserDefinedValues: str,
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"baz1.baz2": "baz3",
 				},
 				SpecDefinedValues: "goo: hoo",
@@ -273,7 +273,7 @@ var _ = Describe("utils", func() {
 			key := "invalid"
 			invalid := "{{"
 			inputs := render.ValuesInputs{
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					key: invalid,
 				},
 			}
@@ -295,7 +295,7 @@ var _ = Describe("utils", func() {
 				ClusterRoleName: "supergloo-crb",
 			},
 			UserDefinedValues: "top:\n  nested: {{ .InstallNamespace }}\n",
-			FlavorParams: map[string]string{
+			Params: map[string]string{
 				"my.app.cluster-role": "{{ .Supergloo.ClusterRoleName }}",
 				"my.app.mesh-ref":     "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
 				"unchanged":           "still-the-same",
@@ -314,7 +314,7 @@ var _ = Describe("utils", func() {
 				ClusterRoleName: "supergloo-crb",
 			},
 			UserDefinedValues: "top:\n  nested: test-ns\n",
-			FlavorParams: map[string]string{
+			Params: map[string]string{
 				"my.app.cluster-role": "supergloo-crb",
 				"my.app.mesh-ref":     "my-mesh.mesh-ns",
 				"unchanged":           "still-the-same",

@@ -82,7 +82,7 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 		Custom interface{}
 	}
 
-	customValues, err := ConvertParamsToNestedMap(inputs.FlavorParams)
+	customValues, err := ConvertParamsToNestedMap(inputs.Params)
 	if err != nil {
 		return nil, err
 	}
