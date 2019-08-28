@@ -35,3 +35,13 @@ func GetInstalledFlavor(name string, flavors []*v1.Flavor) (*v1.Flavor, error) {
 	}
 	return nil, NoFlavorFoundError(name)
 }
+
+func GetRequiredLayerCount(flavor *v1.Flavor) int {
+	count := 0
+	for _, layer := range flavor.GetCustomizationLayers() {
+		if layer.Optional == false {
+			count++
+		}
+	}
+	return count
+}

@@ -47,9 +47,8 @@ type SuperglooInfo struct {
 }
 
 type LayerInput struct {
-	Id       string
-	Option   *hubv1.LayerOption
-	OptionId string
+	Id     string
+	Option *hubv1.LayerOption
 }
 
 type ValuesInputs struct {
@@ -82,22 +81,22 @@ func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) erro
 		return UnexpectedFlavorError(inputs.FlavorName, flavor.GetName())
 	}
 
-	if len(inputs.Layers) != len(flavor.CustomizationLayers) {
+	if len(inputs.Layers) != GetRequiredLayerCount(flavor) {
 		return IncorrectNumberOfInputLayersError
 	}
 
 	for i, inputLayer := range inputs.Layers {
-		actualLayer := flavor.CustomizationLayers[i]
-		if inputLayer.Id != actualLayer.Id {
+		flavorLayer := flavor.CustomizationLayers[i]
+		if inputLayer.Id != flavorLayer.Id {
 			return UnexpectedInputLayerIdError
 		}
 
-		if inputLayer.Option == nil && !actualLayer.Optional {
+		if inputLayer.Option == nil && !flavorLayer.Optional {
 			return InvalidLayerConfigError
 		}
 
 		found := false
-		for _, option := range actualLayer.Options {
+		for _, option := range flavorLayer.Options {
 			if option.Equal(inputLayer.Option) {
 				found = true
 			}
@@ -387,7 +386,7 @@ func ExecInputValuesTemplates(inputs ValuesInputs) (ValuesInputs, error) {
 	inputs.UserDefinedValues = buf.String()
 	buf.Reset()
 
-	// Render the values of the flavor parameters
+	// Render the values of the parameters
 	for paramName, paramValue := range inputs.Params {
 		t := template.Must(template.New(paramName).Parse(paramValue))
 		if err := t.Execute(buf, inputs); err != nil {

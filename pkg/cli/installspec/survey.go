@@ -43,12 +43,14 @@ func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationS
 	}
 	values.FlavorName = flavor.Name
 	values.Params = make(map[string]string)
-	for _, param := range flavor.GetParameters() {
-		val, err := selectParam(param)
-		if err != nil {
-			return nil, err
+	for _, layer := range flavor.GetCustomizationLayers() {
+		for _, param := range layer.GetParameters() {
+			val, err := selectParam(param)
+			if err != nil {
+				return nil, err
+			}
+			values.Params[param.Name] = val
 		}
-		values.Params[param.Name] = val
 	}
 	return &values, nil
 }
