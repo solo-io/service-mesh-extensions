@@ -12,8 +12,7 @@ GCFLAGS := all="-N -l"
 generated-code:
 	protoc --gogo_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp:. -I$(GOPATH)/src -I$(GOPATH)/src/github.com/gogo/protobuf -I$(GOPATH)/src/github.com/gogo/protobuf/protobuf -I$(GOPATH)/src/github.com/solo-io/service-mesh-hub api/v1/registry.proto
 	go generate ./...
-	gofmt -w pkg test
-	goimports -w pkg test
+	gofmt -w $(shell ls -d -- */ | grep -v vendor) && goimports -w $(shell ls -d -- */ | grep -v vendor)
 
 .PHONY: update-deps
 update-deps:
