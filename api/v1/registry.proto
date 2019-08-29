@@ -150,7 +150,7 @@ message LayerOption {
     // A kustomize overlay
     Kustomize kustomize = 4;
     // A set of value overrides
-    string helmValues = 5;
+    string helm_values = 5;
 }
 
 // Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)

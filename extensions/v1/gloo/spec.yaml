@@ -29,9 +29,9 @@ versions:
       displayName: "Vanilla Overlay"
       optional: false
       options:
-      - id: "still the only option"
-        displayName: "you have no choice but this one"
-        description: "not even one"
+      - id: "one"
+        displayName: "how about this one"
+        description: "asdf"
         kustomize:
           github:
             org: solo-io
@@ -39,6 +39,14 @@ versions:
             ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
             directory: extensions/v1/gloo/overlays
           overlayPath: vanilla
+      - id: "two"
+        displayName: "two"
+        description: "qwerty"
+        helmValues: |-
+          discovery:
+            deployment:
+              image:
+                tag: 0.0.1
 #  - name: supergloo
 #    description: "Install gloo as an ingress to your mesh using supergloo"
 #    customizationLayers:

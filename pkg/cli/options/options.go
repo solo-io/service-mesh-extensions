@@ -47,7 +47,7 @@ var RegistryDefaults = Registry{
 	GithubRegistry: v1.GithubRepositoryLocation{
 		Org:       "solo-io",
 		Repo:      "service-mesh-hub",
-		Ref:       "v0.0.2",
+		Ref:       "better-layering-aug",
 		Directory: "extensions/v1",
 	},
 }

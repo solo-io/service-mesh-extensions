@@ -143,7 +143,7 @@ func selectLayerInputList(flavor *v1.Flavor) ([]render.LayerInput, error) {
 }
 
 func selectLayerOption(layer *v1.Layer) (*v1.LayerOption, error) {
-	layerOptions := make([]string, len(layer.Options), 0)
+	layerOptions := make([]string, 0, len(layer.Options))
 	displayNameToLayerOption := make(map[string]*v1.LayerOption, len(layerOptions))
 	for _, option := range layer.GetOptions() {
 		layerOptions = append(layerOptions, option.DisplayName)
