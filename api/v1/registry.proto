@@ -62,6 +62,9 @@ message VersionedApplicationSpec {
 
     // Mesh-specific modifications to the extension installation manifest.
     repeated Flavor flavors = 40;
+
+    // Manifest render parameters that apply to all flavors of this version
+    repeated Parameter parameters = 41;
 }
 
 // InstallationSteps specify an installation procedure for Applications composed of multiple manifests.
