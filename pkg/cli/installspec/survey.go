@@ -42,14 +42,18 @@ func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationS
 		return nil, err
 	}
 	values.FlavorName = flavor.Name
+	if values.Layers, err = selectLayerInputList(flavor); err != nil {
+		return nil, err
+	}
+
+	// TODO joekelley get params at the right time.
 	values.Params = make(map[string]string)
+	if err := selectParams(version.GetParameters(), values.Params); err != nil {
+		return nil, err
+	}
 	for _, layer := range flavor.GetCustomizationLayers() {
-		for _, param := range layer.GetParameters() {
-			val, err := selectParam(param)
-			if err != nil {
-				return nil, err
-			}
-			values.Params[param.Name] = val
+		if err := selectParams(layer.GetParameters(), values.Params); err != nil {
+			return nil, err
 		}
 	}
 	return &values, nil
@@ -121,6 +125,52 @@ func selectFlavor(spec *v1.VersionedApplicationSpec) (*v1.Flavor, error) {
 		return nil, err
 	}
 	return nameToFlavor[flavor], nil
+}
+
+func selectLayerInputList(flavor *v1.Flavor) ([]render.LayerInput, error) {
+	layerInputList := make([]render.LayerInput, 0, len(flavor.GetCustomizationLayers()))
+	for _, layer := range flavor.GetCustomizationLayers() {
+		option, err := selectLayerOption(layer)
+		if err != nil {
+			return nil, err
+		}
+		layerInputList = append(layerInputList, render.LayerInput{
+			Id:     layer.Id,
+			Option: option,
+		})
+	}
+	return layerInputList, nil
+}
+
+func selectLayerOption(layer *v1.Layer) (*v1.LayerOption, error) {
+	layerOptions := make([]string, len(layer.Options), 0)
+	displayNameToLayerOption := make(map[string]*v1.LayerOption, len(layerOptions))
+	for _, option := range layer.GetOptions() {
+		layerOptions = append(layerOptions, option.DisplayName)
+		displayNameToLayerOption[option.DisplayName] = option
+	}
+	option := ""
+	prompt := &survey.Select{
+		Options:  layerOptions,
+		Message:  "Select an option for this layer.",
+		PageSize: 10,
+	}
+	// TODO joekelley support optional layers
+	if err := survey.AskOne(prompt, &option, survey.Required); err != nil {
+		return nil, err
+	}
+	return displayNameToLayerOption[option], nil
+}
+
+func selectParams(specs []*v1.Parameter, dest map[string]string) error {
+	for _, spec := range specs {
+		val, err := selectParam(spec)
+		if err != nil {
+			return err
+		}
+		dest[spec.Name] = val
+	}
+	return nil
 }
 
 func selectParam(spec *v1.Parameter) (string, error) {

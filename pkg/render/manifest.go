@@ -47,9 +47,8 @@ type SuperglooInfo struct {
 }
 
 type LayerInput struct {
-	Id       string
-	Option   *hubv1.LayerOption
-	OptionId string
+	Id     string
+	Option *hubv1.LayerOption
 }
 
 type ValuesInputs struct {
