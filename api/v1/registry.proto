@@ -112,7 +112,8 @@ message Parameter {
     // Description of what the effects of the parameter are.
     string description = 2;
     // Value of the parameter
-    string value = 3;
+    // TODO implement
+    ParameterValue value = 3;
     // Default value of the parameter
     string default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
@@ -120,6 +121,16 @@ message Parameter {
     bool required = 5;
     // User-friendly display name of the parameter
     string display_name = 6;
+}
+
+message ParameterValue {
+    oneof value {
+        // Simple string value for a parameter.
+        string string_value = 1;
+        // Reference to a secret containing the parameter value.
+        // TODO joekelley pre-merge do we need to wrap this and associate keys within `data`?
+        core.solo.io.ResourceRef secret_ref = 2;
+    }
 }
 
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
