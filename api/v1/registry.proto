@@ -112,10 +112,9 @@ message Parameter {
     // Description of what the effects of the parameter are.
     string description = 2;
     // Value of the parameter
-    // TODO implement
     ParameterValue value = 3;
     // Default value of the parameter
-    string default = 4;
+    ParameterValue default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
     bool required = 5;
@@ -124,13 +123,21 @@ message Parameter {
 }
 
 message ParameterValue {
-    oneof value {
-        // Simple string value for a parameter.
-        string string_value = 1;
-        // Reference to a secret containing the parameter value.
-        // TODO joekelley pre-merge do we need to wrap this and associate keys within `data`?
-        core.solo.io.ResourceRef secret_ref = 2;
+    oneof type {
+        string string = 1;
+        float float = 2;
+        bool bool = 3;
+        int64 int = 4;
+        google.protobuf.Timestamp date = 5 [(gogoproto.stdtime) = true];
+        SecretValue secret = 6;
     }
+}
+
+message SecretValue {
+    // Namespace and name of the Kubernetes secret containing the value
+    core.solo.io.ResourceRef ref = 1;
+    // Key for the desired value within the secret's data map.
+    string key = 2;
 }
 
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
