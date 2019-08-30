@@ -111,15 +111,25 @@ message Parameter {
     string name = 1;
     // Description of what the effects of the parameter are.
     string description = 2;
-    // Value of the parameter
-    ParameterValue value = 3;
+    // Type of the parameter.
+    // Used by interfaces to the renderer.
+    ParameterType type = 3;
     // Default value of the parameter
-    ParameterValue default = 4;
+    ParameterValue default = 5;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
-    bool required = 5;
+    bool required = 6;
     // User-friendly display name of the parameter
-    string display_name = 6;
+    string display_name = 7;
+}
+
+enum ParameterType {
+    STRING = 0;
+    FLOAT = 1;
+    BOOL = 2;
+    INT = 3;
+    DATE = 4;
+    SECRET = 5;
 }
 
 message ParameterValue {
