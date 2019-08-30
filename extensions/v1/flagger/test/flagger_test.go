@@ -3,11 +3,12 @@ package test
 import (
 	"context"
 	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/solo-io/go-utils/installutils/kuberesource"
 	. "github.com/solo-io/go-utils/manifesttestutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/test"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"

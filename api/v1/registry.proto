@@ -62,6 +62,9 @@ message VersionedApplicationSpec {
 
     // Mesh-specific modifications to the extension installation manifest.
     repeated Flavor flavors = 40;
+
+    // Do not override predefined namespaces of resources as they appear in manifests
+    bool respect_manifest_namespaces = 41;
 }
 
 // InstallationSteps specify an installation procedure for Applications composed of multiple manifests.
