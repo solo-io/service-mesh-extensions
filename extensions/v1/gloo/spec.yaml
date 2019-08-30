@@ -26,8 +26,7 @@ versions:
     description: "Install gloo"
     customizationLayers:
     - id: "only-vanilla-layer"
-      displayName: "Vanilla Overlay"
-      optional: false
+      displayName: "Vanilla Layer"
       options:
       - id: "one"
         displayName: "how about this one"
@@ -47,14 +46,20 @@ versions:
             deployment:
               image:
                 tag: 0.0.1
-#  - name: supergloo
-#    description: "Install gloo as an ingress to your mesh using supergloo"
-#    customizationLayers:
-#    - kustomize:
-#        github:
-#          org: solo-io
-#          repo: service-mesh-hub
-#          ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
-#          directory: extensions/v1/gloo/overlays
-#        overlayPath: supergloo
+  - name: supergloo
+    description: "Install gloo as an ingress to your mesh using supergloo"
+    customizationLayers:
+      - id: "supergloo-layer"
+        displayName: "Supergloo Layer"
+        options:
+        - id: "one"
+          displayName: "only option"
+          description: "asdf"
+          kustomize:
+            github:
+              org: solo-io
+              repo: service-mesh-hub
+              ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
+              directory: extensions/v1/gloo/overlays
+            overlayPath: supergloo
   version: "0.13.26"

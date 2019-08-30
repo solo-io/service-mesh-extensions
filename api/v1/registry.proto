@@ -130,7 +130,6 @@ message Layer {
     // A user-friendly name of the layer, i.e. "Mutual TLS Settings"
     string display_name = 2;
     // If true, this layer can be flagged on or off for rendering.
-    // TODO joekelley I prefer required here since that's what we have on parameters
     bool optional = 3;
     // One or more variants for this configuration layer, one of which will be chosen by the user.
     repeated LayerOption options = 4;
@@ -218,9 +217,4 @@ message TgzLocation {
 message AllowedVersions {
     string min_version = 2;
     string max_version = 3;
-}
-
-message FlavorTwo {
-    repeated Layer layers = 1;
-    repeated RequirementSet requirement_sets = 2;
 }
