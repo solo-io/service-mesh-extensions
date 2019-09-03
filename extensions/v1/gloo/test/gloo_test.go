@@ -45,7 +45,6 @@ var _ = Describe("gloo extension test", func() {
 			testInput    = func(flavorName string, layers []render.LayerInput) render.ValuesInputs {
 				return render.ValuesInputs{
 					Name:             name,
-					FlavorName:       flavorName,
 					Flavor:           test.GetFlavor(flavorName, version),
 					Layers:           layers,
 					InstallNamespace: namespace,

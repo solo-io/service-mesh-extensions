@@ -36,12 +36,18 @@ versions:
   - name: istio
     description: "Install kiali to your istio mesh"
     customizationLayers:
-    - kustomize:
-        github:
-          org: solo-io
-          repo: service-mesh-hub
-          ref: master
-          directory: extensions/v1/kiali/overlays
+    - id: demo-secret
+      displayName: Demo Secret
+      options:
+      - id: demo-secret
+        displayName: "Demo"
+        description: Install a Kiali with a placeholder secret for demoing purposes.
+        kustomize:
+          github:
+            org: solo-io
+            repo: service-mesh-hub
+            ref: master
+            directory: extensions/v1/kiali/overlays
     requirementSets:
     - meshRequirement:
         meshType: ISTIO

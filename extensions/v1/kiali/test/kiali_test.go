@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/solo-io/go-utils/manifesttestutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/test"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
@@ -37,21 +37,22 @@ var _ = Describe("kiali", func() {
 		}
 		inputs = render.ValuesInputs{
 			Name:             name,
-			FlavorName:       meshName,
 			InstallNamespace: namespace,
 			MeshRef: core.ResourceRef{
 				Name:      meshName,
 				Namespace: namespace,
 			},
 		}
-		labels     = map[string]string {
+		labels = map[string]string{
 			"app": "kiali",
 		}
 	})
 
-	bindVersion := func(versionString string) {
+	bindVersion := func(versionString string, layerInput []render.LayerInput) {
 		version = versionMap[versionString]
+		inputs.Flavor = test.GetFlavor(meshName, version)
 		inputs.SpecDefinedValues = version.ValuesYaml
+		inputs.Layers = layerInput
 		rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 		Expect(err).NotTo(HaveOccurred())
 		testManifest = NewTestManifestWithResources(rendered)
@@ -59,10 +60,10 @@ var _ = Describe("kiali", func() {
 
 	testDemoSecret := func() {
 		rb := ResourceBuilder{
-			Name: name,
+			Name:      name,
 			Namespace: namespace,
-			Data: map[string]string {
-				"username": "admin",
+			Data: map[string]string{
+				"username":   "admin",
 				"passphrase": "admin",
 			},
 			Labels: labels,
@@ -72,12 +73,12 @@ var _ = Describe("kiali", func() {
 
 	Context("0.16 with default values", func() {
 		BeforeEach(func() {
-			bindVersion("0.16")
-			labels = map[string]string {
-				"chart": "kiali",
+			bindVersion("0.16", nil)
+			labels = map[string]string{
+				"chart":    "kiali",
 				"heritage": "Tiller",
-				"release": "kiali",
-				"app": "kiali",
+				"release":  "kiali",
+				"app":      "kiali",
 			}
 		})
 
@@ -92,7 +93,14 @@ var _ = Describe("kiali", func() {
 
 	Context("0.12 with default values", func() {
 		BeforeEach(func() {
-			bindVersion("0.12")
+			bindVersion("0.12", []render.LayerInput{{
+				LayerId:  "demo-secret",
+				OptionId: "demo-secret",
+			}})
+			inputs.Layers = []render.LayerInput{{
+				LayerId:  "demo-secret",
+				OptionId: "demo-secret",
+			}}
 		})
 
 		It("has the correct number of resources", func() {
