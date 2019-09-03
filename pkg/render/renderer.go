@@ -8,10 +8,8 @@ import (
 )
 
 type ManifestRenderer interface {
-	// Given the spec and flavor definition, generate a set of kube resources that represent the exact install manifest.
-	// Note: to allow for custom flavor definitions, flavor is passed in here, and it is not required that the spec contains
-	// it as one of the built-in flavors, as long as it is valid for the user inputs.
-	ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *v1.VersionedApplicationSpec, flavor *v1.Flavor) (kuberesource.UnstructuredResources, error)
+	// Given the spec and values inputs, generate a set of kube resources that represent the exact install manifest.
+	ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *v1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error)
 }
 
 type manifestRenderer struct {
@@ -21,7 +19,7 @@ func NewManifestRenderer() ManifestRenderer {
 	return &manifestRenderer{}
 }
 
-func (m *manifestRenderer) ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *v1.VersionedApplicationSpec, flavor *v1.Flavor) (kuberesource.UnstructuredResources, error) {
+func (m *manifestRenderer) ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *v1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
 	inputs, err := ExecInputValuesTemplates(inputs)
 	if err != nil {
 		return nil, FailedRenderValueTemplatesError(err)
@@ -32,7 +30,7 @@ func (m *manifestRenderer) ComputeResourcesForApplication(ctx context.Context, i
 		return nil, err
 	}
 
-	if err := ValidateInputsAgainstFlavor(inputs, flavor); err != nil {
+	if err := ValidateInputs(inputs); err != nil {
 		return nil, err
 	}
 

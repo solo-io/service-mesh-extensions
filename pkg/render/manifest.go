@@ -38,10 +38,6 @@ var (
 	}
 
 	IncorrectNumberOfInputLayersError = errors.Errorf("incorrect number of input layers")
-
-	UnexpectedInputLayerIdError = errors.Errorf("unexpected input layer id")
-
-	InvalidLayerConfigError = errors.Errorf("invalid layer config")
 )
 
 type SuperglooInfo struct {
@@ -58,40 +54,33 @@ type ValuesInputs struct {
 	Name             string
 	InstallNamespace string
 	Flavor           *hubv1.Flavor
+	// TODO joekelley remove
 	// Deprecated
 	FlavorName string
 	Layers     []LayerInput
 	MeshRef    core.ResourceRef
 
 	UserDefinedValues string
-	Params            map[string]string
 	SpecDefinedValues string
+	// These map to the params found on versions, flavors, and layers,
+	Params map[string]string
 
 	Supergloo SuperglooInfo
 }
 
-// Deprecated: use ManifestRenderer.ComputeResourcesForApplication instead, to allow for custom flavors
+// Deprecated: use ManifestRenderer.ComputeResourcesForApplication
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
-	installedFlavor, err := GetInstalledFlavor(inputs.FlavorName, spec.Flavors)
-	if err != nil {
-		return nil, err
-	}
-
 	renderer := NewManifestRenderer()
-	return renderer.ComputeResourcesForApplication(ctx, inputs, spec, installedFlavor)
+	return renderer.ComputeResourcesForApplication(ctx, inputs, spec)
 }
 
-func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) error {
-	if flavor.GetName() != inputs.FlavorName {
-		return UnexpectedFlavorError(inputs.FlavorName, flavor.GetName())
-	}
-
-	if len(inputs.Layers) != GetRequiredLayerCount(flavor) {
+func ValidateInputs(inputs ValuesInputs) error {
+	if len(inputs.Layers) != GetRequiredLayerCount(inputs.Flavor) {
 		return IncorrectNumberOfInputLayersError
 	}
 
-	for _, flavorLayer := range flavor.CustomizationLayers {
-		layer, err := GetLayer(flavorLayer.Id, flavor)
+	for _, flavorLayer := range inputs.Flavor.CustomizationLayers {
+		layer, err := GetLayer(flavorLayer.Id, inputs.Flavor)
 		if err != nil && !flavorLayer.Optional {
 			return MissingInputForRequiredLayer(err)
 		} else if err != nil && flavorLayer.Optional {
@@ -111,28 +100,29 @@ func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) erro
 		}
 	}
 
-	for _, inputLayer := range inputs.Layers {
-		layer, err := GetLayer(inputLayer.LayerId, flavor)
-		if err != nil {
-			return err
-		}
-
-		var flavorLayer *hubv1.Layer
-		for _, l := range flavor.CustomizationLayers {
-			if layer.Id == l.Id {
-				flavorLayer = l
-				break
-			}
-		}
-		if flavorLayer == nil {
-			return UnexpectedInputLayerIdError
-		}
-
-		if inputLayer.OptionId == "" && !flavorLayer.Optional {
-			return InvalidLayerConfigError
-		}
-
-	}
+	// TODO JOEKELLEY make sure optional layers are handled correctly
+	// for _, inputLayer := range inputs.Layers {
+	//	layer, err := GetLayer(inputLayer.LayerId, inputs.Flavor)
+	//	if err != nil {
+	//		return err
+	//	}
+	//
+	//	var flavorLayer *hubv1.Layer
+	//	for _, l := range inputs.Flavor.CustomizationLayers {
+	//		if layer.Id == l.Id {
+	//			flavorLayer = l
+	//			break
+	//		}
+	//	}
+	//	if flavorLayer == nil {
+	//		return UnexpectedInputLayerIdError
+	//	}
+	//
+	//	if inputLayer.OptionId == "" && !flavorLayer.Optional {
+	//		return InvalidLayerConfigError
+	//	}
+	//
+	//}
 
 	return nil
 }

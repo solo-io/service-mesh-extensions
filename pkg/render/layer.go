@@ -78,8 +78,8 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 	type manifestRenderValues struct {
 		Name             string
 		InstallNamespace string
-		FlavorName       string
-		MeshRef          core.ResourceRef
+		//FlavorName       string
+		MeshRef core.ResourceRef
 
 		Supergloo SuperglooInfo
 
@@ -95,9 +95,9 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 	return manifestRenderValues{
 		Name:             inputs.Name,
 		InstallNamespace: inputs.InstallNamespace,
-		FlavorName:       inputs.FlavorName,
-		MeshRef:          inputs.MeshRef,
-		Supergloo:        inputs.Supergloo,
-		Custom:           customValues,
+		//FlavorName:       inputs.FlavorName,
+		MeshRef:   inputs.MeshRef,
+		Supergloo: inputs.Supergloo,
+		Custom:    customValues,
 	}, nil
 }
