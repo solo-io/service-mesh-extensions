@@ -103,44 +103,8 @@ message Flavor {
     repeated Layer customization_layers = 3;
     // The flavor is considered applicable if any of the specified requirement sets is satisfied.
     repeated RequirementSet requirement_sets = 4;
-}
-
-// Parameters represent values that are used to configure the installation of an extension.
-message Parameter {
-    // Identifier of the parameter
-    string name = 1;
-    // Description of what the effects of the parameter are.
-    string description = 2;
-    // Type of the parameter.
-    // Used by interfaces to the renderer.
-    ParameterType type = 3;
-    // Default value of the parameter
-    ParameterValue default = 5;
-    // Indicates whether a value for the parameter is required for the installation of the extension
-    // to be performed.
-    bool required = 6;
-    // User-friendly display name of the parameter
-    string display_name = 7;
-}
-
-enum ParameterType {
-    STRING = 0;
-    FLOAT = 1;
-    BOOL = 2;
-    INT = 3;
-    DATE = 4;
-    SECRET = 5;
-}
-
-message ParameterValue {
-    oneof type {
-        string string = 1;
-        float float = 2;
-        bool bool = 3;
-        int64 int = 4;
-        google.protobuf.Timestamp date = 5 [(gogoproto.stdtime) = true];
-        SecretValue secret = 6;
-    }
+    // Optional set of parameters to be applied to the flavor.
+    repeated Parameter parameters = 5;
 }
 
 message SecretValue {
@@ -178,6 +142,8 @@ message LayerOption {
     Kustomize kustomize = 4;
     // A set of value overrides
     string helm_values = 5;
+    // Optional set of parameters to be applied to the layer.
+    repeated Parameter parameters = 6;
 }
 
 // Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
@@ -191,6 +157,45 @@ message Kustomize {
 
     // Path to the overlay overlay that will be applied to the base (the rendered installation manifest).
     string overlay_path = 3;
+}
+
+// Parameters represent values that are used to configure the installation of an extension.
+message Parameter {
+    // Identifier of the parameter
+    string name = 1;
+    // Description of what the effects of the parameter are.
+    string description = 2;
+    // Type of the parameter.
+    // Used by interfaces to the renderer.
+    ParameterType type = 3;
+    // Default value of the parameter
+    ParameterValue default = 4;
+    // Indicates whether a value for the parameter is required for the installation of the extension
+    // to be performed.
+    bool required = 5;
+    // User-friendly display name of the parameter
+    string display_name = 6;
+}
+
+// Must stay in sync with the type oneof on the ParameterValue message
+enum ParameterType {
+    STRING = 0;
+    FLOAT = 1;
+    BOOL = 2;
+    INT = 3;
+    DATE = 4;
+    SECRET = 5;
+}
+
+message ParameterValue {
+    oneof type {
+        string string = 1;
+        bool bool = 2;
+        int64 int = 3;
+        float float = 4;
+        google.protobuf.Timestamp date = 5 [(gogoproto.stdtime) = true];
+        SecretValue secret = 6;
+    }
 }
 
 // Wraps a collection of FlavorCompatibilityInfo

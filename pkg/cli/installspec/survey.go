@@ -32,22 +32,25 @@ func GetInstallSpec(reader registry.SpecReader, installNamespace string) (*Insta
 
 func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationSpec, installNamespace string) (*render.ValuesInputs, error) {
 	values := render.ValuesInputs{
-		InstallNamespace: installNamespace,
+		Name:              spec.Name,
+		InstallNamespace:  installNamespace,
+		SpecDefinedValues: version.ValuesYaml,
+		Params:            make(map[string]string),
 	}
 
-	values.Name = spec.Name
-	values.SpecDefinedValues = version.ValuesYaml
 	flavor, err := selectFlavor(version)
 	if err != nil {
 		return nil, err
 	}
 	values.FlavorName = flavor.Name
+	if err = selectParams(flavor.GetParameters(), values.Params); err != nil {
+		return nil, err
+	}
+
 	if values.Layers, err = selectLayerInputList(flavor); err != nil {
 		return nil, err
 	}
 
-	// TODO joekelley get params at the right time.
-	values.Params = make(map[string]string)
 	if err := selectParams(version.GetParameters(), values.Params); err != nil {
 		return nil, err
 	}
@@ -175,7 +178,7 @@ func selectParams(specs []*v1.Parameter, dest map[string]string) error {
 
 func selectParam(spec *v1.Parameter) (string, error) {
 	prompt := &survey.Input{
-		Default: spec.Default,
+		Default: spec.Default.GetString_(),
 		Message: fmt.Sprintf("[%s] %s", spec.Description, spec.Name),
 	}
 	input := ""

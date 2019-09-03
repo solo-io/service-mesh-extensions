@@ -20,11 +20,13 @@ versions:
     - name: crds.create
       description: |-
         Whether or not to create gloo crds.
-      default: "false"
+      default:
+        bool: false
     - name: gloo.deployment.image.tag
       description: |-
         Gloo image tag
-      default: "1.1.1"
+      default:
+        string: "1.1.1"
   flavors:
   - name: vanilla
     description: "Install gloo"
