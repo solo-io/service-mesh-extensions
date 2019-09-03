@@ -42,7 +42,7 @@ func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationS
 	if err != nil {
 		return nil, err
 	}
-	values.FlavorName = flavor.Name
+	values.Flavor = flavor
 	if err = selectParams(flavor.GetParameters(), values.Params); err != nil {
 		return nil, err
 	}

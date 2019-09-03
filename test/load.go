@@ -17,3 +17,12 @@ func LoadApplicationSpec(pathToSpec string) *v1.ApplicationSpec {
 	Expect(err).NotTo(HaveOccurred())
 	return &spec
 }
+
+func GetFlavor(name string, spec *v1.VersionedApplicationSpec) *v1.Flavor {
+	for _, flavor := range spec.Flavors {
+		if flavor.Name == name {
+			return flavor
+		}
+	}
+	return nil
+}

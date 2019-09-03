@@ -33,6 +33,10 @@ var (
 		return errors.Wrapf(err, "error rendering input value templates")
 	}
 
+	MissingInputForRequiredLayer = func(err error) error {
+		return errors.Wrapf(err, "error retrieving input for required layer")
+	}
+
 	IncorrectNumberOfInputLayersError = errors.Errorf("incorrect number of input layers")
 
 	UnexpectedInputLayerIdError = errors.Errorf("unexpected input layer id")
@@ -86,6 +90,27 @@ func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) erro
 		return IncorrectNumberOfInputLayersError
 	}
 
+	for _, flavorLayer := range flavor.CustomizationLayers {
+		layer, err := GetLayer(flavorLayer.Id, flavor)
+		if err != nil && !flavorLayer.Optional {
+			return MissingInputForRequiredLayer(err)
+		} else if err != nil && flavorLayer.Optional {
+			continue
+		}
+
+		var optionId string
+		for _, layerInput := range inputs.Layers {
+			if layerInput.LayerId == flavorLayer.Id {
+				optionId = layerInput.OptionId
+			}
+		}
+
+		_, err = GetLayerOption(optionId, layer)
+		if err != nil {
+			return err
+		}
+	}
+
 	for _, inputLayer := range inputs.Layers {
 		layer, err := GetLayer(inputLayer.LayerId, flavor)
 		if err != nil {
@@ -107,10 +132,6 @@ func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) erro
 			return InvalidLayerConfigError
 		}
 
-		_, err = GetLayerOption(inputLayer.OptionId, layer)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

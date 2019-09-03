@@ -43,12 +43,7 @@ func ApplyLayers(ctx context.Context, inputs ValuesInputs, manifests helmchart.M
 	kustomizeLoader := loader.NewKustomizeLoader(ctx, fs)
 	var manifestBytes []byte
 	for _, layerInput := range inputs.Layers {
-		layer, err := GetLayer(layerInput.LayerId, inputs.Flavor)
-		if err != nil {
-			return nil, err
-		}
-
-		option, err := GetLayerOption(layerInput.OptionId, layer)
+		option, err := GetLayerOptionTwo(layerInput.LayerId, layerInput.OptionId, inputs.Flavor)
 		if err != nil {
 			return nil, err
 		}

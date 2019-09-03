@@ -42,10 +42,12 @@ var _ = Describe("gloo extension test", func() {
 			version      *v1.VersionedApplicationSpec
 			inputs       render.ValuesInputs
 			testManifest TestManifest
-			testInput    = func(flavorName string) render.ValuesInputs {
+			testInput    = func(flavorName string, layers []render.LayerInput) render.ValuesInputs {
 				return render.ValuesInputs{
 					Name:             name,
 					FlavorName:       flavorName,
+					Flavor:           test.GetFlavor(flavorName, version),
+					Layers:           layers,
 					InstallNamespace: namespace,
 					MeshRef: core.ResourceRef{
 						Name:      meshName,
@@ -56,10 +58,14 @@ var _ = Describe("gloo extension test", func() {
 			}
 		)
 
-		Context("0.13.26 with supergloo overlay", func() {
+		PContext("0.13.26 with supergloo overlay", func() {
 			BeforeEach(func() {
 				version = versionMap["0.13.26"]
-				inputs = testInput("supergloo")
+				layers := []render.LayerInput{{
+					LayerId:  "supergloo",
+					OptionId: "ingress",
+				}}
+				inputs = testInput("supergloo", layers)
 				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 				Expect(err).NotTo(HaveOccurred())
 				testManifest = NewTestManifestWithResources(rendered)
@@ -76,7 +82,11 @@ var _ = Describe("gloo extension test", func() {
 		Context("0.13.26 with vanilla overlay", func() {
 			BeforeEach(func() {
 				version = versionMap["0.13.26"]
-				inputs = testInput("vanilla")
+				layers := []render.LayerInput{{
+					LayerId:  "custom-resources",
+					OptionId: "create",
+				}}
+				inputs = testInput("vanilla", layers)
 				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 				Expect(err).NotTo(HaveOccurred())
 				testManifest = NewTestManifestWithResources(rendered)
