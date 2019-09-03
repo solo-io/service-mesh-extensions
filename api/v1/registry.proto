@@ -125,8 +125,6 @@ message Layer {
     bool optional = 3;
     // One or more variants for this configuration layer, one of which will be chosen by the user.
     repeated LayerOption options = 4;
-    // Optional set of parameters to be applied to the layer.
-    repeated Parameter parameters = 5;
 }
 
 // One option for configuring a layer. At least one of the kustomize or helm values should be set, or the layer

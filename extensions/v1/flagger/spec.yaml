@@ -25,6 +25,13 @@ versions:
   valuesYaml: |-
     serviceAccount:
       name: flagger
+  parameters:
+    - name: metricsServer
+      description: |-
+        The URL of the prometheus service that flagger will use to gather canary metrics.
+      required: true
+      default:
+        string: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
   flavors:
   - name: istio
     description: "Install flagger to your Istio mesh"
@@ -33,84 +40,77 @@ versions:
         meshType: ISTIO
         versions:
           minVersion: "1.0.0"
-    parameters:
-    - name: metricsServer
-      description: |-
-        The URL of the prometheus service that flagger will use to gather canary metrics.
-      required: true
-      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
   - name: appmesh
     description: "Install flagger to your AWS App Mesh"
     requirementSets:
     - meshRequirement:
         meshType: AWS_APP_MESH
     parameters:
-    - name: metricsServer
-      description: |-
-        The URL of the prometheus service that flagger will use to gather canary metrics.
-      required: true
-      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
     - name: meshProvider
       description: >
         This value tells flagger which mesh type will be used to shift traffic between services.
-      default: "appmesh"
+      default:
+        string: "appmesh"
       required: true
   - name: istio-supergloo
     description: "Install flagger to your Istio mesh with supergloo as mesh provider"
     customizationLayers:
-    - kustomize:
-        github:
-          org: solo-io
-          repo: service-mesh-hub
-          ref: master
-          directory: extensions/v1/flagger/kustomize
-        overlayPath: istio_supergloo
+    - id: istio-supergloo
+      displayName: Istio Supergloo
+      options:
+        - id: cluster-role-binding
+          displayName: Supergloo
+          kustomize:
+            github:
+              org: solo-io
+              repo: service-mesh-hub
+              ref: master
+              directory: extensions/v1/flagger/kustomize
+            overlayPath: istio_supergloo
     requirementSets:
     - meshRequirement:
         meshType: ISTIO
     parameters:
-    - name: metricsServer
-      description: |-
-        The URL of the prometheus service that flagger will use to gather canary metrics.
-      required: true
-      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
     - name: meshProvider
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
-      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+      default:
+        string: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
       required: true
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
-      default: flagger
+      default:
+        string: flagger
   - name: appmesh-supergloo
     description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
     customizationLayers:
-    - kustomize:
-        github:
-          org: solo-io
-          repo: service-mesh-hub
-          ref: master
-          directory: extensions/v1/flagger/kustomize
-        overlayPath: appmesh_supergloo
+    - id: app-mesh-supergloo
+      displayName: AWS App Mesh
+      options:
+      - id: cluster-role-binding
+        kustomize:
+          github:
+            org: solo-io
+            repo: service-mesh-hub
+            ref: master
+            directory: extensions/v1/flagger/kustomize
+          overlayPath: appmesh_supergloo
     requirementSets:
     - meshRequirement:
         meshType: AWS_APP_MESH
     parameters:
-    - name: metricsServer
-      description: |-
-        The URL of the prometheus service that flagger will use to gather canary metrics.
-      required: true
-      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
     - name: meshProvider
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
-      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+      default:
+        string: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
       required: true
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
-      default: flagger
+      default:
+        string: flagger
   version: "0.12.0"
