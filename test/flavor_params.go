@@ -20,7 +20,7 @@ func GetDefaultParameters(versionedSpec *v1.VersionedApplicationSpec, flavorName
 
 	result := make(map[string]string)
 	for _, param := range flavor.Parameters {
-		result[param.Name] = param.Default
+		result[param.Name] = param.Default.GetString_()
 	}
 	return result
 }

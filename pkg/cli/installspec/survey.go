@@ -138,8 +138,8 @@ func selectLayerInputList(flavor *v1.Flavor) ([]render.LayerInput, error) {
 			return nil, err
 		}
 		layerInputList = append(layerInputList, render.LayerInput{
-			Id:     layer.Id,
-			Option: option,
+			LayerId:  layer.Id,
+			OptionId: option.Id,
 		})
 	}
 	return layerInputList, nil

@@ -31,12 +31,12 @@ versions:
   - name: vanilla
     description: "Install gloo"
     customizationLayers:
-    - id: "only-vanilla-layer"
-      displayName: "Vanilla Layer"
+    - id: "custom-resources"
+      displayName: "Custom Resources"
       options:
-      - id: "one"
-        displayName: "how about this one"
-        description: "asdf"
+      - id: "create"
+        displayName: "Create"
+        description: "Create custom resources at install time"
         kustomize:
           github:
             org: solo-io
@@ -44,23 +44,15 @@ versions:
             ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
             directory: extensions/v1/gloo/overlays
           overlayPath: vanilla
-      - id: "two"
-        displayName: "two"
-        description: "qwerty"
-        helmValues: |-
-          discovery:
-            deployment:
-              image:
-                tag: 0.0.1
   - name: supergloo
     description: "Install gloo as an ingress to your mesh using supergloo"
     customizationLayers:
-      - id: "supergloo-layer"
-        displayName: "Supergloo Layer"
+      - id: "supergloo"
+        displayName: "Mesh Ingress"
         options:
-        - id: "one"
-          displayName: "only option"
-          description: "asdf"
+        - id: "ingress"
+          displayName: "Ingress"
+          description: "Supergloo will configure gloo as an ingress to your mesh"
           kustomize:
             github:
               org: solo-io

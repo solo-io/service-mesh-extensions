@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/solo-io/go-utils/manifesttestutils"
-	"github.com/solo-io/service-mesh-hub/api/v1"
+	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/test"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
@@ -42,12 +42,11 @@ var _ = Describe("gloo extension test", func() {
 			version      *v1.VersionedApplicationSpec
 			inputs       render.ValuesInputs
 			testManifest TestManifest
-			testInput = func(flavorName string) render.ValuesInputs {
+			testInput    = func(flavorName string) render.ValuesInputs {
 				return render.ValuesInputs{
-					Name:               name,
-					FlavorName:         flavorName,
-					InstallNamespace:   namespace,
-					SuperglooNamespace: superglooNamesapce,
+					Name:             name,
+					FlavorName:       flavorName,
+					InstallNamespace: namespace,
 					MeshRef: core.ResourceRef{
 						Name:      meshName,
 						Namespace: namespace,

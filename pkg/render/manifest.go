@@ -47,16 +47,17 @@ type SuperglooInfo struct {
 }
 
 type LayerInput struct {
-	Id     string
-	Option *hubv1.LayerOption
+	LayerId, OptionId string
 }
 
 type ValuesInputs struct {
 	Name             string
 	InstallNamespace string
-	FlavorName       string
-	Layers           []LayerInput
-	MeshRef          core.ResourceRef
+	Flavor           *hubv1.Flavor
+	// Deprecated
+	FlavorName string
+	Layers     []LayerInput
+	MeshRef    core.ResourceRef
 
 	UserDefinedValues string
 	Params            map[string]string
@@ -85,24 +86,30 @@ func ValidateInputsAgainstFlavor(inputs ValuesInputs, flavor *hubv1.Flavor) erro
 		return IncorrectNumberOfInputLayersError
 	}
 
-	for i, inputLayer := range inputs.Layers {
-		flavorLayer := flavor.CustomizationLayers[i]
-		if inputLayer.Id != flavorLayer.Id {
+	for _, inputLayer := range inputs.Layers {
+		layer, err := GetLayer(inputLayer.LayerId, flavor)
+		if err != nil {
+			return err
+		}
+
+		var flavorLayer *hubv1.Layer
+		for _, l := range flavor.CustomizationLayers {
+			if layer.Id == l.Id {
+				flavorLayer = l
+				break
+			}
+		}
+		if flavorLayer == nil {
 			return UnexpectedInputLayerIdError
 		}
 
-		if inputLayer.Option == nil && !flavorLayer.Optional {
+		if inputLayer.OptionId == "" && !flavorLayer.Optional {
 			return InvalidLayerConfigError
 		}
 
-		found := false
-		for _, option := range flavorLayer.Options {
-			if option.Equal(inputLayer.Option) {
-				found = true
-			}
-		}
-		if !found {
-			return InvalidLayerConfigError
+		_, err = GetLayerOption(inputLayer.OptionId, layer)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -127,12 +134,17 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 	valuesMap = CoalesceValuesMap(ctx, valuesMap, specValues)
 
 	for _, layerInput := range inputs.Layers {
-		if layerInput.Option != nil && layerInput.Option.HelmValues != "" {
-			layerValues, err := ConvertYamlStringToNestedMap(layerInput.Option.HelmValues)
+		option, err := GetLayerOptionTwo(layerInput.LayerId, layerInput.OptionId, inputs.Flavor)
+		if err != nil {
+			return "", err
+		}
+
+		if option.HelmValues != "" {
+			layerValues, err := ConvertYamlStringToNestedMap(option.HelmValues)
 			if err != nil {
 				contextutils.LoggerFrom(ctx).Errorw("Error parsing layer values yaml",
 					zap.Error(err),
-					zap.String("values", layerInput.Option.HelmValues))
+					zap.String("values", option.HelmValues))
 				return "", err
 			}
 			valuesMap = CoalesceValuesMap(ctx, valuesMap, layerValues)
