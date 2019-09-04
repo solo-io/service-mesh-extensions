@@ -92,34 +92,10 @@ func ValidateInputs(inputs ValuesInputs) error {
 		}
 
 		_, err = GetLayerOption(optionId, layer)
-		if err != nil {
+		if err != nil && !layer.Optional {
 			return err
 		}
 	}
-
-	// TODO JOEKELLEY make sure optional layers are handled correctly
-	// for _, inputLayer := range inputs.Layers {
-	//	layer, err := GetLayer(inputLayer.LayerId, inputs.Flavor)
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	var flavorLayer *hubv1.Layer
-	//	for _, l := range inputs.Flavor.CustomizationLayers {
-	//		if layer.Id == l.Id {
-	//			flavorLayer = l
-	//			break
-	//		}
-	//	}
-	//	if flavorLayer == nil {
-	//		return UnexpectedInputLayerIdError
-	//	}
-	//
-	//	if inputLayer.OptionId == "" && !flavorLayer.Optional {
-	//		return InvalidLayerConfigError
-	//	}
-	//
-	//}
 
 	return nil
 }

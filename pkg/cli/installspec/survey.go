@@ -167,7 +167,6 @@ func selectLayerOption(layer *v1.Layer) (*v1.LayerOption, error) {
 		Message:  fmt.Sprintf("Select an option for layer %v.", layer.DisplayName),
 		PageSize: 10,
 	}
-	// TODO joekelley support optional layers
 
 	var v survey.Validator
 	if !layer.Optional {
