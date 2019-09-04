@@ -2,12 +2,12 @@ package installspec
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/registry"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
+	"github.com/solo-io/service-mesh-hub/pkg/util"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -193,35 +193,10 @@ func selectParams(specs []*v1.Parameter, dest map[string]string) error {
 
 func selectParam(spec *v1.Parameter) (string, error) {
 	prompt := &survey.Input{
-		Default: getDefaultParamValue(spec),
+		Default: util.GetDefaultString(spec),
 		Message: fmt.Sprintf("[%s] %s", spec.Description, spec.Name),
 	}
 	input := ""
 	err := survey.AskOne(prompt, &input, nil)
 	return input, err
-}
-
-func getDefaultParamValue(spec *v1.Parameter) string {
-	if spec.Default == nil {
-		return ""
-	}
-	switch t := spec.Default.Type.(type) {
-	case *v1.ParameterValue_String_:
-		return t.String_
-	case *v1.ParameterValue_Bool:
-		if t.Bool {
-			return "true"
-		}
-		return "false"
-	case *v1.ParameterValue_Int:
-		return strconv.Itoa(int(t.Int))
-	case *v1.ParameterValue_Float:
-		return strconv.FormatFloat(t.Float, 'E', -1, 64)
-	case *v1.ParameterValue_Date:
-		return t.Date.String()
-	case *v1.ParameterValue_Secret:
-		// Default not supported
-		return ""
-	}
-	return ""
 }
