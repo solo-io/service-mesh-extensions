@@ -16,7 +16,7 @@ var _ = Describe("Reader", func() {
 
 	var reader registry.SpecReader
 
-	Describe("ReaderTest", func() {
+	PDescribe("ReaderTest", func() {
 		Describe("RemoteSpecReader", func() {
 			Describe("GetSpecs", func() {
 				It("works", func() {
