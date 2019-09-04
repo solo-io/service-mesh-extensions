@@ -56,7 +56,6 @@ var _ = Describe("flagger", func() {
 			layers := []render.LayerInput{{LayerId: superglooIstioFlavor, OptionId: "cluster-role-binding"}}
 			inputs = render.ValuesInputs{
 				Name:             name,
-				FlavorName:       superglooIstioFlavor,
 				Flavor:           test.GetFlavor(superglooIstioFlavor, version),
 				InstallNamespace: meshNamespace,
 				MeshRef: core.ResourceRef{

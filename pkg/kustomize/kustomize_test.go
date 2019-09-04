@@ -47,7 +47,6 @@ var _ = Describe("kustomize unit tests", func() {
 		inputs = render.ValuesInputs{
 			Name:             test.HelloWorldChart1_0.Name,
 			InstallNamespace: testNs,
-			FlavorName:       test.DefaultFlavorName,
 		}
 		manifests, err = render.GetManifestsFromApplicationSpec(ctx, inputs, appSpec)
 		Expect(err).NotTo(HaveOccurred())

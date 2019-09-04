@@ -36,7 +36,6 @@ var _ = Describe("bookinfo", func() {
 		}
 		inputs = render.ValuesInputs{
 			Name:             name,
-			FlavorName:       "default",
 			InstallNamespace: namespace,
 			MeshRef: core.ResourceRef{
 				Name:      meshName,

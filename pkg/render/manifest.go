@@ -54,11 +54,8 @@ type ValuesInputs struct {
 	Name             string
 	InstallNamespace string
 	Flavor           *hubv1.Flavor
-	// TODO joekelley remove
-	// Deprecated
-	FlavorName string
-	Layers     []LayerInput
-	MeshRef    core.ResourceRef
+	Layers           []LayerInput
+	MeshRef          core.ResourceRef
 
 	UserDefinedValues string
 	SpecDefinedValues string
