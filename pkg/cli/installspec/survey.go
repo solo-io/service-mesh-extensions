@@ -39,6 +39,10 @@ func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationS
 		Params:            make(map[string]string),
 	}
 
+	if err := selectParams(version.GetParameters(), values.Params); err != nil {
+		return nil, err
+	}
+
 	flavor, err := selectFlavor(version)
 	if err != nil {
 		return nil, err
@@ -52,9 +56,6 @@ func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationS
 		return nil, err
 	}
 
-	if err := selectParams(version.GetParameters(), values.Params); err != nil {
-		return nil, err
-	}
 	for _, layer := range flavor.GetCustomizationLayers() {
 		for _, layerInput := range values.Layers {
 			if layer.Id == layerInput.LayerId {

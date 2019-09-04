@@ -77,13 +77,6 @@ func ValidateInputs(inputs ValuesInputs) error {
 	}
 
 	for _, flavorLayer := range inputs.Flavor.CustomizationLayers {
-		layer, err := GetLayer(flavorLayer.Id, inputs.Flavor)
-		if err != nil && !flavorLayer.Optional {
-			return MissingInputForRequiredLayer(err)
-		} else if err != nil && flavorLayer.Optional {
-			continue
-		}
-
 		var optionId string
 		for _, layerInput := range inputs.Layers {
 			if layerInput.LayerId == flavorLayer.Id {
@@ -91,9 +84,9 @@ func ValidateInputs(inputs ValuesInputs) error {
 			}
 		}
 
-		_, err = GetLayerOption(optionId, layer)
-		if err != nil && !layer.Optional {
-			return err
+		_, err := GetLayerOption(optionId, flavorLayer)
+		if err != nil && !flavorLayer.Optional {
+			return MissingInputForRequiredLayer(err)
 		}
 	}
 

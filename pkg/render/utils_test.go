@@ -282,6 +282,82 @@ var _ = Describe("utils", func() {
 		})
 	})
 
+	Context("validate inputs", func() {
+		It("works in an empty case", func() {
+			inputs := render.ValuesInputs{Flavor: &v1.Flavor{}}
+			err := render.ValidateInputs(inputs)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("works in a non-empty case", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id:      "a",
+							Options: []*v1.LayerOption{{Id: "1"}},
+						},
+					},
+				},
+				Layers: []render.LayerInput{{LayerId: "a", OptionId: "1"}},
+			}
+			err := render.ValidateInputs(inputs)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("works when no layer inputs are provided and no layers are required", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id:       "a",
+							Optional: true,
+							Options:  []*v1.LayerOption{{Id: "1"}},
+						},
+					},
+				},
+			}
+			err := render.ValidateInputs(inputs)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("errors if there is a different number of input layers than required layers", func() {
+			inputs := render.ValuesInputs{Flavor: &v1.Flavor{CustomizationLayers: []*v1.Layer{{}}}}
+			err := render.ValidateInputs(inputs)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(render.IncorrectNumberOfInputLayersError))
+		})
+
+		It("errors if a required layer is missing an option", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id: "a",
+							Options: []*v1.LayerOption{
+								{
+									Id: "1",
+								},
+							},
+						},
+						{
+							Id: "b",
+							Options: []*v1.LayerOption{
+								{
+									Id: "1",
+								},
+							},
+						},
+					},
+				},
+				Layers: []render.LayerInput{{LayerId: "a", OptionId: "1"}, {LayerId: "z", OptionId: "1"}},
+			}
+			err := render.ValidateInputs(inputs)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(render.MissingInputForRequiredLayer(errors.New("")).Error()))
+		})
+	})
+
 	Context("render templates in input values", func() {
 
 		inputs := render.ValuesInputs{
