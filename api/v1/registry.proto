@@ -167,6 +167,7 @@ message Parameter {
     // Used by interfaces to the renderer.
     ParameterType type = 3;
     // Default value of the parameter
+    // TODO should default always just be a string?
     ParameterValue default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
@@ -190,7 +191,7 @@ message ParameterValue {
         string string = 1;
         bool bool = 2;
         int64 int = 3;
-        float float = 4;
+        double float = 4;
         google.protobuf.Timestamp date = 5 [(gogoproto.stdtime) = true];
         SecretValue secret = 6;
     }
