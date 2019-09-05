@@ -2,7 +2,6 @@ package installspec
 
 import (
 	"fmt"
-	"strings"
 
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/registry"
@@ -120,10 +119,6 @@ func selectFlavor(spec *v1.VersionedApplicationSpec) (*v1.Flavor, error) {
 	var flavors []string
 	nameToFlavor := make(map[string]*v1.Flavor)
 	for _, flavor := range spec.GetFlavors() {
-		if strings.Contains(flavor.Name, "supergloo") {
-			// These flavors require supergloo with a cluster-admin role.
-			continue
-		}
 		nameToFlavor[flavor.Name] = flavor
 		flavors = append(flavors, flavor.Name)
 	}

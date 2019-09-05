@@ -43,7 +43,7 @@ func ApplyLayers(ctx context.Context, inputs ValuesInputs, manifests helmchart.M
 	kustomizeLoader := loader.NewKustomizeLoader(ctx, fs)
 	var manifestBytes []byte
 	for _, layerInput := range inputs.Layers {
-		option, err := GetLayerOptionTwo(layerInput.LayerId, layerInput.OptionId, inputs.Flavor)
+		option, err := GetLayerOptionFromFlavor(layerInput.LayerId, layerInput.OptionId, inputs.Flavor)
 		if err != nil {
 			return nil, err
 		}
@@ -81,8 +81,6 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 		//FlavorName       string
 		MeshRef core.ResourceRef
 
-		Supergloo SuperglooInfo
-
 		// Custom values come from the parameters set on a flavor
 		Custom interface{}
 	}
@@ -95,9 +93,7 @@ func getRenderValues(inputs ValuesInputs) (interface{}, error) {
 	return manifestRenderValues{
 		Name:             inputs.Name,
 		InstallNamespace: inputs.InstallNamespace,
-		//FlavorName:       inputs.FlavorName,
-		MeshRef:   inputs.MeshRef,
-		Supergloo: inputs.Supergloo,
-		Custom:    customValues,
+		MeshRef:          inputs.MeshRef,
+		Custom:           customValues,
 	}, nil
 }

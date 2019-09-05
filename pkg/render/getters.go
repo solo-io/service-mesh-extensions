@@ -72,7 +72,7 @@ func GetLayer(layerId string, flavor *v1.Flavor) (*v1.Layer, error) {
 	return nil, InvalidLayerIdError(layerId, flavor.Name)
 }
 
-func GetLayerOptionTwo(layerId, optionId string, flavor *v1.Flavor) (*v1.LayerOption, error) {
+func GetLayerOptionFromFlavor(layerId, optionId string, flavor *v1.Flavor) (*v1.LayerOption, error) {
 	layer, err := GetLayer(layerId, flavor)
 	if err != nil {
 		return nil, err

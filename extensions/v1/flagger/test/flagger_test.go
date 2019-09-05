@@ -21,7 +21,6 @@ var _ = Describe("flagger", func() {
 
 	const (
 		meshNamespace            = "istio-system"
-		superglooNamespace       = "supergloo-system"
 		name                     = "flagger"
 		meshName                 = "my-istio"
 		superglooIstioFlavor     = "istio-supergloo"
@@ -63,12 +62,8 @@ var _ = Describe("flagger", func() {
 					Namespace: meshNamespace,
 				},
 				SpecDefinedValues: version.ValuesYaml,
-				Supergloo: render.SuperglooInfo{
-					Namespace:       superglooNamespace,
-					ClusterRoleName: superglooClusterRoleName,
-				},
-				Params: test.GetDefaultParameters(version, superglooIstioFlavor, layers),
-				Layers: layers,
+				Params:            test.GetDefaultParameters(version, superglooIstioFlavor, layers),
+				Layers:            layers,
 			}
 
 			rendered, err = render.ComputeResourcesForApplication(context.TODO(), inputs, version)

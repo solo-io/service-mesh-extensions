@@ -62,6 +62,7 @@ type ValuesInputs struct {
 	// These map to the params found on versions, flavors, and layers,
 	Params map[string]string
 
+	// deprecated
 	Supergloo SuperglooInfo
 }
 
@@ -111,7 +112,7 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 	valuesMap = CoalesceValuesMap(ctx, valuesMap, specValues)
 
 	for _, layerInput := range inputs.Layers {
-		option, err := GetLayerOptionTwo(layerInput.LayerId, layerInput.OptionId, inputs.Flavor)
+		option, err := GetLayerOptionFromFlavor(layerInput.LayerId, layerInput.OptionId, inputs.Flavor)
 		if err != nil {
 			return "", err
 		}

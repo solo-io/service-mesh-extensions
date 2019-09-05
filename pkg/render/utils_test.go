@@ -372,11 +372,11 @@ var _ = Describe("utils", func() {
 			},
 			UserDefinedValues: "top:\n  nested: {{ .InstallNamespace }}\n",
 			Params: map[string]string{
-				"my.app.cluster-role": "{{ .Supergloo.ClusterRoleName }}",
+				"my.app.cluster-role": "{{ .Custom.Supergloo.ClusterRoleName }}",
 				"my.app.mesh-ref":     "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
 				"unchanged":           "still-the-same",
 			},
-			SpecDefinedValues: "key: {{ .Supergloo.Namespace }}\n",
+			SpecDefinedValues: "key: {{ .Custom.Supergloo.Namespace }}\n",
 		}
 
 		expected := render.ValuesInputs{
