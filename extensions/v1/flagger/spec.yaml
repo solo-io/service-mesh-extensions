@@ -78,6 +78,16 @@ versions:
       default:
         string: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
       required: true
+    - name: SuperglooNamespace
+      description: The namespace in which Supergloo is running.
+      default:
+        string: "supergloo-system"
+      required: true
+    - name: Supergloo.ClusterRoleName
+      description: Supergloo's cluster role name.
+      default:
+        string: "supergloo"
+      required: true
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
@@ -107,6 +117,16 @@ versions:
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
       default:
         string: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+      required: true
+    - name: SuperglooNamespace
+      description: The namespace in which Supergloo is running.
+      default:
+        string: "supergloo-system"
+      required: true
+    - name: Supergloo.ClusterRoleName
+      description: Supergloo's cluster role name.
+      default:
+        string: "supergloo"
       required: true
     - name: serviceAccount.name
       description: |-
