@@ -5,7 +5,6 @@ import (
 
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
-	"github.com/solo-io/service-mesh-hub/pkg/util"
 )
 
 func GetDefaultParameters(versionedSpec *v1.VersionedApplicationSpec, flavorName string, layerInputs []render.LayerInput) map[string]string {
@@ -22,10 +21,10 @@ func GetDefaultParameters(versionedSpec *v1.VersionedApplicationSpec, flavorName
 
 	result := make(map[string]string)
 	for _, param := range versionedSpec.Parameters {
-		result[param.Name] = util.GetDefaultString(param)
+		result[param.Name] = param.Default
 	}
 	for _, param := range flavor.Parameters {
-		result[param.Name] = util.GetDefaultString(param)
+		result[param.Name] = param.Default
 	}
 	for _, layer := range flavor.CustomizationLayers {
 		for _, input := range layerInputs {
@@ -33,7 +32,7 @@ func GetDefaultParameters(versionedSpec *v1.VersionedApplicationSpec, flavorName
 				for _, option := range layer.Options {
 					if option.Id == input.OptionId {
 						for _, param := range option.Parameters {
-							result[param.Name] = util.GetDefaultString(param)
+							result[param.Name] = param.Default
 						}
 					}
 				}

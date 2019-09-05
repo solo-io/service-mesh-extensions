@@ -166,9 +166,9 @@ message Parameter {
     // Type of the parameter.
     // Used by interfaces to the renderer.
     ParameterType type = 3;
-    // Default value of the parameter
-    // TODO should default always just be a string? yes.
-    ParameterValue default = 4;
+    // Default value of the parameter.
+    // Regardless of type, all parameters are ultimately strings passed as helm values.
+    string default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
     bool required = 5;
@@ -176,7 +176,7 @@ message Parameter {
     string display_name = 6;
 }
 
-// Must stay in sync with the type oneof on the ParameterValue message
+// Convenience enum to inform Service Mesh Hub interface implementations.
 enum ParameterType {
     STRING = 0;
     FLOAT = 1;
@@ -184,17 +184,6 @@ enum ParameterType {
     INT = 3;
     DATE = 4;
     SECRET = 5;
-}
-
-message ParameterValue {
-    oneof type {
-        string string = 1;
-        bool bool = 2;
-        int64 int = 3;
-        double float = 4;
-        google.protobuf.Timestamp date = 5 [(gogoproto.stdtime) = true];
-        SecretValue secret = 6;
-    }
 }
 
 // Wraps a collection of FlavorCompatibilityInfo

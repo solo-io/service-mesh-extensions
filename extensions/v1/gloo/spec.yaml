@@ -20,8 +20,7 @@ versions:
     - name: crds.create
       description: |-
         Whether or not to create gloo crds.
-      default:
-        bool: false
+      default: "false"
   flavors:
   - name: vanilla
     description: "Install gloo"
