@@ -61,9 +61,6 @@ type ValuesInputs struct {
 	SpecDefinedValues string
 	// These map to the params found on versions, flavors, and layers,
 	Params map[string]string
-
-	// deprecated
-	Supergloo SuperglooInfo
 }
 
 // Deprecated: use ManifestRenderer.ComputeResourcesForApplication

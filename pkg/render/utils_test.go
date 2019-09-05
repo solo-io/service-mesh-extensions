@@ -366,17 +366,11 @@ var _ = Describe("utils", func() {
 				Namespace: "mesh-ns",
 				Name:      "my-mesh",
 			},
-			Supergloo: render.SuperglooInfo{
-				Namespace:       "supergloo-system",
-				ClusterRoleName: "supergloo-crb",
-			},
 			UserDefinedValues: "top:\n  nested: {{ .InstallNamespace }}\n",
 			Params: map[string]string{
-				"my.app.cluster-role": "{{ .Custom.Supergloo.ClusterRoleName }}",
-				"my.app.mesh-ref":     "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
-				"unchanged":           "still-the-same",
+				"my.app.mesh-ref": "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
+				"unchanged":       "still-the-same",
 			},
-			SpecDefinedValues: "key: {{ .Custom.Supergloo.Namespace }}\n",
 		}
 
 		expected := render.ValuesInputs{
@@ -385,17 +379,11 @@ var _ = Describe("utils", func() {
 				Namespace: "mesh-ns",
 				Name:      "my-mesh",
 			},
-			Supergloo: render.SuperglooInfo{
-				Namespace:       "supergloo-system",
-				ClusterRoleName: "supergloo-crb",
-			},
 			UserDefinedValues: "top:\n  nested: test-ns\n",
 			Params: map[string]string{
-				"my.app.cluster-role": "supergloo-crb",
-				"my.app.mesh-ref":     "my-mesh.mesh-ns",
-				"unchanged":           "still-the-same",
+				"my.app.mesh-ref": "my-mesh.mesh-ns",
+				"unchanged":       "still-the-same",
 			},
-			SpecDefinedValues: "key: supergloo-system\n",
 		}
 
 		It("correctly renders input values", func() {
