@@ -167,7 +167,7 @@ message Parameter {
     // Used by interfaces to the renderer.
     ParameterType type = 3;
     // Default value of the parameter
-    // TODO should default always just be a string?
+    // TODO should default always just be a string? yes.
     ParameterValue default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
