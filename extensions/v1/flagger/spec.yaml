@@ -86,7 +86,7 @@ versions:
     - name: Supergloo.ClusterRoleName
       description: Supergloo's cluster role name.
       default:
-        string: "supergloo"
+        string: "supergloo-cluster-role"
       required: true
     - name: serviceAccount.name
       description: |-
