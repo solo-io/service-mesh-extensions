@@ -92,7 +92,9 @@ func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec) er
 		if err != nil && !flavorLayer.Optional {
 			return MissingInputForRequiredLayer(err)
 		}
-		selectedOptions = append(selectedOptions, option)
+		if option != nil {
+			selectedOptions = append(selectedOptions, option)
+		}
 	}
 
 	// Validate parameters.
