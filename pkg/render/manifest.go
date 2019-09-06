@@ -37,6 +37,10 @@ var (
 		return errors.Wrapf(err, "error retrieving input for required layer")
 	}
 
+	MissingInputForRequireParam = func(name string) error {
+		return errors.Errorf("Missing input for required parameter %v", name)
+	}
+
 	IncorrectNumberOfInputLayersError = errors.Errorf("incorrect number of input layers")
 )
 
@@ -69,11 +73,13 @@ func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, sp
 	return renderer.ComputeResourcesForApplication(ctx, inputs, spec)
 }
 
-func ValidateInputs(inputs ValuesInputs) error {
+func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec) error {
+	// Validate layers and layer options.
 	if len(inputs.Layers) != GetRequiredLayerCount(inputs.Flavor) {
 		return IncorrectNumberOfInputLayersError
 	}
 
+	var selectedOptions []*hubv1.LayerOption
 	for _, flavorLayer := range inputs.Flavor.CustomizationLayers {
 		var optionId string
 		for _, layerInput := range inputs.Layers {
@@ -82,9 +88,29 @@ func ValidateInputs(inputs ValuesInputs) error {
 			}
 		}
 
-		_, err := GetLayerOption(optionId, flavorLayer)
+		option, err := GetLayerOption(optionId, flavorLayer)
 		if err != nil && !flavorLayer.Optional {
 			return MissingInputForRequiredLayer(err)
+		}
+		selectedOptions = append(selectedOptions, option)
+	}
+
+	// Validate parameters.
+	var allParameters []*hubv1.Parameter
+	for _, param := range spec.GetParameters() {
+		allParameters = append(allParameters, param)
+	}
+	for _, param := range inputs.Flavor.GetParameters() {
+		allParameters = append(allParameters, param)
+	}
+	for _, option := range selectedOptions {
+		for _, param := range option.Parameters {
+			allParameters = append(allParameters, param)
+		}
+	}
+	for _, param := range allParameters {
+		if value := inputs.Params[param.Name]; param.Required && value == "" {
+			return MissingInputForRequireParam(param.Name)
 		}
 	}
 

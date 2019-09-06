@@ -20,6 +20,10 @@ func NewManifestRenderer() ManifestRenderer {
 }
 
 func (m *manifestRenderer) ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *v1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
+	if err := ValidateInputs(inputs, *spec); err != nil {
+		return nil, err
+	}
+
 	inputs, err := ExecInputValuesTemplates(inputs)
 	if err != nil {
 		return nil, FailedRenderValueTemplatesError(err)
@@ -27,10 +31,6 @@ func (m *manifestRenderer) ComputeResourcesForApplication(ctx context.Context, i
 
 	manifests, err := GetManifestsFromApplicationSpec(ctx, inputs, spec)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := ValidateInputs(inputs); err != nil {
 		return nil, err
 	}
 

@@ -55,3 +55,32 @@ versions:
               directory: extensions/v1/gloo/overlays
             overlayPath: supergloo
   version: "0.13.26"
+- helmArchive:
+    uri: https://storage.googleapis.com/solo-public-helm/charts/gloo-0.18.35.tgz
+  datePublished: "2019-01-09T15:04:06Z"
+  valuesYaml: |-
+    crds:
+      create: false
+  parameters:
+    - name: apiServer.enable
+      description: |-
+        Whether or not to run the apiserver and UI.
+      required: true
+  flavors:
+    - name: vanilla
+      description: "Install gloo"
+      customizationLayers:
+        - id: "custom-resources"
+          displayName: "Custom Resources"
+          options:
+            - id: "create"
+              displayName: "Create"
+              description: "Create custom resources at install time"
+              kustomize:
+                github:
+                  org: solo-io
+                  repo: service-mesh-hub
+                  ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
+                  directory: extensions/v1/gloo/overlays
+                overlayPath: vanilla
+  version: "0.18.35"
