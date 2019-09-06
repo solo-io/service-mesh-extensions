@@ -107,13 +107,6 @@ message Flavor {
     repeated Parameter parameters = 5;
 }
 
-message SecretValue {
-    // Namespace and name of the Kubernetes secret containing the value
-    core.solo.io.ResourceRef ref = 1;
-    // Key for the desired value within the secret's data map.
-    string key = 2;
-}
-
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
 // the rendered extension installation manifest.
 message Layer {
@@ -121,10 +114,12 @@ message Layer {
     string id = 1;
     // A user-friendly name of the layer, i.e. "Mutual TLS Settings"
     string display_name = 2;
+    // An optional description of the layer's effect on the manifest rendering.
+    string description = 3;
     // If true, this layer can be flagged on or off for rendering.
-    bool optional = 3;
+    bool optional = 4;
     // One or more variants for this configuration layer, one of which will be chosen by the user.
-    repeated LayerOption options = 4;
+    repeated LayerOption options = 5;
 }
 
 // One option for configuring a layer. At least one of the kustomize or helm values should be set, or the layer

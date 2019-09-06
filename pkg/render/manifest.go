@@ -129,8 +129,7 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 	paramValues, err := ConvertParamsToNestedMap(inputs.Params)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing install params",
-			zap.Error(err),
-			zap.Any("params", inputs.Params))
+			zap.Error(err))
 		return "", err
 	}
 	valuesMap = CoalesceValuesMap(ctx, valuesMap, paramValues)
