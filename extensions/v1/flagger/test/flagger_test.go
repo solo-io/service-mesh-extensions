@@ -41,7 +41,7 @@ var _ = Describe("flagger", func() {
 		}
 	})
 
-	Context("0.12.0 with istio-supergloo flavor (default parameters)", func() {
+	PContext("0.12.0 with istio-supergloo flavor (default parameters)", func() {
 		var (
 			version      *v1.VersionedApplicationSpec
 			inputs       render.ValuesInputs
