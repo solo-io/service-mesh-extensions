@@ -27,14 +27,14 @@ var _ = Describe("manifest render plugin", func() {
   kind: MeshIngress
   metadata:
     name: gloo
-    namespace: {{ .SuperglooNamespace }}
+    namespace: {{ .Custom.SuperglooNamespace }}
 `
 		unknownVariables = `
   apiVersion: supergloo.solo.io/v1
   kind: MeshIngress
   metadata:
     name: gloo
-    namespace: {{ .SupergloNamespace }}
+    namespace: {{ .UnknownVariable }}
 `
 		validManifest = `
 apiVersion: v1
@@ -42,7 +42,7 @@ kind: Pod
 metadata:
   annotations:
     installNamespace: {{ .InstallNamespace }}
-    superglooNamespace: {{ .SuperglooNamespace }}
+    superglooNamespace: {{ .Custom.SuperglooNamespace }}
     customValue: {{ .Custom.SomeValue }}
   name: {{ .MeshRef.Name }}
   namespace: {{ .MeshRef.Namespace }}
@@ -95,7 +95,7 @@ spec: {}
 		}{
 			{manifest: invalidYaml_0, description: "template variables are incorrect", err: ""},
 			{manifest: invalidYaml_1, description: "manifest is not valid yaml", err: "error converting YAML to JSON"},
-			{manifest: unknownVariables, description: "template vars are incorrect", err: "can't evaluate field SupergloNamespace"},
+			{manifest: unknownVariables, description: "template vars are incorrect", err: "can't evaluate field UnknownVariable"},
 		}
 		for _, tc := range testCases {
 			testCase := tc
@@ -130,7 +130,7 @@ spec: {}
 			Expect(pod.Name).To(Equal(values.MeshRef.Name))
 			Expect(pod.Namespace).To(Equal(values.MeshRef.Namespace))
 			Expect(pod.Annotations).To(BeEquivalentTo(map[string]string{
-				"superglooNamespace": values.SuperglooNamespace,
+				"superglooNamespace": (values.Custom.(map[string]interface{})["SuperglooNamespace"]).(string),
 				"installNamespace":   values.InstallNamespace,
 				"customValue":        (values.Custom.(map[string]interface{})["SomeValue"]).(string),
 			}))

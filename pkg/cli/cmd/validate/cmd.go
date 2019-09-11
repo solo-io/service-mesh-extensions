@@ -87,7 +87,6 @@ func validate(o *options.Options) error {
 		},
 		SpecDefinedValues: versionContent.ValuesYaml,
 		// TODO - support validation with these parameters
-		//SuperglooNamespace: "",
 		//UserDefinedValues:  "",
 		//Params:       nil,
 		//SpecDefinedValues:  "",
