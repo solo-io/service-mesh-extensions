@@ -75,7 +75,7 @@ func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, sp
 
 func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec) error {
 	// Validate layers and layer options.
-	if len(inputs.Layers) != GetRequiredLayerCount(inputs.Flavor) {
+	if len(inputs.Layers) < GetRequiredLayerCount(inputs.Flavor) {
 		return IncorrectNumberOfInputLayersError
 	}
 

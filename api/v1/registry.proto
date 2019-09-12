@@ -165,7 +165,7 @@ message Parameter {
     // Used by interfaces to the renderer.
     ParameterType type = 3;
     // Default value of the parameter.
-    // Regardless of type, all parameters are ultimately strings passed as helm values.
+    // Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
     string default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.

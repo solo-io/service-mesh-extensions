@@ -48,7 +48,7 @@ var RegistryDefaults = Registry{
 		Org:       "solo-io",
 		Repo:      "service-mesh-hub",
 		Ref:       "better-layering-aug",
-		Directory: "extensions/v1",
+		Directory: "meshes/v1",
 	},
 }
 

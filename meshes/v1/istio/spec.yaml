@@ -11,6 +11,39 @@ versions:
   flavors:
   - name: vanilla
     description: "Install istio control plane to a namespace"
+  - name: banana
+    # inspired by https://github.com/istio/istio/tree/release-1.1/install/kubernetes/helm/istio
+    description: "Install istio control plane to a namespace with a bunch of options"
+    customizationLayers:
+    - id: "gateway"
+      displayName: "Gateway"
+      options:
+        - id: "enabled"
+          displayName: "Enabled"
+          description: "Enable gateways"
+          helmValues: "gateways:\n  enabled: true"
+        - id: "disabled"
+          displayName: "Disabled"
+          description: "Do not enable gateways"
+          helmValues: "gateways:\n  enabled: false"
+    - id: "security"
+      displayName: "Security"
+      optional: true
+      options:
+        - id: "strict"
+          displayName: "Strict"
+          description: "Enable mtls and use self-signed certs"
+          helmValues: "global:\n  controlPlaneSecurityEnabled: true\n  mtls:\n    enabled: true"
+        - id: "strict-custom-cert"
+          displayName: "Strict (Provided Cert)"
+          description: "Enable mtls and provide a cert"
+          parameters:
+            - displayName: "Root Certificate"
+              name: cert.not.implemented
+              description: Provide your own root certificate
+              default: "true"
+              required: true
+              type: BOOL
   installationSteps:
     steps:
     - githubChart:
