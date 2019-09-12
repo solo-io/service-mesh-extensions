@@ -141,6 +141,12 @@ func selectLayerInputList(flavor *v1.Flavor) ([]render.LayerInput, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// handle optional layers
+		if option == nil {
+			continue
+		}
+
 		layerInputList = append(layerInputList, render.LayerInput{
 			LayerId:  layer.Id,
 			OptionId: option.Id,
@@ -156,16 +162,20 @@ func selectLayerOption(layer *v1.Layer) (*v1.LayerOption, error) {
 		layerOptions = append(layerOptions, option.DisplayName)
 		displayNameToLayerOption[option.DisplayName] = option
 	}
+
+	var v survey.Validator
+	if layer.Optional {
+		layerOptions = append(layerOptions, "< skip >")
+		displayNameToLayerOption["< skip >"] = nil
+	} else {
+		v = survey.Required
+	}
+
 	option := ""
 	prompt := &survey.Select{
 		Options:  layerOptions,
 		Message:  fmt.Sprintf("Select an option for layer %v.", layer.DisplayName),
 		PageSize: 10,
-	}
-
-	var v survey.Validator
-	if !layer.Optional {
-		v = survey.Required
 	}
 
 	if err := survey.AskOne(prompt, &option, v); err != nil {
