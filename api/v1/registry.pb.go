@@ -349,16 +349,16 @@ type isVersionedApplicationSpec_InstallationSpec interface {
 }
 
 type VersionedApplicationSpec_GithubChart struct {
-	GithubChart *GithubRepositoryLocation `protobuf:"bytes,13,opt,name=github_chart,json=githubChart,proto3,oneof"`
+	GithubChart *GithubRepositoryLocation `protobuf:"bytes,13,opt,name=github_chart,json=githubChart,proto3,oneof" json:"github_chart,omitempty"`
 }
 type VersionedApplicationSpec_HelmArchive struct {
-	HelmArchive *TgzLocation `protobuf:"bytes,14,opt,name=helm_archive,json=helmArchive,proto3,oneof"`
+	HelmArchive *TgzLocation `protobuf:"bytes,14,opt,name=helm_archive,json=helmArchive,proto3,oneof" json:"helm_archive,omitempty"`
 }
 type VersionedApplicationSpec_ManifestsArchive struct {
-	ManifestsArchive *TgzLocation `protobuf:"bytes,15,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof"`
+	ManifestsArchive *TgzLocation `protobuf:"bytes,15,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof" json:"manifests_archive,omitempty"`
 }
 type VersionedApplicationSpec_InstallationSteps struct {
-	InstallationSteps *InstallationSteps `protobuf:"bytes,16,opt,name=installation_steps,json=installationSteps,proto3,oneof"`
+	InstallationSteps *InstallationSteps `protobuf:"bytes,16,opt,name=installation_steps,json=installationSteps,proto3,oneof" json:"installation_steps,omitempty"`
 }
 
 func (*VersionedApplicationSpec_GithubChart) isVersionedApplicationSpec_InstallationSpec()       {}
@@ -549,13 +549,13 @@ type isInstallationSteps_Step_Step interface {
 }
 
 type InstallationSteps_Step_GithubChart struct {
-	GithubChart *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github_chart,json=githubChart,proto3,oneof"`
+	GithubChart *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github_chart,json=githubChart,proto3,oneof" json:"github_chart,omitempty"`
 }
 type InstallationSteps_Step_HelmArchive struct {
-	HelmArchive *TgzLocation `protobuf:"bytes,2,opt,name=helm_archive,json=helmArchive,proto3,oneof"`
+	HelmArchive *TgzLocation `protobuf:"bytes,2,opt,name=helm_archive,json=helmArchive,proto3,oneof" json:"helm_archive,omitempty"`
 }
 type InstallationSteps_Step_ManifestsArchive struct {
-	ManifestsArchive *TgzLocation `protobuf:"bytes,3,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof"`
+	ManifestsArchive *TgzLocation `protobuf:"bytes,3,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof" json:"manifests_archive,omitempty"`
 }
 
 func (*InstallationSteps_Step_GithubChart) isInstallationSteps_Step_Step()      {}
@@ -890,10 +890,10 @@ type isKustomize_Location interface {
 }
 
 type Kustomize_Github struct {
-	Github *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github,proto3,oneof"`
+	Github *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github,proto3,oneof" json:"github,omitempty"`
 }
 type Kustomize_TgzArchive struct {
-	TgzArchive *TgzLocation `protobuf:"bytes,2,opt,name=tgz_archive,json=tgzArchive,proto3,oneof"`
+	TgzArchive *TgzLocation `protobuf:"bytes,2,opt,name=tgz_archive,json=tgzArchive,proto3,oneof" json:"tgz_archive,omitempty"`
 }
 
 func (*Kustomize_Github) isKustomize_Location()     {}
@@ -945,7 +945,7 @@ type Parameter struct {
 	// Used by interfaces to the renderer.
 	Type ParameterType `protobuf:"varint,3,opt,name=type,proto3,enum=hub.solo.io.ParameterType" json:"type,omitempty"`
 	// Default value of the parameter.
-	// Regardless of type, all parameters are ultimately strings passed as helm values.
+	// Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
 	Default string `protobuf:"bytes,4,opt,name=default,proto3" json:"default,omitempty"`
 	// Indicates whether a value for the parameter is required for the installation of the extension
 	// to be performed.
