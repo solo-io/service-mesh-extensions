@@ -21,7 +21,6 @@ var _ = Describe("flagger", func() {
 
 	const (
 		meshNamespace            = "istio-system"
-		superglooNamespace       = "supergloo-system"
 		name                     = "flagger"
 		meshName                 = "my-istio"
 		superglooIstioFlavor     = "istio-supergloo"
@@ -42,7 +41,7 @@ var _ = Describe("flagger", func() {
 		}
 	})
 
-	Context("0.12.0 with istio-supergloo flavor (default parameters)", func() {
+	PContext("0.12.0 with istio-supergloo flavor (default parameters)", func() {
 		var (
 			version      *v1.VersionedApplicationSpec
 			inputs       render.ValuesInputs
@@ -53,20 +52,18 @@ var _ = Describe("flagger", func() {
 
 		BeforeEach(func() {
 			version = versionMap["0.12.0"]
+			layers := []render.LayerInput{{LayerId: superglooIstioFlavor, OptionId: "cluster-role-binding"}}
 			inputs = render.ValuesInputs{
 				Name:             name,
-				FlavorName:       superglooIstioFlavor,
+				Flavor:           test.GetFlavor(superglooIstioFlavor, version),
 				InstallNamespace: meshNamespace,
 				MeshRef: core.ResourceRef{
 					Name:      meshName,
 					Namespace: meshNamespace,
 				},
 				SpecDefinedValues: version.ValuesYaml,
-				Supergloo: render.SuperglooInfo{
-					Namespace:       superglooNamespace,
-					ClusterRoleName: superglooClusterRoleName,
-				},
-				FlavorParams: test.GetDefaultParameters(version, superglooIstioFlavor),
+				Params:            test.GetDefaultParameters(version, superglooIstioFlavor, layers),
+				Layers:            layers,
 			}
 
 			rendered, err = render.ComputeResourcesForApplication(context.TODO(), inputs, version)

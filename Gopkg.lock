@@ -666,7 +666,7 @@
   version = "v1.5.2"
 
 [[projects]]
-  digest = "1:bab5dbe8bed302a7916471fe5460d5f477e4a2a438584e3ce2b77629a981f1a5"
+  digest = "1:584a94c95fde9fec8cefd24e21f9d99098fcfe9979af65554590e7a90514a95d"
   name = "github.com/solo-io/go-utils"
   packages = [
     "clicore",
@@ -685,16 +685,16 @@
     "vfsutils",
   ]
   pruneopts = "UT"
-  revision = "7bce93b3ce1d25c598225bbf9d5878f0aa98bd5c"
-  version = "v0.8.20"
+  revision = "08035688c449b622f94aacb89d759f672cc31905"
+  version = "v0.9.20"
 
 [[projects]]
-  digest = "1:b6c7e84a5d49dcadb67ebf89c4338a4f4348bc404ac5beaf6868b9775700b2a4"
+  digest = "1:da83b03622b704ff870ef3396af9021e605f9b4999eb3c66f77bc589e6f1fa30"
   name = "github.com/solo-io/solo-kit"
   packages = ["pkg/api/v1/resources/core"]
   pruneopts = "UT"
-  revision = "384dbdaa27e3754a07a4cc65f9331e2f5a0d7d20"
-  version = "v0.8.0"
+  revision = "516e34cf58adb6e4c674b7c95ef181c0ea43cb6a"
+  version = "v0.10.14"
 
 [[projects]]
   digest = "1:bb495ec276ab82d3dd08504bbc0594a65de8c3b22c6f2aaa92d05b73fbf3a82e"
@@ -1507,6 +1507,7 @@
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/util/yaml",
     "k8s.io/helm/pkg/manifest",
+    "k8s.io/helm/pkg/releaseutil",
     "sigs.k8s.io/kustomize/k8sdeps/kunstruct",
     "sigs.k8s.io/kustomize/k8sdeps/kv/plugin",
     "sigs.k8s.io/kustomize/k8sdeps/transformer",

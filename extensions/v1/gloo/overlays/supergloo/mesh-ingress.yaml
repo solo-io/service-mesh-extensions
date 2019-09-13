@@ -6,7 +6,7 @@ manifest: |
   kind: MeshIngress
   metadata:
     name: gloo
-    namespace: {{ .SuperglooNamespace }}
+    namespace: {{ .Custom.SuperglooNamespace }}
   spec:
     gloo: {}
     installationNamespace: {{ .InstallNamespace }}

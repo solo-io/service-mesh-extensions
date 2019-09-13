@@ -65,6 +65,9 @@ message VersionedApplicationSpec {
 
     // Do not override predefined namespaces of resources as they appear in manifests
     bool respect_manifest_namespaces = 41;
+
+    // Manifest render parameters that apply to all flavors of this version
+    repeated Parameter parameters = 42;
 }
 
 // InstallationSteps specify an installation procedure for Applications composed of multiple manifests.
@@ -103,31 +106,40 @@ message Flavor {
     repeated Layer customization_layers = 3;
     // The flavor is considered applicable if any of the specified requirement sets is satisfied.
     repeated RequirementSet requirement_sets = 4;
-    // Optional set of parameters to be used during installation.
+    // Optional set of parameters to be applied to the flavor.
     repeated Parameter parameters = 5;
-}
-
-// Parameters represent values that are used to configure the installation of an extension.
-message Parameter {
-    // Identifier of the parameter
-    string name = 1;
-    // Description of what the effects of the parameter are.
-    string description = 2;
-    // Value of the parameter
-    string value = 3;
-    // Default value of the parameter
-    string default = 4;
-    // Indicates whether a value for the parameter is required for the installation of the extension to be performed.
-    bool required = 5;
 }
 
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
 // the rendered extension installation manifest.
 message Layer {
-    // The actual implementation of the layer
-    oneof type {
-        Kustomize kustomize = 1;
-    }
+    // A unique identifier for the layer, i.e. "mtls"
+    string id = 1;
+    // A user-friendly name of the layer, i.e. "Mutual TLS Settings"
+    string display_name = 2;
+    // An optional description of the layer's effect on the manifest rendering.
+    string description = 3;
+    // If true, this layer can be flagged on or off for rendering.
+    bool optional = 4;
+    // One or more variants for this configuration layer, one of which will be chosen by the user.
+    repeated LayerOption options = 5;
+}
+
+// One option for configuring a layer. At least one of the kustomize or helm values should be set, or the layer
+// will be a no-op during rendering.
+message LayerOption {
+    // Unique identifier for the layer option, i.e. "strict"
+    string id = 1;
+    // A user-friendly name
+    string display_name = 2;
+    // A user-friendly description
+    string description = 3;
+    // A kustomize overlay
+    Kustomize kustomize = 4;
+    // A set of value overrides
+    string helm_values = 5;
+    // Optional set of parameters to be applied to the layer.
+    repeated Parameter parameters = 6;
 }
 
 // Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
@@ -141,6 +153,35 @@ message Kustomize {
 
     // Path to the overlay overlay that will be applied to the base (the rendered installation manifest).
     string overlay_path = 3;
+}
+
+// Parameters represent values that are used to configure the installation of an extension.
+message Parameter {
+    // Identifier of the parameter
+    string name = 1;
+    // Description of what the effects of the parameter are.
+    string description = 2;
+    // Type of the parameter.
+    // Used by interfaces to the renderer.
+    ParameterType type = 3;
+    // Default value of the parameter.
+    // Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
+    string default = 4;
+    // Indicates whether a value for the parameter is required for the installation of the extension
+    // to be performed.
+    bool required = 5;
+    // User-friendly display name of the parameter
+    string display_name = 6;
+}
+
+// Convenience enum to inform Service Mesh Hub interface implementations.
+enum ParameterType {
+    STRING = 0;
+    FLOAT = 1;
+    BOOL = 2;
+    INT = 3;
+    DATE = 4;
+    SECRET = 5;
 }
 
 // Wraps a collection of FlavorCompatibilityInfo
