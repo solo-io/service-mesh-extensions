@@ -25,7 +25,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ApplicationType int32
 
@@ -309,16 +309,16 @@ type isVersionedApplicationSpec_InstallationSpec interface {
 }
 
 type VersionedApplicationSpec_GithubChart struct {
-	GithubChart *GithubRepositoryLocation `protobuf:"bytes,13,opt,name=github_chart,json=githubChart,proto3,oneof"`
+	GithubChart *GithubRepositoryLocation `protobuf:"bytes,13,opt,name=github_chart,json=githubChart,proto3,oneof" json:"github_chart,omitempty"`
 }
 type VersionedApplicationSpec_HelmArchive struct {
-	HelmArchive *TgzLocation `protobuf:"bytes,14,opt,name=helm_archive,json=helmArchive,proto3,oneof"`
+	HelmArchive *TgzLocation `protobuf:"bytes,14,opt,name=helm_archive,json=helmArchive,proto3,oneof" json:"helm_archive,omitempty"`
 }
 type VersionedApplicationSpec_ManifestsArchive struct {
-	ManifestsArchive *TgzLocation `protobuf:"bytes,15,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof"`
+	ManifestsArchive *TgzLocation `protobuf:"bytes,15,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof" json:"manifests_archive,omitempty"`
 }
 type VersionedApplicationSpec_InstallationSteps struct {
-	InstallationSteps *InstallationSteps `protobuf:"bytes,16,opt,name=installation_steps,json=installationSteps,proto3,oneof"`
+	InstallationSteps *InstallationSteps `protobuf:"bytes,16,opt,name=installation_steps,json=installationSteps,proto3,oneof" json:"installation_steps,omitempty"`
 }
 
 func (*VersionedApplicationSpec_GithubChart) isVersionedApplicationSpec_InstallationSpec()       {}
@@ -403,116 +403,14 @@ func (m *VersionedApplicationSpec) GetRespectManifestNamespaces() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*VersionedApplicationSpec) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _VersionedApplicationSpec_OneofMarshaler, _VersionedApplicationSpec_OneofUnmarshaler, _VersionedApplicationSpec_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*VersionedApplicationSpec) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*VersionedApplicationSpec_GithubChart)(nil),
 		(*VersionedApplicationSpec_HelmArchive)(nil),
 		(*VersionedApplicationSpec_ManifestsArchive)(nil),
 		(*VersionedApplicationSpec_InstallationSteps)(nil),
 	}
-}
-
-func _VersionedApplicationSpec_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*VersionedApplicationSpec)
-	// installation_spec
-	switch x := m.InstallationSpec.(type) {
-	case *VersionedApplicationSpec_GithubChart:
-		_ = b.EncodeVarint(13<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.GithubChart); err != nil {
-			return err
-		}
-	case *VersionedApplicationSpec_HelmArchive:
-		_ = b.EncodeVarint(14<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.HelmArchive); err != nil {
-			return err
-		}
-	case *VersionedApplicationSpec_ManifestsArchive:
-		_ = b.EncodeVarint(15<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ManifestsArchive); err != nil {
-			return err
-		}
-	case *VersionedApplicationSpec_InstallationSteps:
-		_ = b.EncodeVarint(16<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.InstallationSteps); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("VersionedApplicationSpec.InstallationSpec has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _VersionedApplicationSpec_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*VersionedApplicationSpec)
-	switch tag {
-	case 13: // installation_spec.github_chart
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(GithubRepositoryLocation)
-		err := b.DecodeMessage(msg)
-		m.InstallationSpec = &VersionedApplicationSpec_GithubChart{msg}
-		return true, err
-	case 14: // installation_spec.helm_archive
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TgzLocation)
-		err := b.DecodeMessage(msg)
-		m.InstallationSpec = &VersionedApplicationSpec_HelmArchive{msg}
-		return true, err
-	case 15: // installation_spec.manifests_archive
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TgzLocation)
-		err := b.DecodeMessage(msg)
-		m.InstallationSpec = &VersionedApplicationSpec_ManifestsArchive{msg}
-		return true, err
-	case 16: // installation_spec.installation_steps
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(InstallationSteps)
-		err := b.DecodeMessage(msg)
-		m.InstallationSpec = &VersionedApplicationSpec_InstallationSteps{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _VersionedApplicationSpec_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*VersionedApplicationSpec)
-	// installation_spec
-	switch x := m.InstallationSpec.(type) {
-	case *VersionedApplicationSpec_GithubChart:
-		s := proto.Size(x.GithubChart)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *VersionedApplicationSpec_HelmArchive:
-		s := proto.Size(x.HelmArchive)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *VersionedApplicationSpec_ManifestsArchive:
-		s := proto.Size(x.ManifestsArchive)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *VersionedApplicationSpec_InstallationSteps:
-		s := proto.Size(x.InstallationSteps)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // InstallationSteps specify an installation procedure for Applications composed of multiple manifests.
@@ -604,13 +502,13 @@ type isInstallationSteps_Step_Step interface {
 }
 
 type InstallationSteps_Step_GithubChart struct {
-	GithubChart *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github_chart,json=githubChart,proto3,oneof"`
+	GithubChart *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github_chart,json=githubChart,proto3,oneof" json:"github_chart,omitempty"`
 }
 type InstallationSteps_Step_HelmArchive struct {
-	HelmArchive *TgzLocation `protobuf:"bytes,2,opt,name=helm_archive,json=helmArchive,proto3,oneof"`
+	HelmArchive *TgzLocation `protobuf:"bytes,2,opt,name=helm_archive,json=helmArchive,proto3,oneof" json:"helm_archive,omitempty"`
 }
 type InstallationSteps_Step_ManifestsArchive struct {
-	ManifestsArchive *TgzLocation `protobuf:"bytes,3,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof"`
+	ManifestsArchive *TgzLocation `protobuf:"bytes,3,opt,name=manifests_archive,json=manifestsArchive,proto3,oneof" json:"manifests_archive,omitempty"`
 }
 
 func (*InstallationSteps_Step_GithubChart) isInstallationSteps_Step_Step()      {}
@@ -652,97 +550,13 @@ func (m *InstallationSteps_Step) GetManifestsArchive() *TgzLocation {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*InstallationSteps_Step) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _InstallationSteps_Step_OneofMarshaler, _InstallationSteps_Step_OneofUnmarshaler, _InstallationSteps_Step_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*InstallationSteps_Step) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*InstallationSteps_Step_GithubChart)(nil),
 		(*InstallationSteps_Step_HelmArchive)(nil),
 		(*InstallationSteps_Step_ManifestsArchive)(nil),
 	}
-}
-
-func _InstallationSteps_Step_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*InstallationSteps_Step)
-	// step
-	switch x := m.Step.(type) {
-	case *InstallationSteps_Step_GithubChart:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.GithubChart); err != nil {
-			return err
-		}
-	case *InstallationSteps_Step_HelmArchive:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.HelmArchive); err != nil {
-			return err
-		}
-	case *InstallationSteps_Step_ManifestsArchive:
-		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ManifestsArchive); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("InstallationSteps_Step.Step has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _InstallationSteps_Step_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*InstallationSteps_Step)
-	switch tag {
-	case 1: // step.github_chart
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(GithubRepositoryLocation)
-		err := b.DecodeMessage(msg)
-		m.Step = &InstallationSteps_Step_GithubChart{msg}
-		return true, err
-	case 2: // step.helm_archive
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TgzLocation)
-		err := b.DecodeMessage(msg)
-		m.Step = &InstallationSteps_Step_HelmArchive{msg}
-		return true, err
-	case 3: // step.manifests_archive
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TgzLocation)
-		err := b.DecodeMessage(msg)
-		m.Step = &InstallationSteps_Step_ManifestsArchive{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _InstallationSteps_Step_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*InstallationSteps_Step)
-	// step
-	switch x := m.Step.(type) {
-	case *InstallationSteps_Step_GithubChart:
-		s := proto.Size(x.GithubChart)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *InstallationSteps_Step_HelmArchive:
-		s := proto.Size(x.HelmArchive)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *InstallationSteps_Step_ManifestsArchive:
-		s := proto.Size(x.ManifestsArchive)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // A flavor represents a particular variant of an extension.
@@ -940,7 +754,7 @@ type isLayer_Type interface {
 }
 
 type Layer_Kustomize struct {
-	Kustomize *Kustomize `protobuf:"bytes,1,opt,name=kustomize,proto3,oneof"`
+	Kustomize *Kustomize `protobuf:"bytes,1,opt,name=kustomize,proto3,oneof" json:"kustomize,omitempty"`
 }
 
 func (*Layer_Kustomize) isLayer_Type() {}
@@ -959,59 +773,11 @@ func (m *Layer) GetKustomize() *Kustomize {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Layer) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Layer_OneofMarshaler, _Layer_OneofUnmarshaler, _Layer_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Layer) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Layer_Kustomize)(nil),
 	}
-}
-
-func _Layer_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Layer)
-	// type
-	switch x := m.Type.(type) {
-	case *Layer_Kustomize:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Kustomize); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Layer.Type has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Layer_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Layer)
-	switch tag {
-	case 1: // type.kustomize
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Kustomize)
-		err := b.DecodeMessage(msg)
-		m.Type = &Layer_Kustomize{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Layer_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Layer)
-	// type
-	switch x := m.Type.(type) {
-	case *Layer_Kustomize:
-		s := proto.Size(x.Kustomize)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
@@ -1059,10 +825,10 @@ type isKustomize_Location interface {
 }
 
 type Kustomize_Github struct {
-	Github *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github,proto3,oneof"`
+	Github *GithubRepositoryLocation `protobuf:"bytes,1,opt,name=github,proto3,oneof" json:"github,omitempty"`
 }
 type Kustomize_TgzArchive struct {
-	TgzArchive *TgzLocation `protobuf:"bytes,2,opt,name=tgz_archive,json=tgzArchive,proto3,oneof"`
+	TgzArchive *TgzLocation `protobuf:"bytes,2,opt,name=tgz_archive,json=tgzArchive,proto3,oneof" json:"tgz_archive,omitempty"`
 }
 
 func (*Kustomize_Github) isKustomize_Location()     {}
@@ -1096,78 +862,12 @@ func (m *Kustomize) GetOverlayPath() string {
 	return ""
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Kustomize) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Kustomize_OneofMarshaler, _Kustomize_OneofUnmarshaler, _Kustomize_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Kustomize) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Kustomize_Github)(nil),
 		(*Kustomize_TgzArchive)(nil),
 	}
-}
-
-func _Kustomize_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Kustomize)
-	// location
-	switch x := m.Location.(type) {
-	case *Kustomize_Github:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Github); err != nil {
-			return err
-		}
-	case *Kustomize_TgzArchive:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.TgzArchive); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Kustomize.Location has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Kustomize_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Kustomize)
-	switch tag {
-	case 1: // location.github
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(GithubRepositoryLocation)
-		err := b.DecodeMessage(msg)
-		m.Location = &Kustomize_Github{msg}
-		return true, err
-	case 2: // location.tgz_archive
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TgzLocation)
-		err := b.DecodeMessage(msg)
-		m.Location = &Kustomize_TgzArchive{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Kustomize_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Kustomize)
-	// location
-	switch x := m.Location.(type) {
-	case *Kustomize_Github:
-		s := proto.Size(x.Github)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Kustomize_TgzArchive:
-		s := proto.Size(x.TgzArchive)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // Wraps a collection of FlavorCompatibilityInfo
