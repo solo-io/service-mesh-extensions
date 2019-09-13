@@ -7,6 +7,8 @@ import (
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 )
 
+//go:generate mockgen -source=./renderer.go -package mocks -destination=./mocks/mock_render.go ManifestRenderer
+
 type ManifestRenderer interface {
 	// Given the spec and values inputs, generate a set of kube resources that represent the exact install manifest.
 	ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *v1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error)
