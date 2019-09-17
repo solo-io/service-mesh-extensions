@@ -99,12 +99,6 @@ func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec) er
 
 	// Validate parameters.
 	var allParameters []*hubv1.Parameter
-	for _, param := range spec.GetParameters() {
-		allParameters = append(allParameters, param)
-	}
-	for _, param := range inputs.Flavor.GetParameters() {
-		allParameters = append(allParameters, param)
-	}
 	for _, option := range selectedOptions {
 		for _, param := range option.Parameters {
 			allParameters = append(allParameters, param)
