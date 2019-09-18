@@ -385,6 +385,16 @@ var _ = Describe("utils", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(render.MissingInputForRequireParam("required").Error()))
 		})
+
+		It("errors if an unrecognized param is provided", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{Parameters: []*v1.Parameter{{Name: "recognized"}}},
+				Params: map[string]string{"unrecognized": "param"},
+			}
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{})
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(render.UnrecognizedParamError("unrecognized").Error()))
+		})
 	})
 
 	Context("render templates in input values", func() {

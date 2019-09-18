@@ -157,16 +157,17 @@ message Kustomize {
 
 // Parameters represent values that are used to configure the installation of an extension.
 message Parameter {
-    // Identifier of the parameter
+    // Identifier of the parameter.
+    // This doubles as the key used to access the parameter's value in templates during render.
     string name = 1;
     // Description of what the effects of the parameter are.
     string description = 2;
     // Type of the parameter.
     // Used by interfaces to the renderer.
+    // Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
     ParameterType type = 3;
     // Default value of the parameter.
-    // Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
-    string default = 4;
+    ParameterValue default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
     bool required = 5;
@@ -175,6 +176,7 @@ message Parameter {
 }
 
 // Convenience enum to inform Service Mesh Hub interface implementations.
+// Types here should be kept in sync with the ParameterValue message.
 enum ParameterType {
     STRING = 0;
     FLOAT = 1;
@@ -182,6 +184,40 @@ enum ParameterType {
     INT = 3;
     DATE = 4;
     SECRET = 5;
+}
+
+// Value for a parameter.
+// Types here should be kept in sync with the ParameterType enum.
+// Note that regardless of type, parameters are passed as string helm values.
+message ParameterValue {
+    oneof type {
+        string string_value = 1;
+        int64 int_value = 2;
+        double float_value = 3;
+        bool boolean_value = 4;
+        google.protobuf.Timestamp date_value = 5 [(gogoproto.stdtime) = true];
+        SecretValue secret_value = 6;
+    }
+}
+
+// Secrets can be provided to the render in a number of ways.
+// Note that secrets will be rendered as plain text when being utilized by the renderer.
+message SecretValue {
+    // Ref for a Kubernetes secret.
+    message SecretRef {
+        core.solo.io.ResourceRef ref = 1;
+        // Where to locate the value of the secret in the `data` field
+        string key = 2;
+    }
+
+    oneof type {
+        // Kubernetes secret ref.
+        SecretRef secret_ref = 1;
+        // Path to a local file containing the secret.
+        string file_path = 2;
+        // Plain text secret.
+        string plain_text = 3;
+    }
 }
 
 // Wraps a collection of FlavorCompatibilityInfo

@@ -47,16 +47,72 @@ var _ = Describe("istio extension test", func() {
 		)
 
 		Context("1.1.7", func() {
-			BeforeEach(func() {
-				version = versionMap["1.1.7"]
-				inputs = testInput("vanilla")
-				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
-				Expect(err).NotTo(HaveOccurred())
-				testManifest = NewTestManifestWithResources(rendered)
+			Context("vanilla", func() {
+				BeforeEach(func() {
+					version = versionMap["1.1.7"]
+					inputs = testInput("vanilla")
+					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
+					Expect(err).NotTo(HaveOccurred())
+					testManifest = NewTestManifestWithResources(rendered)
+				})
+
+				It("has the correct number of resources", func() {
+					Expect(testManifest.NumResources()).To(Equal(93))
+				})
 			})
 
-			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(93))
+			Context("banana", func() {
+				BeforeEach(func() {
+					version = versionMap["1.1.7"]
+					inputs = testInput("banana")
+					inputs.Layers = []render.LayerInput{
+						{LayerId: "security", OptionId: "strict-custom-cert"},
+						{LayerId: "gateway", OptionId: "disabled"},
+					}
+					inputs.Params = map[string]string{"cert.not.implemented": "barbaz"}
+					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
+					Expect(err).NotTo(HaveOccurred())
+					testManifest = NewTestManifestWithResources(rendered)
+				})
+
+				It("has the correct number of resources", func() {
+					Expect(testManifest.NumResources()).To(Equal(84))
+				})
+			})
+		})
+
+		Context("1.3.0", func() {
+			Context("vanilla", func() {
+				BeforeEach(func() {
+					version = versionMap["1.3.0"]
+					inputs = testInput("vanilla")
+					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
+					Expect(err).NotTo(HaveOccurred())
+					testManifest = NewTestManifestWithResources(rendered)
+				})
+
+				It("has the correct number of resources", func() {
+					Expect(testManifest.NumResources()).To(Equal(94))
+				})
+			})
+
+			Context("banana", func() {
+				BeforeEach(func() {
+					version = versionMap["1.3.0"]
+					inputs = testInput("banana")
+					inputs.Layers = []render.LayerInput{
+						{LayerId: "security", OptionId: "strict-custom-cert"},
+						{LayerId: "gateway", OptionId: "disabled"},
+					}
+					inputs.Params = map[string]string{"cert.not.implemented": "barbaz"}
+					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
+					Expect(err).NotTo(HaveOccurred())
+					testManifest = NewTestManifestWithResources(rendered)
+				})
+
+				It("has the correct number of resources", func() {
+					Expect(testManifest.NumResources()).To(Equal(87))
+				})
 			})
 		})
 	})

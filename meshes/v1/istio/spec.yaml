@@ -41,9 +41,15 @@ versions:
             - displayName: "Root Certificate"
               name: cert.not.implemented
               description: Provide your own root certificate
-              default: "true"
+              default:
+                secretValue:
+                  secretRef:
+                    ref:
+                      namespace: "namespace"
+                      name: "name"
+                    key: "secret"
               required: true
-              type: BOOL
+              type: SECRET
   installationSteps:
     steps:
     - githubChart:
@@ -92,9 +98,15 @@ versions:
                 - displayName: "Root Certificate"
                   name: cert.not.implemented
                   description: Provide your own root certificate
-                  default: "true"
+                  default:
+                    secretValue:
+                      secretRef:
+                        ref:
+                          namespace: "namespace"
+                          name: "name"
+                        key: "secret"
                   required: true
-                  type: BOOL
+                  type: SECRET
   installationSteps:
     steps:
       - githubChart:

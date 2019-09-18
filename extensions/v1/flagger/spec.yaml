@@ -30,7 +30,8 @@ versions:
       description: |-
         The URL of the prometheus service that flagger will use to gather canary metrics.
       required: true
-      default: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
+      default:
+        stringValue: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
   flavors:
   - name: istio
     description: "Install flagger to your Istio mesh"
@@ -48,7 +49,8 @@ versions:
     - name: meshProvider
       description: >
         This value tells flagger which mesh type will be used to shift traffic between services.
-      default: "appmesh"
+      default:
+        stringValue: "appmesh"
       required: true
   - name: istio-supergloo
     description: "Install flagger to your Istio mesh with supergloo as mesh provider"
@@ -73,20 +75,24 @@ versions:
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
-      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+      default:
+        stringValue: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
       required: true
     - name: SuperglooNamespace
       description: The namespace in which Supergloo is running.
-      default: "supergloo-system"
+      default:
+        stringValue: "supergloo-system"
       required: true
     - name: Supergloo.ClusterRoleName
       description: Supergloo's cluster role name.
-      default: "supergloo-cluster-role"
+      default:
+        stringValue: "supergloo-cluster-role"
       required: true
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
-      default: flagger
+      default:
+        stringValue: flagger
   - name: appmesh-supergloo
     description: "Install flagger to your AWS App Mesh with supergloo as mesh provider"
     customizationLayers:
@@ -109,18 +115,22 @@ versions:
       description: >
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
-      default: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+      default:
+        stringValue: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
       required: true
     - name: SuperglooNamespace
       description: The namespace in which Supergloo is running.
-      default: "supergloo-system"
+      default:
+        stringValue: "supergloo-system"
       required: true
     - name: Supergloo.ClusterRoleName
       description: Supergloo's cluster role name.
-      default: "supergloo"
+      default:
+        stringValue: "supergloo"
       required: true
     - name: serviceAccount.name
       description: |-
         The name of the service account that will be created and assigned to flagger pods.
-      default: flagger
+      default:
+        stringValue: flagger
   version: "0.12.0"

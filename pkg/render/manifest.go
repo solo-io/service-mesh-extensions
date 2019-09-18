@@ -41,6 +41,10 @@ var (
 		return errors.Errorf("Missing input for required parameter %v", name)
 	}
 
+	UnrecognizedParamError = func(name string) error {
+		return errors.Errorf("Parameter %v is not specified on the selected versioned application spec, flavor, or layer option", name)
+	}
+
 	IncorrectNumberOfInputLayersError = errors.Errorf("incorrect number of input layers")
 )
 
@@ -98,21 +102,26 @@ func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec) er
 	}
 
 	// Validate parameters.
-	var allParameters []*hubv1.Parameter
+	allParameters := make(map[string]*hubv1.Parameter)
 	for _, param := range spec.GetParameters() {
-		allParameters = append(allParameters, param)
+		allParameters[param.Name] = param
 	}
 	for _, param := range inputs.Flavor.GetParameters() {
-		allParameters = append(allParameters, param)
+		allParameters[param.Name] = param
 	}
 	for _, option := range selectedOptions {
 		for _, param := range option.Parameters {
-			allParameters = append(allParameters, param)
+			allParameters[param.Name] = param
 		}
 	}
 	for _, param := range allParameters {
 		if value := inputs.Params[param.Name]; param.Required && value == "" {
 			return MissingInputForRequireParam(param.Name)
+		}
+	}
+	for name := range inputs.Params {
+		if _, ok := allParameters[name]; !ok {
+			return UnrecognizedParamError(name)
 		}
 	}
 

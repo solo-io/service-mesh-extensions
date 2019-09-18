@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Demos Yaml Test", func() {
+var _ = Describe("Meshes Yaml Test", func() {
 	const (
 		specYamlFilename = "spec.yaml"
 		rootDir          = "../meshes/v1"

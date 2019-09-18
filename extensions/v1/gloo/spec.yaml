@@ -16,11 +16,6 @@ versions:
   valuesYaml: |-
     crds:
       create: false
-  parameters:
-    - name: crds.create
-      description: |-
-        Whether or not to create gloo crds.
-      default: "false"
   flavors:
   - name: vanilla
     description: "Install gloo"
@@ -38,6 +33,12 @@ versions:
             ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
             directory: extensions/v1/gloo/overlays
           overlayPath: vanilla
+        parameters:
+          - name: crds.create
+            description: |-
+              Whether or not to create gloo crds.
+            default:
+              stringValue: "false"
   - name: supergloo
     description: "Install gloo as an ingress to your mesh using supergloo"
     customizationLayers:
@@ -54,6 +55,12 @@ versions:
               ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
               directory: extensions/v1/gloo/overlays
             overlayPath: supergloo
+          parameters:
+            - name: crds.create
+              description: |-
+                Whether or not to create gloo crds.
+              default:
+                stringValue: "false"
   version: "0.13.26"
 - helmArchive:
     uri: https://storage.googleapis.com/solo-public-helm/charts/gloo-0.18.35.tgz
@@ -61,11 +68,6 @@ versions:
   valuesYaml: |-
     crds:
       create: false
-  parameters:
-    - name: apiServer.enable
-      description: |-
-        Whether or not to run the apiserver and UI.
-      required: true
   flavors:
     - name: vanilla
       description: "Install gloo"
@@ -83,4 +85,16 @@ versions:
                   ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
                   directory: extensions/v1/gloo/overlays
                 overlayPath: vanilla
+              parameters:
+                - name: crds.create
+                  description: |-
+                    Whether or not to create gloo crds.
+                  default:
+                    stringValue: "false"
+                - name: apiServer.enable
+                  description: |-
+                    Whether or not to run the apiserver and UI.
+                  required: true
+                  type: BOOL
+                  displayName: Enable UI
   version: "0.18.35"
