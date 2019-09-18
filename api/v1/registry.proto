@@ -164,6 +164,7 @@ message Parameter {
     string description = 2;
     // Type of the parameter.
     // Used by interfaces to the renderer.
+    // Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
     ParameterType type = 3;
     // Default value of the parameter.
     ParameterValue default = 4;

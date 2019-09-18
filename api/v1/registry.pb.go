@@ -945,6 +945,7 @@ type Parameter struct {
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// Type of the parameter.
 	// Used by interfaces to the renderer.
+	// Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
 	Type ParameterType `protobuf:"varint,3,opt,name=type,proto3,enum=hub.solo.io.ParameterType" json:"type,omitempty"`
 	// Default value of the parameter.
 	Default *ParameterValue `protobuf:"bytes,4,opt,name=default,proto3" json:"default,omitempty"`
