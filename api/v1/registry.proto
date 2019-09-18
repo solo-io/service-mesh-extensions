@@ -65,7 +65,8 @@ message VersionedApplicationSpec {
 
     // Do not override predefined namespaces of resources as they appear in manifests
     bool respect_manifest_namespaces = 41;
-    // Optional set of parameters to be applied to all flavors of this version.
+
+    // Manifest render parameters that apply to all flavors of this version
     repeated Parameter parameters = 42;
 }
 
@@ -106,7 +107,7 @@ message Flavor {
     // The flavor is considered applicable if any of the specified requirement sets is satisfied.
     repeated RequirementSet requirement_sets = 4;
     // Optional set of parameters to be applied to the flavor.
-    repeated Parameter parameters = 6;
+    repeated Parameter parameters = 5;
 }
 
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
