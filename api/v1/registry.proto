@@ -174,6 +174,17 @@ message Parameter {
     string display_name = 6;
 }
 
+// Convenience enum to inform Service Mesh Hub interface implementations.
+// Types here should be kept in sync with the ParameterValue message.
+enum ParameterType {
+    STRING = 0;
+    FLOAT = 1;
+    BOOL = 2;
+    INT = 3;
+    DATE = 4;
+    SECRET = 5;
+}
+
 // Value for a parameter.
 // Types here should be kept in sync with the ParameterType enum.
 // Note that regardless of type, parameters are passed as string helm values.
@@ -184,19 +195,28 @@ message ParameterValue {
         double float_value = 3;
         bool boolean_value = 4;
         google.protobuf.Timestamp date_value = 5 [(gogoproto.stdtime) = true];
-        core.solo.io.ResourceRef secret_ref = 6;
+        SecretValue secret_value = 6;
     }
 }
 
-// Convenience enum to inform Service Mesh Hub interface implementations.
-// Types here should be kept in sync with the ParameterValue message.
-enum ParameterType {
-    STRING = 0;
-    FLOAT = 1;
-    BOOL = 2;
-    INT = 3;
-    DATE = 4;
-    SECRET = 5;
+// Secrets can be provided to the render in a number of ways.
+// Note that secrets will be rendered as plain text when being utilized by the renderer.
+message SecretValue {
+    // Ref for a Kubernetes secret.
+    message SecretRef {
+        core.solo.io.ResourceRef ref = 1;
+        // Where to locate the value of the secret in the `data` field
+        string key = 2;
+    }
+
+    oneof type {
+        // Kubernetes secret ref.
+        SecretRef secret_ref = 1;
+        // Path to a local file containing the secret.
+        string file_path = 2;
+        // Plain text secret.
+        string plain_text = 3;
+    }
 }
 
 // Wraps a collection of FlavorCompatibilityInfo

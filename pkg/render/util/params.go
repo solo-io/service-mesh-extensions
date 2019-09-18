@@ -19,8 +19,8 @@ func ParamValueToString(value *v1.ParameterValue) string {
 		return strconv.FormatFloat(t.FloatValue, 'f', -1, 64)
 	case *v1.ParameterValue_IntValue:
 		return strconv.Itoa(int(t.IntValue))
-	case *v1.ParameterValue_SecretRef:
-		// not implemented, would require Kube context / exposing secrets
+	case *v1.ParameterValue_SecretValue:
+		// TODO not yet supported
 		return ""
 	case *v1.ParameterValue_StringValue:
 		return t.StringValue
