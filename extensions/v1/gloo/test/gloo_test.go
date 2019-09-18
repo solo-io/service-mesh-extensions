@@ -131,17 +131,13 @@ var _ = Describe("gloo extension test", func() {
 					Name: name,
 					Flavor: &v1.Flavor{
 						Name: "custom-flavor",
-						Parameters: []*v1.Parameter{{
-							Name:     "gateway.upgrade",
-							Required: true,
-						}},
 					},
-					Params:           map[string]string{"gateway.upgrade": "true", "apiServer.enable": "true"},
 					InstallNamespace: namespace,
 					MeshRef: core.ResourceRef{
 						Name:      meshName,
 						Namespace: namespace,
 					},
+					UserDefinedValues: "gateway:\n  upgrade: true",
 					SpecDefinedValues: version.ValuesYaml,
 				}
 				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
