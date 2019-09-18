@@ -17,7 +17,7 @@ func Cmd(o *options.Options) *cobra.Command {
 	}
 	pflags := cmd.PersistentFlags()
 	pflags.StringVarP(&o.Registry.LocalDirectory, "specs-path", "p", "",
-		"local directory to access application specs from, e.g. `extensions/v1`")
+		"local directory to access application specs from, e.g. `./extensions/v1`")
 	pflags.StringVarP(&o.Registry.GithubRegistry.Org, "registry-org", "", options.RegistryDefaults.GithubRegistry.Org,
 		"owner of github registry")
 	pflags.StringVarP(&o.Registry.GithubRegistry.Repo, "registry-repo", "", options.RegistryDefaults.GithubRegistry.Repo,
