@@ -6,6 +6,7 @@ import (
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/registry"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
+	"github.com/solo-io/service-mesh-hub/pkg/render/util"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -37,18 +38,11 @@ func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationS
 		Params:            make(map[string]string),
 	}
 
-	if err := selectParams(version.GetParameters(), values.Params); err != nil {
-		return nil, err
-	}
-
 	flavor, err := selectFlavor(version)
 	if err != nil {
 		return nil, err
 	}
 	values.Flavor = flavor
-	if err = selectParams(flavor.GetParameters(), values.Params); err != nil {
-		return nil, err
-	}
 
 	if values.Layers, err = selectLayerInputList(flavor); err != nil {
 		return nil, err
@@ -197,7 +191,7 @@ func selectParams(specs []*v1.Parameter, dest map[string]string) error {
 
 func selectParam(spec *v1.Parameter) (string, error) {
 	prompt := &survey.Input{
-		Default: spec.Default,
+		Default: util.ParamValueToString(spec.Default),
 		Message: fmt.Sprintf("[%s] %s", spec.Description, spec.Name),
 	}
 	input := ""

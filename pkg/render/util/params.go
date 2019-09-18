@@ -7,7 +7,7 @@ import (
 )
 
 func ParamValueToString(value *v1.ParameterValue) string {
-	switch t := value.Type.(type) {
+	switch t := value.GetType().(type) {
 	case *v1.ParameterValue_BooleanValue:
 		if t.BooleanValue {
 			return "true"
