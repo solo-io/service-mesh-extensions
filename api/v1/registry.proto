@@ -65,8 +65,7 @@ message VersionedApplicationSpec {
 
     // Do not override predefined namespaces of resources as they appear in manifests
     bool respect_manifest_namespaces = 41;
-
-    // Manifest render parameters that apply to all flavors of this version
+    // Optional set of parameters to be applied to all flavors of this version.
     repeated Parameter parameters = 42;
 }
 
@@ -107,7 +106,7 @@ message Flavor {
     // The flavor is considered applicable if any of the specified requirement sets is satisfied.
     repeated RequirementSet requirement_sets = 4;
     // Optional set of parameters to be applied to the flavor.
-    repeated Parameter parameters = 5;
+    repeated Parameter parameters = 6;
 }
 
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
@@ -157,7 +156,8 @@ message Kustomize {
 
 // Parameters represent values that are used to configure the installation of an extension.
 message Parameter {
-    // Identifier of the parameter
+    // Identifier of the parameter.
+    // This doubles as the key used to access the parameter's value in templates during render.
     string name = 1;
     // Description of what the effects of the parameter are.
     string description = 2;
@@ -165,8 +165,7 @@ message Parameter {
     // Used by interfaces to the renderer.
     ParameterType type = 3;
     // Default value of the parameter.
-    // Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
-    string default = 4;
+    ParameterValue default = 4;
     // Indicates whether a value for the parameter is required for the installation of the extension
     // to be performed.
     bool required = 5;
@@ -174,7 +173,22 @@ message Parameter {
     string display_name = 6;
 }
 
+// Value for a parameter.
+// Types here should be kept in sync with the ParameterType enum.
+// Note that regardless of type, parameters are passed as string helm values.
+message ParameterValue {
+    oneof type {
+        string string_value = 1;
+        int64 int_value = 2;
+        double float_value = 3;
+        bool boolean_value = 4;
+        google.protobuf.Timestamp date_value = 5 [(gogoproto.stdtime) = true];
+        core.solo.io.ResourceRef secret_ref = 6;
+    }
+}
+
 // Convenience enum to inform Service Mesh Hub interface implementations.
+// Types here should be kept in sync with the ParameterValue message.
 enum ParameterType {
     STRING = 0;
     FLOAT = 1;

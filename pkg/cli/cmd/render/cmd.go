@@ -7,7 +7,6 @@ import (
 	"github.com/solo-io/go-utils/installutils/helmchart"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/installspec"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/options"
-	"github.com/solo-io/service-mesh-hub/pkg/registry"
 	renderutil "github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/pkg/util"
 	"github.com/spf13/cobra"
@@ -22,6 +21,9 @@ func Cmd(o *options.Options) *cobra.Command {
 		},
 	}
 	pflags := cmd.PersistentFlags()
+
+	pflags.StringVarP(&o.Registry.LocalDirectory, "specs-path", "p", "",
+		"local directory to access application specs from, e.g. `extensions/v1`")
 	pflags.StringVarP(&o.Registry.GithubRegistry.Org, "registry-org", "", options.RegistryDefaults.GithubRegistry.Org,
 		"owner of github registry")
 	pflags.StringVarP(&o.Registry.GithubRegistry.Repo, "registry-repo", "", options.RegistryDefaults.GithubRegistry.Repo,
@@ -41,7 +43,7 @@ func render(o *options.Options) error {
 	var installSpec *installspec.InstallSpec
 	var err error
 	if o.InstallSpecFile == "" {
-		reader := registry.NewGithubSpecReader(o.Ctx, o.Registry.GithubRegistry)
+		reader := options.MustGetSpecReader(o)
 		if installSpec, err = installspec.GetInstallSpec(reader, o.InstallNamespace); err != nil {
 			return err
 		}

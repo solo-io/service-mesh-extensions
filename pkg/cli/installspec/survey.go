@@ -6,6 +6,7 @@ import (
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/registry"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
+	"github.com/solo-io/service-mesh-hub/pkg/render/util"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -197,7 +198,7 @@ func selectParams(specs []*v1.Parameter, dest map[string]string) error {
 
 func selectParam(spec *v1.Parameter) (string, error) {
 	prompt := &survey.Input{
-		Default: spec.Default,
+		Default: util.ParamValueToString(spec.Default),
 		Message: fmt.Sprintf("[%s] %s", spec.Description, spec.Name),
 	}
 	input := ""

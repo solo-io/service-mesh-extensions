@@ -40,6 +40,7 @@ var ValidateDefaults = Validate{
 }
 
 type Registry struct {
+	LocalDirectory string
 	GithubRegistry v1.GithubRepositoryLocation
 }
 
