@@ -3,17 +3,13 @@ package render
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
-	"github.com/solo-io/go-utils/contextutils"
 	"github.com/solo-io/go-utils/installutils/helmchart"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/installspec"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/options"
-	"github.com/solo-io/service-mesh-hub/pkg/registry"
 	renderutil "github.com/solo-io/service-mesh-hub/pkg/render"
 	"github.com/solo-io/service-mesh-hub/pkg/util"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 func Cmd(o *options.Options) *cobra.Command {
@@ -47,7 +43,7 @@ func render(o *options.Options) error {
 	var installSpec *installspec.InstallSpec
 	var err error
 	if o.InstallSpecFile == "" {
-		reader := mustGetSpecReader(o)
+		reader := options.MustGetSpecReader(o)
 		if installSpec, err = installspec.GetInstallSpec(reader, o.InstallNamespace); err != nil {
 			return err
 		}
@@ -80,17 +76,4 @@ func renderManifest(ctx context.Context, spec *installspec.InstallSpec) (string,
 		return "", err
 	}
 	return manifests.CombinedString() + "\n", nil
-}
-
-func mustGetSpecReader(o *options.Options) registry.SpecReader {
-	if o.Registry.LocalDirectory == "" {
-		return registry.NewGithubSpecReader(o.Ctx, o.Registry.GithubRegistry)
-	}
-
-	absPath, err := filepath.Abs(o.Registry.LocalDirectory)
-	if err != nil {
-		contextutils.LoggerFrom(o.Ctx).Fatalw("Failed to get absolute path", zap.Error(err))
-	}
-
-	return registry.NewLocalSpecReader(o.Ctx, absPath)
 }
