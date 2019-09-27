@@ -140,6 +140,24 @@ message LayerOption {
     string helm_values = 5;
     // Optional set of parameters to be applied to the layer.
     repeated Parameter parameters = 6;
+    // Optional set of resources that must be present in the cluster for this layer to function correctly.
+    // Note that these resources do not factor into manifest rendering, but can be used by interfaces to the
+    // renderer to validate or create expected resources on the cluster before install.
+    repeated ResourceDependency resource_dependencies = 7;
+}
+
+// Represents a resource that must be present on a cluster for install to succeed.
+message ResourceDependency {
+    // Describes a Kubernetes Secret
+    message Secret {
+        core.solo.io.ResourceRef ref = 1;
+        // List of keys that should be present on the Secret's data map
+        repeated string keys = 2;
+    }
+
+    oneof type {
+        Secret secret = 1;
+    }
 }
 
 // Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
@@ -200,16 +218,16 @@ message ParameterValue {
     }
 }
 
+// Ref for a Kubernetes secret.
+message SecretRef {
+    core.solo.io.ResourceRef ref = 1;
+    // Where to locate the value of the secret in the `data` field
+    string key = 2;
+}
+
 // Secrets can be provided to the render in a number of ways.
 // Note that secrets will be rendered as plain text when being utilized by the renderer.
 message SecretValue {
-    // Ref for a Kubernetes secret.
-    message SecretRef {
-        core.solo.io.ResourceRef ref = 1;
-        // Where to locate the value of the secret in the `data` field
-        string key = 2;
-    }
-
     oneof type {
         // Kubernetes secret ref.
         SecretRef secret_ref = 1;
