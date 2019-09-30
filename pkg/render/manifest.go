@@ -74,11 +74,11 @@ type ValuesInputs struct {
 
 // Deprecated: use ManifestRenderer.ComputeResourcesForApplication
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
-	renderer := NewManifestRenderer(validation.NoopValidateEnvironment)
+	renderer := NewManifestRenderer(validation.NoopValidateResources)
 	return renderer.ComputeResourcesForApplication(ctx, inputs, spec)
 }
 
-func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec, validate validation.ValidateEnvironment) error {
+func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec, validate validation.ValidateResourceDependencies) error {
 	// Validate layers and layer options.
 	if len(inputs.Layers) < GetRequiredLayerCount(inputs.Flavor) {
 		return IncorrectNumberOfInputLayersError
@@ -103,7 +103,7 @@ func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec, va
 	}
 
 	for _, o := range selectedOptions {
-		if err := validate(o.GetEnvironmentRequirements()); err != nil {
+		if err := validate(o.GetResourceDependencies()); err != nil {
 			return err
 		}
 	}

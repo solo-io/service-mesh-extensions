@@ -2,8 +2,8 @@ package validation
 
 import v1 "github.com/solo-io/service-mesh-hub/api/v1"
 
-type ValidateEnvironment func(deps []*v1.EnvironmentRequirements) error
+type ValidateResourceDependencies func(deps []*v1.ResourceDependency) error
 
-func NoopValidateEnvironment(deps []*v1.EnvironmentRequirements) error {
+func NoopValidateResources(deps []*v1.ResourceDependency) error {
 	return nil
 }

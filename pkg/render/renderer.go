@@ -16,10 +16,10 @@ type ManifestRenderer interface {
 }
 
 type manifestRenderer struct {
-	validateEnvironment validation.ValidateEnvironment
+	validateEnvironment validation.ValidateResourceDependencies
 }
 
-func NewManifestRenderer(validateFn validation.ValidateEnvironment) ManifestRenderer {
+func NewManifestRenderer(validateFn validation.ValidateResourceDependencies) ManifestRenderer {
 	return &manifestRenderer{validateEnvironment: validateFn}
 }
 

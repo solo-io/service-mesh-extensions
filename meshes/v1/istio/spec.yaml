@@ -117,15 +117,14 @@ versions:
                     enabled: true
                     security:
                       selfSigned: false
-              environmentRequirements:
-                - resourceDependencies:
-                  - secretDependency:
-                      name: cacerts
-                      keys:
-                        - ca-cert.pem
-                        - ca-key.pem
-                        - root-cert.pem
-                        - cert-chain.pem
+              resourceDependencies:
+              - secretDependency:
+                  name: cacerts
+                  keys:
+                    - ca-cert.pem
+                    - ca-key.pem
+                    - root-cert.pem
+                    - cert-chain.pem
               parameters:
                 - displayName: "Root Certificate"
                   name: cert.not.implemented
