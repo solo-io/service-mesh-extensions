@@ -95,7 +95,7 @@ versions:
               displayName: "Strict (Provided Cert)"
               description: "Enable mtls and provide a cert"
               helmValues: "global:\n  controlPlaneSecurityEnabled: true\n  mtls:\n    enabled: true\nsecurity:\n selfSigned: false"
-              validations:
+              operatorValidations:
                 - resourceDependencies:
                   - secret:
                       name: cacerts
