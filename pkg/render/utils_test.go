@@ -3,6 +3,7 @@ package render_test
 import (
 	"context"
 
+	"github.com/solo-io/service-mesh-hub/pkg/render/validation"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
 	"github.com/solo-io/service-mesh-hub/pkg/render"
@@ -285,7 +286,7 @@ var _ = Describe("utils", func() {
 	Context("validate inputs", func() {
 		It("works in an empty case", func() {
 			inputs := render.ValuesInputs{Flavor: &v1.Flavor{}}
-			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{})
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateEnvironment)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -317,7 +318,7 @@ var _ = Describe("utils", func() {
 					},
 				},
 			}
-			err := render.ValidateInputs(inputs, version)
+			err := render.ValidateInputs(inputs, version, validation.NoopValidateEnvironment)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -334,13 +335,13 @@ var _ = Describe("utils", func() {
 					Parameters: []*v1.Parameter{{Name: "foo"}},
 				},
 			}
-			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{})
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateEnvironment)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("errors if there is a different number of input layers than required layers", func() {
 			inputs := render.ValuesInputs{Flavor: &v1.Flavor{CustomizationLayers: []*v1.Layer{{}}}}
-			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{})
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateEnvironment)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(render.IncorrectNumberOfInputLayersError))
 		})
@@ -369,7 +370,7 @@ var _ = Describe("utils", func() {
 				},
 				Layers: []render.LayerInput{{LayerId: "a", OptionId: "1"}, {LayerId: "z", OptionId: "1"}},
 			}
-			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{})
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateEnvironment)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(render.MissingInputForRequiredLayer(errors.New("")).Error()))
 		})
@@ -381,7 +382,7 @@ var _ = Describe("utils", func() {
 				},
 				Params: map[string]string{"required": ""},
 			}
-			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{})
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateEnvironment)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(render.MissingInputForRequireParam("required").Error()))
 		})
@@ -391,9 +392,42 @@ var _ = Describe("utils", func() {
 				Flavor: &v1.Flavor{Parameters: []*v1.Parameter{{Name: "recognized"}}},
 				Params: map[string]string{"unrecognized": "param"},
 			}
-			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{})
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateEnvironment)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(render.UnrecognizedParamError("unrecognized").Error()))
+		})
+
+		It("errors if the environment validation function errors", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id:      "a",
+							Options: []*v1.LayerOption{{Id: "1"}},
+						},
+					},
+					Parameters: []*v1.Parameter{{
+						Name:     "foo",
+						Required: true,
+					}},
+				},
+				Layers: []render.LayerInput{{LayerId: "a", OptionId: "1"}},
+				Params: map[string]string{"foo": "bar", "bar": "baz"},
+			}
+			version := v1.VersionedApplicationSpec{
+				Parameters: []*v1.Parameter{
+					{
+						Name:     "bar",
+						Required: true,
+					},
+					{
+						Name: "optional",
+					},
+				},
+			}
+			err := render.ValidateInputs(inputs, version, func([]*v1.EnvironmentRequirements) error { return errors.Errorf("test") })
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("test"))
 		})
 	})
 

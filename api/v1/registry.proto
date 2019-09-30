@@ -140,11 +140,13 @@ message LayerOption {
     string helm_values = 5;
     // Optional set of parameters to be applied to the layer.
     repeated Parameter parameters = 6;
-    // Optional set of validations that interfaces to the renderer should implement.
-    repeated OperatorValidations operator_validations = 7;
+    // Optional set of cluster requirements for this layer option.
+    // Interfaces to the renderer can implement validations against these requirements.
+    // TODO does this make more sense on the layer itself?
+    repeated EnvironmentRequirements environment_requirements = 7;
 }
 
-message OperatorValidations {
+message EnvironmentRequirements {
     // Optional set of resources that must be present in the cluster for this layer to function correctly.
     // Note that these resources do not factor into manifest rendering, but can be used by interfaces to the
     // renderer to validate or create expected resources on the cluster before install.
