@@ -6,12 +6,13 @@ package v1
 import (
 	bytes "bytes"
 	fmt "fmt"
+	math "math"
+	time "time"
+
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	_ "github.com/golang/protobuf/ptypes/timestamp"
 	core "github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
-	math "math"
-	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
