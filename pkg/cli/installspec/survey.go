@@ -206,6 +206,6 @@ func selectParam(spec *v1.Parameter) (string, error) {
 		Message: fmt.Sprintf("[%s] %s", spec.Description, spec.Name),
 	}
 	input := ""
-	err := survey.AskOne(prompt, &input, nil)
+	err = survey.AskOne(prompt, &input, nil)
 	return input, err
 }

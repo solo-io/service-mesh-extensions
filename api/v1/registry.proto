@@ -140,6 +140,7 @@ message LayerOption {
     string helm_values = 5;
     // Optional set of parameters to be applied to the layer.
     repeated Parameter parameters = 6;
+
     // Optional set of cluster requirements for this layer option.
     // Interfaces to the renderer can implement validations against these requirements.
     // TODO does this make more sense on the layer itself?
@@ -158,23 +159,14 @@ message ResourceDependency {
     // Describes a Kubernetes Secret
     message Secret {
         // Corresponds to the name on the object metadata of the secret.
-        // Note that referenced secrets must be in the Service Mesh Hub operator's install namespace.
+        // Note that referenced secrets must be in this application's install namespace.
         string name = 1;
         // List of keys that should be present on the Secret's data map
         repeated string keys = 2;
     }
 
-    // Describes a Service Mesh Hub application.
-    // Referenced applications must be available via a registry on the user's Hub instance.
-    // Applies to application installations managed by Service Mesh Hub.
-    message Application {
-        // The name of the application as defined in the application's spec.
-        string name = 1;
-    }
-
     oneof type {
-        Secret secret = 1;
-        Application application = 2;
+        Secret secret_dependency = 1;
     }
 }
 
