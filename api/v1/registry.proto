@@ -140,6 +140,11 @@ message LayerOption {
     string helm_values = 5;
     // Optional set of parameters to be applied to the layer.
     repeated Parameter parameters = 6;
+    // Optional set of validations that interfaces to the renderer should implement.
+    repeated ExternalValidation validations = 7;
+}
+
+message ExternalValidation {
     // Optional set of resources that must be present in the cluster for this layer to function correctly.
     // Note that these resources do not factor into manifest rendering, but can be used by interfaces to the
     // renderer to validate or create expected resources on the cluster before install.
@@ -150,13 +155,24 @@ message LayerOption {
 message ResourceDependency {
     // Describes a Kubernetes Secret
     message Secret {
-        core.solo.io.ResourceRef ref = 1;
+        // Corresponds to the name on the object metadata of the secret.
+        // Note that referenced secrets must be in the Service Mesh Hub operator's install namespace.
+        string name = 1;
         // List of keys that should be present on the Secret's data map
         repeated string keys = 2;
     }
 
+    // Describes a Service Mesh Hub application.
+    // Referenced applications must be available via a registry on the user's Hub instance.
+    // Applies to application installations managed by Service Mesh Hub.
+    message Application {
+        // The name of the application as defined in the application's spec.
+        string name = 1;
+    }
+
     oneof type {
         Secret secret = 1;
+        Application app = 2;
     }
 }
 

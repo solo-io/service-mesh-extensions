@@ -94,18 +94,16 @@ versions:
             - id: "strict-custom-cert"
               displayName: "Strict (Provided Cert)"
               description: "Enable mtls and provide a cert"
-              helmValues: "global:\n  controlPlaneSecurityEnabled: true\n  mtls:\n    enabled: true\ssecurity:\n selfSigned: false"
-              resourceDependencies:
-                - secret:
-                    ref:
-                      # Not sure if it makes sense to do anything with namespace here
-                      namespace: Install Namespace
+              helmValues: "global:\n  controlPlaneSecurityEnabled: true\n  mtls:\n    enabled: true\nsecurity:\n selfSigned: false"
+              validations:
+                - resourceDependencies:
+                  - secret:
                       name: cacerts
-                    keys:
-                      - ca-cert.pem
-                      - ca-key.pem
-                      - root-cert.pem
-                      - cert-chain.pem
+                      keys:
+                        - ca-cert.pem
+                        - ca-key.pem
+                        - root-cert.pem
+                        - cert-chain.pem
               parameters:
                 - displayName: "Root Certificate"
                   name: cert.not.implemented
