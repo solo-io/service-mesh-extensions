@@ -22,10 +22,18 @@ func GetDefaultParameters(versionedSpec *v1.VersionedApplicationSpec, flavorName
 
 	result := make(map[string]string)
 	for _, param := range versionedSpec.Parameters {
-		result[param.Name] = util.ParamValueToString(param.Default)
+		v, err := util.ParamValueToString(param.Default, util.PlainTextSecretGetter)
+		if err != nil {
+			panic(err.Error())
+		}
+		result[param.Name] = v
 	}
 	for _, param := range flavor.Parameters {
-		result[param.Name] = util.ParamValueToString(param.Default)
+		v, err := util.ParamValueToString(param.Default, util.PlainTextSecretGetter)
+		if err != nil {
+			panic(err.Error())
+		}
+		result[param.Name] = v
 	}
 	for _, layer := range flavor.CustomizationLayers {
 		for _, input := range layerInputs {
@@ -33,7 +41,11 @@ func GetDefaultParameters(versionedSpec *v1.VersionedApplicationSpec, flavorName
 				for _, option := range layer.Options {
 					if option.Id == input.OptionId {
 						for _, param := range option.Parameters {
-							result[param.Name] = util.ParamValueToString(param.Default)
+							v, err := util.ParamValueToString(param.Default, util.PlainTextSecretGetter)
+							if err != nil {
+								panic(err.Error())
+							}
+							result[param.Name] = v
 						}
 					}
 				}

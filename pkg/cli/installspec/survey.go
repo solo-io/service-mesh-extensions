@@ -197,8 +197,12 @@ func selectParams(specs []*v1.Parameter, dest map[string]string) error {
 }
 
 func selectParam(spec *v1.Parameter) (string, error) {
+	d, err := util.ParamValueToString(spec.Default, util.PlainTextSecretGetter)
+	if err != nil {
+		return "", err
+	}
 	prompt := &survey.Input{
-		Default: util.ParamValueToString(spec.Default),
+		Default: d,
 		Message: fmt.Sprintf("[%s] %s", spec.Description, spec.Name),
 	}
 	input := ""
