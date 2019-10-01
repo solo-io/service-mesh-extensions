@@ -21,11 +21,15 @@ versions:
         - id: "enabled"
           displayName: "Enabled"
           description: "Enable gateways"
-          helmValues: "gateways:\n  enabled: true"
+          helmValues: |
+            gateways:
+              enabled: true
         - id: "disabled"
           displayName: "Disabled"
           description: "Do not enable gateways"
-          helmValues: "gateways:\n  enabled: false"
+          helmValues: |
+            gateways:
+              enabled: false
     - id: "security"
       displayName: "Security"
       optional: true
@@ -33,7 +37,11 @@ versions:
         - id: "strict"
           displayName: "Strict"
           description: "Enable mtls and use self-signed certs"
-          helmValues: "global:\n  controlPlaneSecurityEnabled: true\n  mtls:\n    enabled: true"
+          helmValues: |
+            global:
+              controlPlaneSecurityEnabled: true
+              mtls:
+                enabled: true
         - id: "strict-custom-cert"
           displayName: "Strict (Provided Cert)"
           description: "Enable mtls and provide a cert"
@@ -78,11 +86,15 @@ versions:
             - id: "enabled"
               displayName: "Enabled"
               description: "Enable gateways"
-              helmValues: "gateways:\n  enabled: true"
+              helmValues: |
+                gateways:
+                  enabled: true
             - id: "disabled"
               displayName: "Disabled"
               description: "Do not enable gateways"
-              helmValues: "gateways:\n  enabled: false"
+              helmValues: |
+                gateways:
+                  enabled: false
         - id: "security"
           displayName: "Security"
           optional: true
@@ -90,10 +102,29 @@ versions:
             - id: "strict"
               displayName: "Strict"
               description: "Enable mtls and use self-signed certs"
-              helmValues: "global:\n  controlPlaneSecurityEnabled: true\n  mtls:\n    enabled: true"
+              helmValues: |
+                global:
+                  controlPlaneSecurityEnabled: true
+                  mtls:
+                    enabled: true
             - id: "strict-custom-cert"
               displayName: "Strict (Provided Cert)"
               description: "Enable mtls and provide a cert"
+              helmValues: |
+                global:
+                  controlPlaneSecurityEnabled: true
+                  mtls:
+                    enabled: true
+                    security:
+                      selfSigned: false
+              resourceDependencies:
+              - secretDependency:
+                  name: cacerts
+                  keys:
+                    - ca-cert.pem
+                    - ca-key.pem
+                    - root-cert.pem
+                    - cert-chain.pem
               parameters:
                 - displayName: "Root Certificate"
                   name: cert.not.implemented

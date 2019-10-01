@@ -5,6 +5,7 @@ import (
 	"context"
 	"text/template"
 
+	"github.com/solo-io/service-mesh-hub/pkg/render/validation"
 	"k8s.io/helm/pkg/manifest"
 
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
@@ -73,11 +74,11 @@ type ValuesInputs struct {
 
 // Deprecated: use ManifestRenderer.ComputeResourcesForApplication
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
-	renderer := NewManifestRenderer()
+	renderer := NewManifestRenderer(validation.NoopValidateResources)
 	return renderer.ComputeResourcesForApplication(ctx, inputs, spec)
 }
 
-func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec) error {
+func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec, validate validation.ValidateResourceDependencies) error {
 	// Validate layers and layer options.
 	if len(inputs.Layers) < GetRequiredLayerCount(inputs.Flavor) {
 		return IncorrectNumberOfInputLayersError
@@ -98,6 +99,12 @@ func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec) er
 		}
 		if option != nil {
 			selectedOptions = append(selectedOptions, option)
+		}
+	}
+
+	for _, o := range selectedOptions {
+		if err := validate(o.GetResourceDependencies()); err != nil {
+			return err
 		}
 	}
 
