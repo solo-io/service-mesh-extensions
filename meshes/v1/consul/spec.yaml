@@ -1,0 +1,19 @@
+applicationCreator: Hashicorp
+type: MESH
+logoUrl: https://www.datocms-assets.com/2885/1508281312-blog-consul.svg
+longDescription: |
+  Consul is a distributed, highly available, and data center aware solution to connect and configure applications across dynamic, distributed infrastructure.
+name: consul
+shortDescription: |
+  Consul is a distributed, highly available, and data center aware solution to connect and configure applications across dynamic, distributed infrastructure.
+repositoryUrl: https://github.com/hashicorp/consul
+versions:
+- version: "v0.9.0"
+  githubChart:
+    directory: ""
+    org: hashicorp
+    ref: v0.9.0
+    repo: consul-helm
+  flavors:
+  - name: vanilla
+    description: "Install Consul control plane to a namespace"
