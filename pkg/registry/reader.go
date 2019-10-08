@@ -208,8 +208,8 @@ func getSpecsFromDirectory(ctx context.Context, fs afero.Fs, subdirs []os.FileIn
 		descriptionBytes, err := afero.ReadFile(fs, descriptionPath)
 		var renderedBytes []byte
 		if err != nil {
-			info := fmt.Sprintf("%v not loaded for %v, falling back to inline long description", descriptionFilename, subdir.Name())
-			contextutils.LoggerFrom(ctx).Infow(info,
+			debugDesc := fmt.Sprintf("%v not loaded for %v, falling back to inline long description", descriptionFilename, subdir.Name())
+			contextutils.LoggerFrom(ctx).Debugw(debugDesc,
 				zap.Error(err),
 				zap.String("file", specPath))
 			renderer := blackfriday.HtmlRenderer(0, subdir.Name(), "")
