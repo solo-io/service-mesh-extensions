@@ -82,7 +82,7 @@ versions:
                 github:
                   org: solo-io
                   repo: service-mesh-hub
-                  ref: dc0a1121b20af378576d18a134abe17508b45a73
+                  ref: 4d711afe8b40f91db759fc1104cd5c5c865a329b
                   directory: extensions/v1/gloo/overlays
                 overlayPath: vanilla-18
               parameters:
