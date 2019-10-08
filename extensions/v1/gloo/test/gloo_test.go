@@ -112,7 +112,7 @@ var _ = Describe("gloo extension test", func() {
 					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 					Expect(err).NotTo(HaveOccurred())
 					testManifest = NewTestManifestWithResources(rendered)
-					Expect(testManifest.NumResources()).To(Equal(33))
+					Expect(testManifest.NumResources()).To(Equal(35))
 				})
 
 				It("has the correct number of resources with apiserver disabled", func() {
@@ -120,7 +120,7 @@ var _ = Describe("gloo extension test", func() {
 					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 					Expect(err).NotTo(HaveOccurred())
 					testManifest = NewTestManifestWithResources(rendered)
-					Expect(testManifest.NumResources()).To(Equal(28))
+					Expect(testManifest.NumResources()).To(Equal(30))
 				})
 			})
 		})
