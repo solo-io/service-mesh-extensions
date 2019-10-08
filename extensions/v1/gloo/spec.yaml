@@ -82,15 +82,10 @@ versions:
                 github:
                   org: solo-io
                   repo: service-mesh-hub
-                  ref: 8bd7b43c04582a3a22b854e1f77597a7f29d6bbd
+                  ref: dc0a1121b20af378576d18a134abe17508b45a73
                   directory: extensions/v1/gloo/overlays
-                overlayPath: vanilla
+                overlayPath: vanilla-18
               parameters:
-                - name: crds.create
-                  description: |-
-                    Whether or not to create gloo crds.
-                  default:
-                    stringValue: "false"
                 - name: apiServer.enable
                   description: |-
                     Whether or not to run the apiserver and UI.
