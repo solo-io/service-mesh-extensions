@@ -75,12 +75,14 @@ versions:
             - id: "create"
               displayName: "Create"
               description: "Create custom resources at install time"
+              kustomize:
+                github:
+                  org: solo-io
+                  repo: service-mesh-hub
+                  ref: a08f2bcbcb88233dad97ff66aa85293c0bc1d074
+                  directory: extensions/v1/gloo/overlays
+                overlayPath: vanilla-18
               parameters:
-                - name: crds.create
-                  description: |-
-                    Whether or not to create gloo crds.
-                  default:
-                    stringValue: "false"
                 - name: apiServer.enable
                   description: |-
                     Whether or not to run the apiserver and UI.
