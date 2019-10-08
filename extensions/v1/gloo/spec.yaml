@@ -65,9 +65,6 @@ versions:
 - helmArchive:
     uri: https://storage.googleapis.com/solo-public-helm/charts/gloo-0.18.35.tgz
   datePublished: "2019-01-09T15:04:06Z"
-  valuesYaml: |-
-    crds:
-      create: false
   flavors:
     - name: vanilla
       description: "Install gloo"
