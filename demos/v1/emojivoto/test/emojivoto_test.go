@@ -2,8 +2,6 @@ package test
 
 import (
 	"context"
-	"github.com/solo-io/service-mesh-hub/pkg/render/validation"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/solo-io/go-utils/manifesttestutils"
@@ -49,8 +47,7 @@ var _ = Describe("emojivoto", func() {
 		version = versionMap[versionString]
 		inputs.SpecDefinedValues = version.ValuesYaml
 		inputs.Flavor = test.GetFlavor("default", versionMap[versionString])
-		renderer := render.NewManifestRenderer(validation.NoopValidateResources)
-		rendered, err := renderer.ComputeResourcesForApplication(context.TODO(), inputs, version)
+		rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 		Expect(err).NotTo(HaveOccurred())
 		testManifest = NewTestManifestWithResources(rendered)
 	}

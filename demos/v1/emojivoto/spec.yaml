@@ -3,12 +3,12 @@ type: DEMO
 logoUrl: https://avatars3.githubusercontent.com/u/23534644?s=200&v=4
 longDescription: |
   The canonical testing application for linkerd.
-name: bookinfo
+name: emojivoto
 shortDescription: |
   The canonical testing application for linkerd.
 versions:
   - manifestsArchive:
-      uri: https://run.linkerd.io/emojivoto.yml # will change
+      uri: https://github.com/solo-io/service-mesh-hub/raw/vote-app/demos/v1/emojivoto/emojivoto.tar.gz
     flavors:
       - name: default
         description: "Install emojivoto"
