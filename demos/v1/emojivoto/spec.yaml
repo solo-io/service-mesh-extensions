@@ -8,7 +8,7 @@ shortDescription: |
   The canonical testing application for linkerd.
 versions:
   - manifestsArchive:
-      uri: https://github.com/solo-io/service-mesh-hub/raw/vote-app/demos/v1/emojivoto/emojivoto.tar.gz
+      uri: https://storage.googleapis.com/sm-marketplace-registry/emojivoto.tar.gz
     flavors:
       - name: default
         description: "Install emojivoto"
