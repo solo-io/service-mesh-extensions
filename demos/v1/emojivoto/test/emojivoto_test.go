@@ -55,7 +55,7 @@ var _ = Describe("emojivoto", func() {
 
 	Context("latest with default values", func() {
 		BeforeEach(func() {
-			bindVersion("latest")
+			bindVersion("v8")
 		})
 
 		It("has the correct number of resources", func() {
