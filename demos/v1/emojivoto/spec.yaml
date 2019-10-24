@@ -2,10 +2,10 @@ applicationCreator: linkerd
 type: DEMO
 logoUrl: https://avatars2.githubusercontent.com/u/10824329?s=400&v=4
 longDescription: |
-  A microservice application that allows users to vote for their favorite emoji, and tracks votes received on a leaderboard. May the best emoji win.
+  The canonical testing application for linkerd.
 name: emojivoto
 shortDescription: |
-  The canonical testing application for linkerd.
+  A microservice application that allows users to vote for their favorite emoji, and tracks votes received on a leaderboard. May the best emoji win.
 versions:
   - manifestsArchive:
       uri: https://storage.googleapis.com/sm-marketplace-registry/emojivoto.tar.gz
