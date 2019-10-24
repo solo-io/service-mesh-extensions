@@ -1,6 +1,6 @@
 applicationCreator: linkerd
 type: DEMO
-logoUrl: https://avatars3.githubusercontent.com/u/23534644?s=200&v=4
+logoUrl: https://avatars2.githubusercontent.com/u/10824329?s=400&v=4
 longDescription: |
   The canonical testing application for linkerd.
 name: emojivoto
