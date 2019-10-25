@@ -31,7 +31,7 @@ var _ = Describe("istio extension test", func() {
 		}
 	})
 
-	Context("vanilla", func() {
+	Context("istio", func() {
 		var (
 			version      *v1.VersionedApplicationSpec
 			inputs       render.ValuesInputs
@@ -81,10 +81,10 @@ var _ = Describe("istio extension test", func() {
 			})
 		})
 
-		Context("1.3.0", func() {
+		Context("1.3", func() {
 			Context("vanilla", func() {
 				BeforeEach(func() {
-					version = versionMap["1.3.0"]
+					version = versionMap["1.3"]
 					inputs = testInput("vanilla")
 					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 					Expect(err).NotTo(HaveOccurred())
@@ -92,13 +92,13 @@ var _ = Describe("istio extension test", func() {
 				})
 
 				It("has the correct number of resources", func() {
-					Expect(testManifest.NumResources()).To(Equal(94))
+					Expect(testManifest.NumResources()).To(Equal(90))
 				})
 			})
 
 			Context("banana", func() {
 				BeforeEach(func() {
-					version = versionMap["1.3.0"]
+					version = versionMap["1.3"]
 					inputs = testInput("banana")
 					inputs.Layers = []render.LayerInput{
 						{LayerId: "security", OptionId: "strict-custom-cert"},
@@ -111,7 +111,7 @@ var _ = Describe("istio extension test", func() {
 				})
 
 				It("has the correct number of resources", func() {
-					Expect(testManifest.NumResources()).To(Equal(87))
+					Expect(testManifest.NumResources()).To(Equal(83))
 				})
 			})
 		})

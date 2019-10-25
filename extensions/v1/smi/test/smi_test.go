@@ -65,7 +65,7 @@ var _ = Describe("smi extension test", func() {
 			})
 
 			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(5))
+				Expect(testManifest.NumResources()).To(Equal(7))
 			})
 		})
 	})

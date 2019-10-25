@@ -16,5 +16,5 @@ versions:
         meshType: ISTIO
         versions:
           minVersion: "1.0.2"
-          maxVersion: "1.1.6"
+          maxVersion: "1.4"
   version: "0.0.1"
