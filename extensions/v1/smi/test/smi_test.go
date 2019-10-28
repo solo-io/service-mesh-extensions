@@ -55,9 +55,9 @@ var _ = Describe("smi extension test", func() {
 			}
 		)
 
-		Context("0.0.1", func() {
+		Context("0.1.0", func() {
 			BeforeEach(func() {
-				version = versionMap["0.0.1"]
+				version = versionMap["0.1.0"]
 				inputs = testInput("istio")
 				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 				Expect(err).NotTo(HaveOccurred())
