@@ -18,7 +18,6 @@ import (
 	"github.com/solo-io/go-utils/tarutils"
 	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/spf13/afero"
-	"sigs.k8s.io/kustomize/pkg/types"
 )
 
 const (

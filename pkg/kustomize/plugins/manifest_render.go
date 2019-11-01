@@ -6,10 +6,6 @@ import (
 	"text/template"
 
 	"github.com/pkg/errors"
-	"sigs.k8s.io/kustomize/k8sdeps/kunstruct"
-	"sigs.k8s.io/kustomize/pkg/ifc"
-	"sigs.k8s.io/kustomize/pkg/resmap"
-	"sigs.k8s.io/kustomize/pkg/resource"
 )
 
 const (

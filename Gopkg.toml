@@ -39,44 +39,49 @@
 
 [[override]]
   name = "sigs.k8s.io/kustomize"
-  revision = "92897c7d33b87b00b516d3b13f4cf7b774f70677"
+  revision = "4005b80b"
   source = "https://github.com/solo-io/kustomize.git"
 
 [[override]]
   name = "github.com/solo-io/go-utils"
-  version = "0.8.20"
+  version = "0.10.24"
+
 
 [[override]]
   name = "github.com/solo-io/solo-kit"
-  version = "0.8.0"
+  version = "0.11.8"
 
 [[override]]
   name = "k8s.io/kubernetes"
-  version = "=v1.13.1"
+  version = "=v1.15.0"
 
 [[override]]
   name = "k8s.io/api"
-  version = "kubernetes-1.13.1"
+  version = "kubernetes-1.15.0"
 
 [[override]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.13.1"
+  version = "kubernetes-1.15.0"
 
 [[override]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.13.1"
+  version = "kubernetes-1.15.0"
 
 [[override]]
   name = "k8s.io/apiextensions-apiserver"
-  version = "kubernetes-1.13.1"
+  version = "kubernetes-1.15.0"
 
 [[override]]
   name = "k8s.io/apiserver"
-  version = "kubernetes-1.13.1"
+  version = "kubernetes-1.15.0"
+
+[[override]]
+  name = "k8s.io/cli-runtime"
+  version = "kubernetes-1.15.0"
 
 [[override]]
   name = "k8s.io/helm"
-  version = "v2.12.3"
+  version = "v2.15.0"
 
 [[override]]
   name = "github.com/russross/blackfriday"

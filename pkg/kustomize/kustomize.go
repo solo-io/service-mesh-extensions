@@ -7,20 +7,19 @@ import (
 
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/loader"
 	"github.com/solo-io/service-mesh-hub/pkg/kustomize/plugins"
-
-	"github.com/pkg/errors"
-
-	"github.com/solo-io/go-utils/installutils/helmchart"
-	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"sigs.k8s.io/kustomize/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/k8sdeps/kv/plugin"
 	"sigs.k8s.io/kustomize/k8sdeps/transformer"
 	"sigs.k8s.io/kustomize/pkg/commands/build"
 	"sigs.k8s.io/kustomize/pkg/fs"
-	kplugins "sigs.k8s.io/kustomize/pkg/plugins"
 	"sigs.k8s.io/kustomize/pkg/resmap"
 	"sigs.k8s.io/kustomize/pkg/resource"
 	"sigs.k8s.io/kustomize/pkg/types"
+
+	"github.com/pkg/errors"
+
+	"github.com/solo-io/go-utils/installutils/helmchart"
+	hubv1 "github.com/solo-io/service-mesh-hub/api/v1"
 )
 
 //go:generate mockgen -package=mocks -mock_names Loader=MockPluginLoader -destination=../internal/mocks/loader_factory.go sigs.k8s.io/kustomize/pkg/plugins LoaderFactory
