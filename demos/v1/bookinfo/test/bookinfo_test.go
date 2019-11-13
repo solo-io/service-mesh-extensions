@@ -59,7 +59,7 @@ var _ = Describe("bookinfo", func() {
 		})
 
 		It("has the correct number of resources", func() {
-			Expect(testManifest.NumResources()).To(Equal(10))
+			Expect(testManifest.NumResources()).To(Equal(16))
 		})
 	})
 })
