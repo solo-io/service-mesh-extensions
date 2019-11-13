@@ -73,9 +73,13 @@ func validate(o *options.Options) error {
 	if err != nil {
 		return err
 	}
+	flavorContent, err := getFlavorContent(versionContent, o.Validate.Flavor)
+	if err != nil {
+		return err
+	}
 	inputValues := render.ValuesInputs{
 		Name:             o.Validate.ApplicationName,
-		FlavorName:       o.Validate.Flavor,
+		Flavor:           flavorContent,
 		InstallNamespace: o.Validate.InstallNamespace,
 		MeshRef: core.ResourceRef{
 			Namespace: o.Validate.MeshNamespace,
@@ -83,9 +87,8 @@ func validate(o *options.Options) error {
 		},
 		SpecDefinedValues: versionContent.ValuesYaml,
 		// TODO - support validation with these parameters
-		//SuperglooNamespace: "",
 		//UserDefinedValues:  "",
-		//FlavorParams:       nil,
+		//Params:       nil,
 		//SpecDefinedValues:  "",
 	}
 
@@ -129,4 +132,13 @@ func getVersionContent(list []*v1.VersionedApplicationSpec, version string) (*v1
 		}
 	}
 	return nil, fmt.Errorf("could not find version %v in specification", version)
+}
+
+func getFlavorContent(version *v1.VersionedApplicationSpec, name string) (*v1.Flavor, error) {
+	for _, content := range version.Flavors {
+		if name == content.Name {
+			return content, nil
+		}
+	}
+	return nil, fmt.Errorf("could not find flavor %v in specification", name)
 }

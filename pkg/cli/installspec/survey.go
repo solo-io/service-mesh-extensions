@@ -2,11 +2,11 @@ package installspec
 
 import (
 	"fmt"
-	"strings"
 
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 	"github.com/solo-io/service-mesh-hub/pkg/registry"
 	"github.com/solo-io/service-mesh-hub/pkg/render"
+	"github.com/solo-io/service-mesh-hub/pkg/render/util"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -32,23 +32,41 @@ func GetInstallSpec(reader registry.SpecReader, installNamespace string) (*Insta
 
 func GetValuesInputs(spec *v1.ApplicationSpec, version *v1.VersionedApplicationSpec, installNamespace string) (*render.ValuesInputs, error) {
 	values := render.ValuesInputs{
-		InstallNamespace: installNamespace,
+		Name:              spec.Name,
+		InstallNamespace:  installNamespace,
+		SpecDefinedValues: version.ValuesYaml,
+		Params:            make(map[string]string),
 	}
 
-	values.Name = spec.Name
-	values.SpecDefinedValues = version.ValuesYaml
+	if err := selectParams(version.GetParameters(), values.Params); err != nil {
+		return nil, err
+	}
+
 	flavor, err := selectFlavor(version)
 	if err != nil {
 		return nil, err
 	}
-	values.FlavorName = flavor.Name
-	values.FlavorParams = make(map[string]string)
-	for _, param := range flavor.GetParameters() {
-		val, err := selectParam(param)
-		if err != nil {
-			return nil, err
+	values.Flavor = flavor
+	if err = selectParams(flavor.GetParameters(), values.Params); err != nil {
+		return nil, err
+	}
+
+	if values.Layers, err = selectLayerInputList(flavor); err != nil {
+		return nil, err
+	}
+
+	for _, layer := range flavor.GetCustomizationLayers() {
+		for _, layerInput := range values.Layers {
+			if layer.Id == layerInput.LayerId {
+				for _, option := range layer.Options {
+					if option.Id == layerInput.OptionId {
+						if err := selectParams(option.GetParameters(), values.Params); err != nil {
+							return nil, err
+						}
+					}
+				}
+			}
 		}
-		values.FlavorParams[param.Name] = val
 	}
 	return &values, nil
 }
@@ -101,10 +119,6 @@ func selectFlavor(spec *v1.VersionedApplicationSpec) (*v1.Flavor, error) {
 	var flavors []string
 	nameToFlavor := make(map[string]*v1.Flavor)
 	for _, flavor := range spec.GetFlavors() {
-		if strings.Contains(flavor.Name, "supergloo") {
-			// These flavors require supergloo with a cluster-admin role.
-			continue
-		}
 		nameToFlavor[flavor.Name] = flavor
 		flavors = append(flavors, flavor.Name)
 	}
@@ -121,12 +135,77 @@ func selectFlavor(spec *v1.VersionedApplicationSpec) (*v1.Flavor, error) {
 	return nameToFlavor[flavor], nil
 }
 
+func selectLayerInputList(flavor *v1.Flavor) ([]render.LayerInput, error) {
+	layerInputList := make([]render.LayerInput, 0, len(flavor.GetCustomizationLayers()))
+	for _, layer := range flavor.GetCustomizationLayers() {
+		option, err := selectLayerOption(layer)
+		if err != nil {
+			return nil, err
+		}
+
+		// handle optional layers
+		if option == nil {
+			continue
+		}
+
+		layerInputList = append(layerInputList, render.LayerInput{
+			LayerId:  layer.Id,
+			OptionId: option.Id,
+		})
+	}
+	return layerInputList, nil
+}
+
+func selectLayerOption(layer *v1.Layer) (*v1.LayerOption, error) {
+	layerOptions := make([]string, 0, len(layer.Options))
+	displayNameToLayerOption := make(map[string]*v1.LayerOption, len(layerOptions))
+	for _, option := range layer.GetOptions() {
+		layerOptions = append(layerOptions, option.DisplayName)
+		displayNameToLayerOption[option.DisplayName] = option
+	}
+
+	var v survey.Validator
+	if layer.Optional {
+		layerOptions = append(layerOptions, "< skip >")
+		displayNameToLayerOption["< skip >"] = nil
+	} else {
+		v = survey.Required
+	}
+
+	option := ""
+	prompt := &survey.Select{
+		Options:  layerOptions,
+		Message:  fmt.Sprintf("Select an option for layer %v.", layer.DisplayName),
+		PageSize: 10,
+	}
+
+	if err := survey.AskOne(prompt, &option, v); err != nil {
+		return nil, err
+	}
+	return displayNameToLayerOption[option], nil
+}
+
+func selectParams(specs []*v1.Parameter, dest map[string]string) error {
+	for _, spec := range specs {
+		val, err := selectParam(spec)
+		if err != nil {
+			return err
+		}
+		dest[spec.Name] = val
+	}
+	return nil
+}
+
 func selectParam(spec *v1.Parameter) (string, error) {
+	d, err := util.ParamValueToString(spec.Default, util.PlainTextSecretGetter)
+	if err != nil {
+		return "", err
+	}
 	prompt := &survey.Input{
-		Default: spec.Default,
+		Default: d,
 		Message: fmt.Sprintf("[%s] %s", spec.Description, spec.Name),
 	}
 	input := ""
-	err := survey.AskOne(prompt, &input, nil)
+	err = survey.AskOne(prompt, &input, nil)
 	return input, err
 }

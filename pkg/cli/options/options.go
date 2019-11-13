@@ -40,6 +40,7 @@ var ValidateDefaults = Validate{
 }
 
 type Registry struct {
+	LocalDirectory string
 	GithubRegistry v1.GithubRepositoryLocation
 }
 
@@ -47,8 +48,8 @@ var RegistryDefaults = Registry{
 	GithubRegistry: v1.GithubRepositoryLocation{
 		Org:       "solo-io",
 		Repo:      "service-mesh-hub",
-		Ref:       "v0.0.2",
-		Directory: "extensions/v1",
+		Ref:       "better-layering-aug",
+		Directory: "meshes/v1",
 	},
 }
 

@@ -3,6 +3,7 @@ package render_test
 import (
 	"context"
 
+	"github.com/solo-io/service-mesh-hub/pkg/render/validation"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
 	"github.com/solo-io/service-mesh-hub/pkg/render"
@@ -210,7 +211,7 @@ var _ = Describe("utils", func() {
 		It("works", func() {
 			inputs := render.ValuesInputs{
 				UserDefinedValues: "foo: bar",
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"baz1.baz2": "baz3",
 				},
 				SpecDefinedValues: "goo: hoo",
@@ -221,7 +222,7 @@ var _ = Describe("utils", func() {
 
 		It("prefers flavor params to spec values", func() {
 			inputs := render.ValuesInputs{
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"foo": "bar",
 				},
 				SpecDefinedValues: "foo: baz",
@@ -233,7 +234,7 @@ var _ = Describe("utils", func() {
 		It("prefers user params to flavor params", func() {
 			inputs := render.ValuesInputs{
 				UserDefinedValues: "foo: bar",
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"foo": "baz",
 				},
 			}
@@ -251,7 +252,7 @@ var _ = Describe("utils", func() {
 			str := "invalidYaml"
 			inputs := render.ValuesInputs{
 				UserDefinedValues: str,
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					"baz1.baz2": "baz3",
 				},
 				SpecDefinedValues: "goo: hoo",
@@ -273,12 +274,160 @@ var _ = Describe("utils", func() {
 			key := "invalid"
 			invalid := "{{"
 			inputs := render.ValuesInputs{
-				FlavorParams: map[string]string{
+				Params: map[string]string{
 					key: invalid,
 				},
 			}
 			_, err := render.ComputeValueOverrides(context.TODO(), inputs)
 			Expect(err.Error()).To(ContainSubstring(render.UnableToParseParameterError(errors.Errorf(""), key, invalid).Error()))
+		})
+	})
+
+	Context("validate inputs", func() {
+		It("works in an empty case", func() {
+			inputs := render.ValuesInputs{Flavor: &v1.Flavor{}}
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateResources)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("works in a non-empty case", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id:      "a",
+							Options: []*v1.LayerOption{{Id: "1"}},
+						},
+					},
+					Parameters: []*v1.Parameter{{
+						Name:     "foo",
+						Required: true,
+					}},
+				},
+				Layers: []render.LayerInput{{LayerId: "a", OptionId: "1"}},
+				Params: map[string]string{"foo": "bar", "bar": "baz"},
+			}
+			version := v1.VersionedApplicationSpec{
+				Parameters: []*v1.Parameter{
+					{
+						Name:     "bar",
+						Required: true,
+					},
+					{
+						Name: "optional",
+					},
+				},
+			}
+			err := render.ValidateInputs(inputs, version, validation.NoopValidateResources)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("works when no layer or param inputs are provided and no layers or params are required", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id:       "a",
+							Optional: true,
+							Options:  []*v1.LayerOption{{Id: "1"}},
+						},
+					},
+					Parameters: []*v1.Parameter{{Name: "foo"}},
+				},
+			}
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateResources)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("errors if there is a different number of input layers than required layers", func() {
+			inputs := render.ValuesInputs{Flavor: &v1.Flavor{CustomizationLayers: []*v1.Layer{{}}}}
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateResources)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(render.IncorrectNumberOfInputLayersError))
+		})
+
+		It("errors if a required layer is missing an option", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id: "a",
+							Options: []*v1.LayerOption{
+								{
+									Id: "1",
+								},
+							},
+						},
+						{
+							Id: "b",
+							Options: []*v1.LayerOption{
+								{
+									Id: "1",
+								},
+							},
+						},
+					},
+				},
+				Layers: []render.LayerInput{{LayerId: "a", OptionId: "1"}, {LayerId: "z", OptionId: "1"}},
+			}
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateResources)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(render.MissingInputForRequiredLayer(errors.New("")).Error()))
+		})
+
+		It("errors if a required parameter is missing a value", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					Parameters: []*v1.Parameter{{Name: "required", Required: true}},
+				},
+				Params: map[string]string{"required": ""},
+			}
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateResources)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(render.MissingInputForRequireParam("required").Error()))
+		})
+
+		It("errors if an unrecognized param is provided", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{Parameters: []*v1.Parameter{{Name: "recognized"}}},
+				Params: map[string]string{"unrecognized": "param"},
+			}
+			err := render.ValidateInputs(inputs, v1.VersionedApplicationSpec{}, validation.NoopValidateResources)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(render.UnrecognizedParamError("unrecognized").Error()))
+		})
+
+		It("errors if the environment validation function errors", func() {
+			inputs := render.ValuesInputs{
+				Flavor: &v1.Flavor{
+					CustomizationLayers: []*v1.Layer{
+						{
+							Id:      "a",
+							Options: []*v1.LayerOption{{Id: "1"}},
+						},
+					},
+					Parameters: []*v1.Parameter{{
+						Name:     "foo",
+						Required: true,
+					}},
+				},
+				Layers: []render.LayerInput{{LayerId: "a", OptionId: "1"}},
+				Params: map[string]string{"foo": "bar", "bar": "baz"},
+			}
+			version := v1.VersionedApplicationSpec{
+				Parameters: []*v1.Parameter{
+					{
+						Name:     "bar",
+						Required: true,
+					},
+					{
+						Name: "optional",
+					},
+				},
+			}
+			err := render.ValidateInputs(inputs, version, func([]*v1.ResourceDependency) error { return errors.Errorf("test") })
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("test"))
 		})
 	})
 
@@ -290,17 +439,11 @@ var _ = Describe("utils", func() {
 				Namespace: "mesh-ns",
 				Name:      "my-mesh",
 			},
-			Supergloo: render.SuperglooInfo{
-				Namespace:       "supergloo-system",
-				ClusterRoleName: "supergloo-crb",
-			},
 			UserDefinedValues: "top:\n  nested: {{ .InstallNamespace }}\n",
-			FlavorParams: map[string]string{
-				"my.app.cluster-role": "{{ .Supergloo.ClusterRoleName }}",
-				"my.app.mesh-ref":     "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
-				"unchanged":           "still-the-same",
+			Params: map[string]string{
+				"my.app.mesh-ref": "{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}",
+				"unchanged":       "still-the-same",
 			},
-			SpecDefinedValues: "key: {{ .Supergloo.Namespace }}\n",
 		}
 
 		expected := render.ValuesInputs{
@@ -309,17 +452,11 @@ var _ = Describe("utils", func() {
 				Namespace: "mesh-ns",
 				Name:      "my-mesh",
 			},
-			Supergloo: render.SuperglooInfo{
-				Namespace:       "supergloo-system",
-				ClusterRoleName: "supergloo-crb",
-			},
 			UserDefinedValues: "top:\n  nested: test-ns\n",
-			FlavorParams: map[string]string{
-				"my.app.cluster-role": "supergloo-crb",
-				"my.app.mesh-ref":     "my-mesh.mesh-ns",
-				"unchanged":           "still-the-same",
+			Params: map[string]string{
+				"my.app.mesh-ref": "my-mesh.mesh-ns",
+				"unchanged":       "still-the-same",
 			},
-			SpecDefinedValues: "key: supergloo-system\n",
 		}
 
 		It("correctly renders input values", func() {

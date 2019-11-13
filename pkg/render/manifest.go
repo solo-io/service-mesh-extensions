@@ -5,6 +5,7 @@ import (
 	"context"
 	"text/template"
 
+	"github.com/solo-io/service-mesh-hub/pkg/render/validation"
 	"k8s.io/helm/pkg/manifest"
 
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
@@ -32,6 +33,20 @@ var (
 	FailedRenderValueTemplatesError = func(err error) error {
 		return errors.Wrapf(err, "error rendering input value templates")
 	}
+
+	MissingInputForRequiredLayer = func(err error) error {
+		return errors.Wrapf(err, "error retrieving input for required layer")
+	}
+
+	MissingInputForRequireParam = func(name string) error {
+		return errors.Errorf("Missing input for required parameter %v", name)
+	}
+
+	UnrecognizedParamError = func(name string) error {
+		return errors.Errorf("Parameter %v is not specified on the selected versioned application spec, flavor, or layer option", name)
+	}
+
+	IncorrectNumberOfInputLayersError = errors.Errorf("incorrect number of input layers")
 )
 
 type SuperglooInfo struct {
@@ -40,51 +55,94 @@ type SuperglooInfo struct {
 	ClusterRoleName    string
 }
 
-type ValuesInputs struct {
-	Name               string
-	InstallNamespace   string
-	FlavorName         string
-	MeshRef            core.ResourceRef
-	SuperglooNamespace string
-
-	UserDefinedValues string
-	FlavorParams      map[string]string
-	SpecDefinedValues string
-
-	// TODO: remove old value (SuperglooNamespace) after new ones have been wired on the marketplace side
-	Supergloo SuperglooInfo
+type LayerInput struct {
+	LayerId, OptionId string
 }
 
+type ValuesInputs struct {
+	Name             string
+	InstallNamespace string
+	Flavor           *hubv1.Flavor
+	Layers           []LayerInput
+	MeshRef          core.ResourceRef
+
+	UserDefinedValues string
+	SpecDefinedValues string
+	// These map to the params found on versions, flavors, and layers,
+	Params map[string]string
+}
+
+// Deprecated: use ManifestRenderer.ComputeResourcesForApplication
 func ComputeResourcesForApplication(ctx context.Context, inputs ValuesInputs, spec *hubv1.VersionedApplicationSpec) (kuberesource.UnstructuredResources, error) {
-	inputs, err := ExecInputValuesTemplates(inputs)
-	if err != nil {
-		return nil, FailedRenderValueTemplatesError(err)
+	renderer := NewManifestRenderer(validation.NoopValidateResources)
+	return renderer.ComputeResourcesForApplication(ctx, inputs, spec)
+}
+
+func ValidateInputs(inputs ValuesInputs, spec hubv1.VersionedApplicationSpec, validate validation.ValidateResourceDependencies) error {
+	// Validate layers and layer options.
+	if len(inputs.Layers) < GetRequiredLayerCount(inputs.Flavor) {
+		return IncorrectNumberOfInputLayersError
 	}
 
-	manifests, err := GetManifestsFromApplicationSpec(ctx, inputs, spec)
-	if err != nil {
-		return nil, err
+	var selectedOptions []*hubv1.LayerOption
+	for _, flavorLayer := range inputs.Flavor.CustomizationLayers {
+		var optionId string
+		for _, layerInput := range inputs.Layers {
+			if layerInput.LayerId == flavorLayer.Id {
+				optionId = layerInput.OptionId
+			}
+		}
+
+		option, err := GetLayerOption(optionId, flavorLayer)
+		if err != nil && !flavorLayer.Optional {
+			return MissingInputForRequiredLayer(err)
+		}
+		if option != nil {
+			selectedOptions = append(selectedOptions, option)
+		}
 	}
 
-	installedFlavor, err := GetInstalledFlavor(inputs.FlavorName, spec.Flavors)
-	if err != nil {
-		return nil, err
+	for _, o := range selectedOptions {
+		if err := validate(o.GetResourceDependencies()); err != nil {
+			return err
+		}
 	}
 
-	rawResources, err := ApplyLayers(ctx, inputs, installedFlavor, manifests)
-	if err != nil {
-		return nil, err
+	// Validate parameters.
+	allParameters := make(map[string]*hubv1.Parameter)
+	for _, param := range spec.GetParameters() {
+		allParameters[param.Name] = param
+	}
+	for _, param := range inputs.Flavor.GetParameters() {
+		allParameters[param.Name] = param
+	}
+	for _, option := range selectedOptions {
+		for _, param := range option.Parameters {
+			allParameters[param.Name] = param
+		}
+	}
+	for _, param := range allParameters {
+		if value := inputs.Params[param.Name]; param.Required && value == "" {
+			return MissingInputForRequireParam(param.Name)
+		}
+	}
+	for name := range inputs.Params {
+		if _, ok := allParameters[name]; !ok {
+			return UnrecognizedParamError(name)
+		}
 	}
 
-	return FilterByLabel(ctx, spec, rawResources), nil
+	return nil
 }
 
 /*
- Coalesces spec values yaml, params, and user-defined values yaml.
- User defined values override params which override spec values.
+ Coalesces spec values yaml, layer values, params, and user-defined values yaml.
+ User defined values override params which override layer values which override spec values.
  If there is an error parsing, it is logged and propagated.
 */
 func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, error) {
+	valuesMap := make(map[string]interface{})
+
 	specValues, err := ConvertYamlStringToNestedMap(inputs.SpecDefinedValues)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing spec values yaml",
@@ -92,14 +150,33 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.String("values", inputs.SpecDefinedValues))
 		return "", err
 	}
+	valuesMap = CoalesceValuesMap(ctx, valuesMap, specValues)
 
-	paramValues, err := ConvertParamsToNestedMap(inputs.FlavorParams)
+	for _, layerInput := range inputs.Layers {
+		option, err := GetLayerOptionFromFlavor(layerInput.LayerId, layerInput.OptionId, inputs.Flavor)
+		if err != nil {
+			return "", err
+		}
+
+		if option.HelmValues != "" {
+			layerValues, err := ConvertYamlStringToNestedMap(option.HelmValues)
+			if err != nil {
+				contextutils.LoggerFrom(ctx).Errorw("Error parsing layer values yaml",
+					zap.Error(err),
+					zap.String("values", option.HelmValues))
+				return "", err
+			}
+			valuesMap = CoalesceValuesMap(ctx, valuesMap, layerValues)
+		}
+	}
+
+	paramValues, err := ConvertParamsToNestedMap(inputs.Params)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw("Error parsing install params",
-			zap.Error(err),
-			zap.Any("params", inputs.FlavorParams))
+			zap.Error(err))
 		return "", err
 	}
+	valuesMap = CoalesceValuesMap(ctx, valuesMap, paramValues)
 
 	userValues, err := ConvertYamlStringToNestedMap(inputs.UserDefinedValues)
 	if err != nil {
@@ -108,9 +185,8 @@ func ComputeValueOverrides(ctx context.Context, inputs ValuesInputs) (string, er
 			zap.Any("params", inputs.UserDefinedValues))
 		return "", err
 	}
-
-	valuesMap := CoalesceValuesMap(ctx, specValues, paramValues)
 	valuesMap = CoalesceValuesMap(ctx, valuesMap, userValues)
+
 	values, err := ConvertNestedMapToYaml(valuesMap)
 	if err != nil {
 		contextutils.LoggerFrom(ctx).Errorw(err.Error(), zap.Error(err), zap.Any("valuesMap", valuesMap))
@@ -318,7 +394,7 @@ func getManifestsFromInstallationStep(ctx context.Context, inputs ValuesInputs, 
 	return manifests, nil
 }
 
-// The SpecDefinedValues, UserDefinedValues, and FlavorParams inputs can contain template
+// The SpecDefinedValues, UserDefinedValues, and Params inputs can contain template
 // actions (text delimited by "{{" and "}}" ). This function renders the contents of these
 // parameters using the data contained in 'input' and updates 'input' with the results.
 func ExecInputValuesTemplates(inputs ValuesInputs) (ValuesInputs, error) {
@@ -340,13 +416,13 @@ func ExecInputValuesTemplates(inputs ValuesInputs) (ValuesInputs, error) {
 	inputs.UserDefinedValues = buf.String()
 	buf.Reset()
 
-	// Render the values of the flavor parameters
-	for paramName, paramValue := range inputs.FlavorParams {
+	// Render the values of the parameters
+	for paramName, paramValue := range inputs.Params {
 		t := template.Must(template.New(paramName).Parse(paramValue))
 		if err := t.Execute(buf, inputs); err != nil {
 			return ValuesInputs{}, err
 		}
-		inputs.FlavorParams[paramName] = buf.String()
+		inputs.Params[paramName] = buf.String()
 		buf.Reset()
 	}
 

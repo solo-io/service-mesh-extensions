@@ -13,3 +13,9 @@ versions:
   - name: default
     description: "Install bookinfo"
   version: "1.13.0"
+- manifestsArchive:
+    uri: https://storage.googleapis.com/sm-marketplace-registry/bookinfo-1.15.0.tar.gz
+  flavors:
+  - name: default
+    description: "Install bookinfo"
+  version: "1.15.0"

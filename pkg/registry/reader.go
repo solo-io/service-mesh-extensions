@@ -46,6 +46,10 @@ var (
 	FailedToGetSpecsFromGithubError = func(err error) error {
 		return errors.Wrap(err, "Failed to get application specs from github")
 	}
+
+	FailedToGetLocalSpecsError = func(err error) error {
+		return errors.Wrap(err, "Failed to get local application specs")
+	}
 )
 
 type RemoteSpecReader struct {
@@ -77,6 +81,8 @@ func (r *RemoteSpecReader) getBytesYaml() ([]byte, error) {
 	defer response.Body.Close()
 	return ioutil.ReadAll(response.Body)
 }
+
+var _ SpecReader = &RemoteSpecReader{}
 
 func NewRemoteSpecReader(ctx context.Context, url string) *RemoteSpecReader {
 	contextutils.LoggerFrom(ctx).Infow("Initializing reader for remote application spec registry",
@@ -138,19 +144,61 @@ func (r *GithubSpecReader) GetSpecs() ([]*v1.ApplicationSpec, error) {
 		return nil, wrapped
 	}
 
+	return getSpecsFromDirectory(r.ctx, fs, subdirs, specParent)
+}
+
+var _ SpecReader = &GithubSpecReader{}
+
+func NewGithubSpecReader(ctx context.Context, location v1.GithubRepositoryLocation) *GithubSpecReader {
+	contextutils.LoggerFrom(ctx).Infow("Initializing reader for github spec registry",
+		zap.Any("location", location))
+
+	return &GithubSpecReader{
+		ctx:      ctx,
+		location: location,
+	}
+}
+
+type LocalSpecReader struct {
+	ctx  context.Context
+	path string
+}
+
+func (r *LocalSpecReader) GetSpecs() ([]*v1.ApplicationSpec, error) {
+	fs := afero.NewOsFs()
+	subdirs, err := afero.ReadDir(fs, r.path)
+	if err != nil {
+		wrapped := FailedToGetLocalSpecsError(err)
+		contextutils.LoggerFrom(r.ctx).Errorw(wrapped.Error(), zap.Error(err))
+		return nil, wrapped
+	}
+
+	return getSpecsFromDirectory(r.ctx, fs, subdirs, r.path)
+}
+
+var _ SpecReader = &LocalSpecReader{}
+
+func NewLocalSpecReader(ctx context.Context, path string) *LocalSpecReader {
+	return &LocalSpecReader{
+		ctx:  ctx,
+		path: path,
+	}
+}
+
+func getSpecsFromDirectory(ctx context.Context, fs afero.Fs, subdirs []os.FileInfo, specParent string) ([]*v1.ApplicationSpec, error) {
 	// Create an application spec for every subdirectory
 	var specs []*v1.ApplicationSpec
 	for _, subdir := range subdirs {
 		specPath := filepath.Join(specParent, subdir.Name(), specFilename)
 		specBytes, err := afero.ReadFile(fs, specPath)
 		if err != nil {
-			contextutils.LoggerFrom(r.ctx).Errorw("Failed to read spec file", zap.Error(err), zap.String("file", specPath))
+			contextutils.LoggerFrom(ctx).Errorw("Failed to read spec file", zap.Error(err), zap.String("file", specPath))
 			continue
 		}
 
 		spec := &v1.ApplicationSpec{}
 		if err := protoutils.UnmarshalYamlAllowUnknown(specBytes, spec); err != nil {
-			contextutils.LoggerFrom(r.ctx).Errorw("Failed to unmarshal spec file", zap.Error(err), zap.String("file", specPath))
+			contextutils.LoggerFrom(ctx).Errorw("Failed to unmarshal spec file", zap.Error(err), zap.String("file", specPath))
 			continue
 		}
 
@@ -160,8 +208,8 @@ func (r *GithubSpecReader) GetSpecs() ([]*v1.ApplicationSpec, error) {
 		descriptionBytes, err := afero.ReadFile(fs, descriptionPath)
 		var renderedBytes []byte
 		if err != nil {
-			info := fmt.Sprintf("%v not loaded for %v, falling back to inline long description", descriptionFilename, subdir.Name())
-			contextutils.LoggerFrom(r.ctx).Infow(info,
+			debugDesc := fmt.Sprintf("%v not loaded for %v, falling back to inline long description", descriptionFilename, subdir.Name())
+			contextutils.LoggerFrom(ctx).Debugw(debugDesc,
 				zap.Error(err),
 				zap.String("file", specPath))
 			renderer := blackfriday.HtmlRenderer(0, subdir.Name(), "")
@@ -182,14 +230,4 @@ func (r *GithubSpecReader) GetSpecs() ([]*v1.ApplicationSpec, error) {
 	}
 
 	return specs, nil
-}
-
-func NewGithubSpecReader(ctx context.Context, location v1.GithubRepositoryLocation) *GithubSpecReader {
-	contextutils.LoggerFrom(ctx).Infow("Initializing reader for github spec registry",
-		zap.Any("location", location))
-
-	return &GithubSpecReader{
-		ctx:      ctx,
-		location: location,
-	}
 }

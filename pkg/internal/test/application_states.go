@@ -76,8 +76,12 @@ func GetFlavor(kustomizeLayer *hubv1.Kustomize) *hubv1.Flavor {
 	if kustomizeLayer != nil {
 		flavor.CustomizationLayers = []*hubv1.Layer{
 			{
-				Type: &hubv1.Layer_Kustomize{
-					Kustomize: kustomizeLayer,
+				Id:       "layer",
+				Optional: false,
+				Options: []*hubv1.LayerOption{
+					{
+						Kustomize: kustomizeLayer,
+					},
 				},
 			},
 		}

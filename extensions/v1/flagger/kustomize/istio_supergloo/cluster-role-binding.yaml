@@ -9,7 +9,7 @@ manifest: |
   roleRef:
     apiGroup: rbac.authorization.k8s.io
     kind: ClusterRole
-    name: {{ .Supergloo.ClusterRoleName }}
+    name: {{ .Custom.Supergloo.ClusterRoleName }}
   subjects:
   - name: {{ .Custom.serviceAccount.name }}
     namespace: {{ .InstallNamespace }}

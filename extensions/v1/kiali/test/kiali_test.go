@@ -37,7 +37,6 @@ var _ = Describe("kiali", func() {
 		}
 		inputs = render.ValuesInputs{
 			Name:             name,
-			FlavorName:       meshName,
 			InstallNamespace: namespace,
 			MeshRef: core.ResourceRef{
 				Name:      meshName,
@@ -49,9 +48,11 @@ var _ = Describe("kiali", func() {
 		}
 	})
 
-	bindVersion := func(versionString string) {
+	bindVersion := func(versionString string, layerInput []render.LayerInput) {
 		version = versionMap[versionString]
+		inputs.Flavor = test.GetFlavor(meshName, version)
 		inputs.SpecDefinedValues = version.ValuesYaml
+		inputs.Layers = layerInput
 		rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 		Expect(err).NotTo(HaveOccurred())
 		testManifest = NewTestManifestWithResources(rendered)
@@ -72,7 +73,7 @@ var _ = Describe("kiali", func() {
 
 	Context("0.16 with default values", func() {
 		BeforeEach(func() {
-			bindVersion("0.16")
+			bindVersion("0.16", nil)
 			labels = map[string]string{
 				"chart":    "kiali",
 				"heritage": "Tiller",
@@ -92,7 +93,14 @@ var _ = Describe("kiali", func() {
 
 	Context("0.12 with default values", func() {
 		BeforeEach(func() {
-			bindVersion("0.12")
+			bindVersion("0.12", []render.LayerInput{{
+				LayerId:  "demo-secret",
+				OptionId: "demo-secret",
+			}})
+			inputs.Layers = []render.LayerInput{{
+				LayerId:  "demo-secret",
+				OptionId: "demo-secret",
+			}}
 		})
 
 		It("has the correct number of resources", func() {

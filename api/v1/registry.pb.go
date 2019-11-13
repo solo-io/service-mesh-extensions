@@ -27,6 +27,45 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Convenience enum to inform Service Mesh Hub interface implementations.
+// Types here should be kept in sync with the ParameterValue message.
+type ParameterType int32
+
+const (
+	ParameterType_STRING ParameterType = 0
+	ParameterType_FLOAT  ParameterType = 1
+	ParameterType_BOOL   ParameterType = 2
+	ParameterType_INT    ParameterType = 3
+	ParameterType_DATE   ParameterType = 4
+	ParameterType_SECRET ParameterType = 5
+)
+
+var ParameterType_name = map[int32]string{
+	0: "STRING",
+	1: "FLOAT",
+	2: "BOOL",
+	3: "INT",
+	4: "DATE",
+	5: "SECRET",
+}
+
+var ParameterType_value = map[string]int32{
+	"STRING": 0,
+	"FLOAT":  1,
+	"BOOL":   2,
+	"INT":    3,
+	"DATE":   4,
+	"SECRET": 5,
+}
+
+func (x ParameterType) String() string {
+	return proto.EnumName(ParameterType_name, int32(x))
+}
+
+func (ParameterType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{0}
+}
+
 type ApplicationType int32
 
 const (
@@ -52,7 +91,7 @@ func (x ApplicationType) String() string {
 }
 
 func (ApplicationType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{0}
+	return fileDescriptor_d1ad3a89626d72ea, []int{1}
 }
 
 type MeshType int32
@@ -80,7 +119,7 @@ func (x MeshType) String() string {
 }
 
 func (MeshType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{1}
+	return fileDescriptor_d1ad3a89626d72ea, []int{2}
 }
 
 // This is static content for an application. It includes basic metadata that is common to every version of an
@@ -273,10 +312,12 @@ type VersionedApplicationSpec struct {
 	// Mesh-specific modifications to the extension installation manifest.
 	Flavors []*Flavor `protobuf:"bytes,40,rep,name=flavors,proto3" json:"flavors,omitempty"`
 	// Do not override predefined namespaces of resources as they appear in manifests
-	RespectManifestNamespaces bool     `protobuf:"varint,41,opt,name=respect_manifest_namespaces,json=respectManifestNamespaces,proto3" json:"respect_manifest_namespaces,omitempty"`
-	XXX_NoUnkeyedLiteral      struct{} `json:"-"`
-	XXX_unrecognized          []byte   `json:"-"`
-	XXX_sizecache             int32    `json:"-"`
+	RespectManifestNamespaces bool `protobuf:"varint,41,opt,name=respect_manifest_namespaces,json=respectManifestNamespaces,proto3" json:"respect_manifest_namespaces,omitempty"`
+	// Manifest render parameters that apply to all flavors of this version
+	Parameters           []*Parameter `protobuf:"bytes,42,rep,name=parameters,proto3" json:"parameters,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
 func (m *VersionedApplicationSpec) Reset()         { *m = VersionedApplicationSpec{} }
@@ -401,6 +442,13 @@ func (m *VersionedApplicationSpec) GetRespectManifestNamespaces() bool {
 		return m.RespectManifestNamespaces
 	}
 	return false
+}
+
+func (m *VersionedApplicationSpec) GetParameters() []*Parameter {
+	if m != nil {
+		return m.Parameters
+	}
+	return nil
 }
 
 // XXX_OneofWrappers is for the internal use of the proto package.
@@ -569,7 +617,7 @@ type Flavor struct {
 	CustomizationLayers []*Layer `protobuf:"bytes,3,rep,name=customization_layers,json=customizationLayers,proto3" json:"customization_layers,omitempty"`
 	// The flavor is considered applicable if any of the specified requirement sets is satisfied.
 	RequirementSets []*RequirementSet `protobuf:"bytes,4,rep,name=requirement_sets,json=requirementSets,proto3" json:"requirement_sets,omitempty"`
-	// Optional set of parameters to be used during installation.
+	// Optional set of parameters to be applied to the flavor.
 	Parameters           []*Parameter `protobuf:"bytes,5,rep,name=parameters,proto3" json:"parameters,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`
@@ -635,100 +683,29 @@ func (m *Flavor) GetParameters() []*Parameter {
 	return nil
 }
 
-// Parameters represent values that are used to configure the installation of an extension.
-type Parameter struct {
-	// Identifier of the parameter
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Description of what the effects of the parameter are.
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// Value of the parameter
-	Value string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
-	// Default value of the parameter
-	Default string `protobuf:"bytes,4,opt,name=default,proto3" json:"default,omitempty"`
-	// Indicates whether a value for the parameter is required for the installation of the extension to be performed.
-	Required             bool     `protobuf:"varint,5,opt,name=required,proto3" json:"required,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Parameter) Reset()         { *m = Parameter{} }
-func (m *Parameter) String() string { return proto.CompactTextString(m) }
-func (*Parameter) ProtoMessage()    {}
-func (*Parameter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{5}
-}
-func (m *Parameter) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Parameter.Unmarshal(m, b)
-}
-func (m *Parameter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Parameter.Marshal(b, m, deterministic)
-}
-func (m *Parameter) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Parameter.Merge(m, src)
-}
-func (m *Parameter) XXX_Size() int {
-	return xxx_messageInfo_Parameter.Size(m)
-}
-func (m *Parameter) XXX_DiscardUnknown() {
-	xxx_messageInfo_Parameter.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Parameter proto.InternalMessageInfo
-
-func (m *Parameter) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Parameter) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
-func (m *Parameter) GetValue() string {
-	if m != nil {
-		return m.Value
-	}
-	return ""
-}
-
-func (m *Parameter) GetDefault() string {
-	if m != nil {
-		return m.Default
-	}
-	return ""
-}
-
-func (m *Parameter) GetRequired() bool {
-	if m != nil {
-		return m.Required
-	}
-	return false
-}
-
 // A layer represent optional processing steps that can be executed to apply mesh-specific transformations to
 // the rendered extension installation manifest.
 type Layer struct {
-	// The actual implementation of the layer
-	//
-	// Types that are valid to be assigned to Type:
-	//	*Layer_Kustomize
-	Type                 isLayer_Type `protobuf_oneof:"type"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+	// A unique identifier for the layer, i.e. "mtls"
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// A user-friendly name of the layer, i.e. "Mutual TLS Settings"
+	DisplayName string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	// An optional description of the layer's effect on the manifest rendering.
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// If true, this layer can be flagged on or off for rendering.
+	Optional bool `protobuf:"varint,4,opt,name=optional,proto3" json:"optional,omitempty"`
+	// One or more variants for this configuration layer, one of which will be chosen by the user.
+	Options              []*LayerOption `protobuf:"bytes,5,rep,name=options,proto3" json:"options,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *Layer) Reset()         { *m = Layer{} }
 func (m *Layer) String() string { return proto.CompactTextString(m) }
 func (*Layer) ProtoMessage()    {}
 func (*Layer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{6}
+	return fileDescriptor_d1ad3a89626d72ea, []int{5}
 }
 func (m *Layer) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Layer.Unmarshal(m, b)
@@ -748,36 +725,252 @@ func (m *Layer) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Layer proto.InternalMessageInfo
 
-type isLayer_Type interface {
-	isLayer_Type()
+func (m *Layer) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Layer) GetDisplayName() string {
+	if m != nil {
+		return m.DisplayName
+	}
+	return ""
+}
+
+func (m *Layer) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *Layer) GetOptional() bool {
+	if m != nil {
+		return m.Optional
+	}
+	return false
+}
+
+func (m *Layer) GetOptions() []*LayerOption {
+	if m != nil {
+		return m.Options
+	}
+	return nil
+}
+
+// One option for configuring a layer. At least one of the kustomize or helm values should be set, or the layer
+// will be a no-op during rendering.
+type LayerOption struct {
+	// Unique identifier for the layer option, i.e. "strict"
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// A user-friendly name
+	DisplayName string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	// A user-friendly description
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// A kustomize overlay
+	Kustomize *Kustomize `protobuf:"bytes,4,opt,name=kustomize,proto3" json:"kustomize,omitempty"`
+	// A set of value overrides
+	HelmValues string `protobuf:"bytes,5,opt,name=helm_values,json=helmValues,proto3" json:"helm_values,omitempty"`
+	// Optional set of parameters to be applied to the layer.
+	Parameters []*Parameter `protobuf:"bytes,6,rep,name=parameters,proto3" json:"parameters,omitempty"`
+	// Optional set of resources that must be present in the cluster for this layer to function correctly.
+	// Note that these resources do not factor into manifest rendering, but can be used by interfaces to the
+	// renderer to validate or create expected resources on the cluster before install.
+	ResourceDependencies []*ResourceDependency `protobuf:"bytes,7,rep,name=resource_dependencies,json=resourceDependencies,proto3" json:"resource_dependencies,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_unrecognized     []byte                `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
+}
+
+func (m *LayerOption) Reset()         { *m = LayerOption{} }
+func (m *LayerOption) String() string { return proto.CompactTextString(m) }
+func (*LayerOption) ProtoMessage()    {}
+func (*LayerOption) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{6}
+}
+func (m *LayerOption) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_LayerOption.Unmarshal(m, b)
+}
+func (m *LayerOption) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_LayerOption.Marshal(b, m, deterministic)
+}
+func (m *LayerOption) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LayerOption.Merge(m, src)
+}
+func (m *LayerOption) XXX_Size() int {
+	return xxx_messageInfo_LayerOption.Size(m)
+}
+func (m *LayerOption) XXX_DiscardUnknown() {
+	xxx_messageInfo_LayerOption.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LayerOption proto.InternalMessageInfo
+
+func (m *LayerOption) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *LayerOption) GetDisplayName() string {
+	if m != nil {
+		return m.DisplayName
+	}
+	return ""
+}
+
+func (m *LayerOption) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *LayerOption) GetKustomize() *Kustomize {
+	if m != nil {
+		return m.Kustomize
+	}
+	return nil
+}
+
+func (m *LayerOption) GetHelmValues() string {
+	if m != nil {
+		return m.HelmValues
+	}
+	return ""
+}
+
+func (m *LayerOption) GetParameters() []*Parameter {
+	if m != nil {
+		return m.Parameters
+	}
+	return nil
+}
+
+func (m *LayerOption) GetResourceDependencies() []*ResourceDependency {
+	if m != nil {
+		return m.ResourceDependencies
+	}
+	return nil
+}
+
+// Represents a resource that must be present on a cluster for install to succeed.
+type ResourceDependency struct {
+	// Types that are valid to be assigned to Type:
+	//	*ResourceDependency_SecretDependency
+	Type                 isResourceDependency_Type `protobuf_oneof:"type"`
+	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
+	XXX_unrecognized     []byte                    `json:"-"`
+	XXX_sizecache        int32                     `json:"-"`
+}
+
+func (m *ResourceDependency) Reset()         { *m = ResourceDependency{} }
+func (m *ResourceDependency) String() string { return proto.CompactTextString(m) }
+func (*ResourceDependency) ProtoMessage()    {}
+func (*ResourceDependency) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{7}
+}
+func (m *ResourceDependency) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResourceDependency.Unmarshal(m, b)
+}
+func (m *ResourceDependency) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResourceDependency.Marshal(b, m, deterministic)
+}
+func (m *ResourceDependency) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResourceDependency.Merge(m, src)
+}
+func (m *ResourceDependency) XXX_Size() int {
+	return xxx_messageInfo_ResourceDependency.Size(m)
+}
+func (m *ResourceDependency) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResourceDependency.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResourceDependency proto.InternalMessageInfo
+
+type isResourceDependency_Type interface {
+	isResourceDependency_Type()
 	Equal(interface{}) bool
 }
 
-type Layer_Kustomize struct {
-	Kustomize *Kustomize `protobuf:"bytes,1,opt,name=kustomize,proto3,oneof" json:"kustomize,omitempty"`
+type ResourceDependency_SecretDependency struct {
+	SecretDependency *ResourceDependency_Secret `protobuf:"bytes,1,opt,name=secret_dependency,json=secretDependency,proto3,oneof" json:"secret_dependency,omitempty"`
 }
 
-func (*Layer_Kustomize) isLayer_Type() {}
+func (*ResourceDependency_SecretDependency) isResourceDependency_Type() {}
 
-func (m *Layer) GetType() isLayer_Type {
+func (m *ResourceDependency) GetType() isResourceDependency_Type {
 	if m != nil {
 		return m.Type
 	}
 	return nil
 }
 
-func (m *Layer) GetKustomize() *Kustomize {
-	if x, ok := m.GetType().(*Layer_Kustomize); ok {
-		return x.Kustomize
+func (m *ResourceDependency) GetSecretDependency() *ResourceDependency_Secret {
+	if x, ok := m.GetType().(*ResourceDependency_SecretDependency); ok {
+		return x.SecretDependency
 	}
 	return nil
 }
 
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*Layer) XXX_OneofWrappers() []interface{} {
+func (*ResourceDependency) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*Layer_Kustomize)(nil),
+		(*ResourceDependency_SecretDependency)(nil),
 	}
+}
+
+// Describes a Kubernetes Secret
+type ResourceDependency_Secret struct {
+	// Corresponds to the name on the object metadata of the secret.
+	// Note that referenced secrets must be in this application's install namespace.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// List of keys that should be present on the Secret's data map
+	Keys                 []string `protobuf:"bytes,2,rep,name=keys,proto3" json:"keys,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ResourceDependency_Secret) Reset()         { *m = ResourceDependency_Secret{} }
+func (m *ResourceDependency_Secret) String() string { return proto.CompactTextString(m) }
+func (*ResourceDependency_Secret) ProtoMessage()    {}
+func (*ResourceDependency_Secret) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{7, 0}
+}
+func (m *ResourceDependency_Secret) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResourceDependency_Secret.Unmarshal(m, b)
+}
+func (m *ResourceDependency_Secret) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResourceDependency_Secret.Marshal(b, m, deterministic)
+}
+func (m *ResourceDependency_Secret) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResourceDependency_Secret.Merge(m, src)
+}
+func (m *ResourceDependency_Secret) XXX_Size() int {
+	return xxx_messageInfo_ResourceDependency_Secret.Size(m)
+}
+func (m *ResourceDependency_Secret) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResourceDependency_Secret.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResourceDependency_Secret proto.InternalMessageInfo
+
+func (m *ResourceDependency_Secret) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *ResourceDependency_Secret) GetKeys() []string {
+	if m != nil {
+		return m.Keys
+	}
+	return nil
 }
 
 // Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
@@ -799,7 +992,7 @@ func (m *Kustomize) Reset()         { *m = Kustomize{} }
 func (m *Kustomize) String() string { return proto.CompactTextString(m) }
 func (*Kustomize) ProtoMessage()    {}
 func (*Kustomize) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{7}
+	return fileDescriptor_d1ad3a89626d72ea, []int{8}
 }
 func (m *Kustomize) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Kustomize.Unmarshal(m, b)
@@ -870,6 +1063,369 @@ func (*Kustomize) XXX_OneofWrappers() []interface{} {
 	}
 }
 
+// Parameters represent values that are used to configure the installation of an extension.
+type Parameter struct {
+	// Identifier of the parameter.
+	// This doubles as the key used to access the parameter's value in templates during render.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Description of what the effects of the parameter are.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// Type of the parameter.
+	// Used by interfaces to the renderer.
+	// Regardless of type, all parameters are ultimately strings passed as helm and layer template values.
+	Type ParameterType `protobuf:"varint,3,opt,name=type,proto3,enum=hub.solo.io.ParameterType" json:"type,omitempty"`
+	// Default value of the parameter.
+	Default *ParameterValue `protobuf:"bytes,4,opt,name=default,proto3" json:"default,omitempty"`
+	// Indicates whether a value for the parameter is required for the installation of the extension
+	// to be performed.
+	Required bool `protobuf:"varint,5,opt,name=required,proto3" json:"required,omitempty"`
+	// User-friendly display name of the parameter
+	DisplayName          string   `protobuf:"bytes,6,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Parameter) Reset()         { *m = Parameter{} }
+func (m *Parameter) String() string { return proto.CompactTextString(m) }
+func (*Parameter) ProtoMessage()    {}
+func (*Parameter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{9}
+}
+func (m *Parameter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Parameter.Unmarshal(m, b)
+}
+func (m *Parameter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Parameter.Marshal(b, m, deterministic)
+}
+func (m *Parameter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Parameter.Merge(m, src)
+}
+func (m *Parameter) XXX_Size() int {
+	return xxx_messageInfo_Parameter.Size(m)
+}
+func (m *Parameter) XXX_DiscardUnknown() {
+	xxx_messageInfo_Parameter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Parameter proto.InternalMessageInfo
+
+func (m *Parameter) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Parameter) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *Parameter) GetType() ParameterType {
+	if m != nil {
+		return m.Type
+	}
+	return ParameterType_STRING
+}
+
+func (m *Parameter) GetDefault() *ParameterValue {
+	if m != nil {
+		return m.Default
+	}
+	return nil
+}
+
+func (m *Parameter) GetRequired() bool {
+	if m != nil {
+		return m.Required
+	}
+	return false
+}
+
+func (m *Parameter) GetDisplayName() string {
+	if m != nil {
+		return m.DisplayName
+	}
+	return ""
+}
+
+// Value for a parameter.
+// Types here should be kept in sync with the ParameterType enum.
+// Note that regardless of type, parameters are passed as string helm values.
+type ParameterValue struct {
+	// Types that are valid to be assigned to Type:
+	//	*ParameterValue_StringValue
+	//	*ParameterValue_IntValue
+	//	*ParameterValue_FloatValue
+	//	*ParameterValue_BooleanValue
+	//	*ParameterValue_DateValue
+	//	*ParameterValue_SecretValue
+	Type                 isParameterValue_Type `protobuf_oneof:"type"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_unrecognized     []byte                `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
+}
+
+func (m *ParameterValue) Reset()         { *m = ParameterValue{} }
+func (m *ParameterValue) String() string { return proto.CompactTextString(m) }
+func (*ParameterValue) ProtoMessage()    {}
+func (*ParameterValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{10}
+}
+func (m *ParameterValue) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ParameterValue.Unmarshal(m, b)
+}
+func (m *ParameterValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ParameterValue.Marshal(b, m, deterministic)
+}
+func (m *ParameterValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ParameterValue.Merge(m, src)
+}
+func (m *ParameterValue) XXX_Size() int {
+	return xxx_messageInfo_ParameterValue.Size(m)
+}
+func (m *ParameterValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_ParameterValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ParameterValue proto.InternalMessageInfo
+
+type isParameterValue_Type interface {
+	isParameterValue_Type()
+	Equal(interface{}) bool
+}
+
+type ParameterValue_StringValue struct {
+	StringValue string `protobuf:"bytes,1,opt,name=string_value,json=stringValue,proto3,oneof" json:"string_value,omitempty"`
+}
+type ParameterValue_IntValue struct {
+	IntValue int64 `protobuf:"varint,2,opt,name=int_value,json=intValue,proto3,oneof" json:"int_value,omitempty"`
+}
+type ParameterValue_FloatValue struct {
+	FloatValue float64 `protobuf:"fixed64,3,opt,name=float_value,json=floatValue,proto3,oneof" json:"float_value,omitempty"`
+}
+type ParameterValue_BooleanValue struct {
+	BooleanValue bool `protobuf:"varint,4,opt,name=boolean_value,json=booleanValue,proto3,oneof" json:"boolean_value,omitempty"`
+}
+type ParameterValue_DateValue struct {
+	DateValue *time.Time `protobuf:"bytes,5,opt,name=date_value,json=dateValue,proto3,oneof,stdtime" json:"date_value,omitempty"`
+}
+type ParameterValue_SecretValue struct {
+	SecretValue *SecretValue `protobuf:"bytes,6,opt,name=secret_value,json=secretValue,proto3,oneof" json:"secret_value,omitempty"`
+}
+
+func (*ParameterValue_StringValue) isParameterValue_Type()  {}
+func (*ParameterValue_IntValue) isParameterValue_Type()     {}
+func (*ParameterValue_FloatValue) isParameterValue_Type()   {}
+func (*ParameterValue_BooleanValue) isParameterValue_Type() {}
+func (*ParameterValue_DateValue) isParameterValue_Type()    {}
+func (*ParameterValue_SecretValue) isParameterValue_Type()  {}
+
+func (m *ParameterValue) GetType() isParameterValue_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+func (m *ParameterValue) GetStringValue() string {
+	if x, ok := m.GetType().(*ParameterValue_StringValue); ok {
+		return x.StringValue
+	}
+	return ""
+}
+
+func (m *ParameterValue) GetIntValue() int64 {
+	if x, ok := m.GetType().(*ParameterValue_IntValue); ok {
+		return x.IntValue
+	}
+	return 0
+}
+
+func (m *ParameterValue) GetFloatValue() float64 {
+	if x, ok := m.GetType().(*ParameterValue_FloatValue); ok {
+		return x.FloatValue
+	}
+	return 0
+}
+
+func (m *ParameterValue) GetBooleanValue() bool {
+	if x, ok := m.GetType().(*ParameterValue_BooleanValue); ok {
+		return x.BooleanValue
+	}
+	return false
+}
+
+func (m *ParameterValue) GetDateValue() *time.Time {
+	if x, ok := m.GetType().(*ParameterValue_DateValue); ok {
+		return x.DateValue
+	}
+	return nil
+}
+
+func (m *ParameterValue) GetSecretValue() *SecretValue {
+	if x, ok := m.GetType().(*ParameterValue_SecretValue); ok {
+		return x.SecretValue
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ParameterValue) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ParameterValue_StringValue)(nil),
+		(*ParameterValue_IntValue)(nil),
+		(*ParameterValue_FloatValue)(nil),
+		(*ParameterValue_BooleanValue)(nil),
+		(*ParameterValue_DateValue)(nil),
+		(*ParameterValue_SecretValue)(nil),
+	}
+}
+
+// Ref for a Kubernetes secret.
+type SecretRef struct {
+	Ref *core.ResourceRef `protobuf:"bytes,1,opt,name=ref,proto3" json:"ref,omitempty"`
+	// Where to locate the value of the secret in the `data` field
+	Key                  string   `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SecretRef) Reset()         { *m = SecretRef{} }
+func (m *SecretRef) String() string { return proto.CompactTextString(m) }
+func (*SecretRef) ProtoMessage()    {}
+func (*SecretRef) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{11}
+}
+func (m *SecretRef) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SecretRef.Unmarshal(m, b)
+}
+func (m *SecretRef) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SecretRef.Marshal(b, m, deterministic)
+}
+func (m *SecretRef) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SecretRef.Merge(m, src)
+}
+func (m *SecretRef) XXX_Size() int {
+	return xxx_messageInfo_SecretRef.Size(m)
+}
+func (m *SecretRef) XXX_DiscardUnknown() {
+	xxx_messageInfo_SecretRef.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SecretRef proto.InternalMessageInfo
+
+func (m *SecretRef) GetRef() *core.ResourceRef {
+	if m != nil {
+		return m.Ref
+	}
+	return nil
+}
+
+func (m *SecretRef) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+// Secrets can be provided to the render in a number of ways.
+// Note that secrets will be rendered as plain text when being utilized by the renderer.
+type SecretValue struct {
+	// Types that are valid to be assigned to Type:
+	//	*SecretValue_SecretRef
+	//	*SecretValue_FilePath
+	//	*SecretValue_PlainText
+	Type                 isSecretValue_Type `protobuf_oneof:"type"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
+}
+
+func (m *SecretValue) Reset()         { *m = SecretValue{} }
+func (m *SecretValue) String() string { return proto.CompactTextString(m) }
+func (*SecretValue) ProtoMessage()    {}
+func (*SecretValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d1ad3a89626d72ea, []int{12}
+}
+func (m *SecretValue) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SecretValue.Unmarshal(m, b)
+}
+func (m *SecretValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SecretValue.Marshal(b, m, deterministic)
+}
+func (m *SecretValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SecretValue.Merge(m, src)
+}
+func (m *SecretValue) XXX_Size() int {
+	return xxx_messageInfo_SecretValue.Size(m)
+}
+func (m *SecretValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_SecretValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SecretValue proto.InternalMessageInfo
+
+type isSecretValue_Type interface {
+	isSecretValue_Type()
+	Equal(interface{}) bool
+}
+
+type SecretValue_SecretRef struct {
+	SecretRef *SecretRef `protobuf:"bytes,1,opt,name=secret_ref,json=secretRef,proto3,oneof" json:"secret_ref,omitempty"`
+}
+type SecretValue_FilePath struct {
+	FilePath string `protobuf:"bytes,2,opt,name=file_path,json=filePath,proto3,oneof" json:"file_path,omitempty"`
+}
+type SecretValue_PlainText struct {
+	PlainText string `protobuf:"bytes,3,opt,name=plain_text,json=plainText,proto3,oneof" json:"plain_text,omitempty"`
+}
+
+func (*SecretValue_SecretRef) isSecretValue_Type() {}
+func (*SecretValue_FilePath) isSecretValue_Type()  {}
+func (*SecretValue_PlainText) isSecretValue_Type() {}
+
+func (m *SecretValue) GetType() isSecretValue_Type {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+func (m *SecretValue) GetSecretRef() *SecretRef {
+	if x, ok := m.GetType().(*SecretValue_SecretRef); ok {
+		return x.SecretRef
+	}
+	return nil
+}
+
+func (m *SecretValue) GetFilePath() string {
+	if x, ok := m.GetType().(*SecretValue_FilePath); ok {
+		return x.FilePath
+	}
+	return ""
+}
+
+func (m *SecretValue) GetPlainText() string {
+	if x, ok := m.GetType().(*SecretValue_PlainText); ok {
+		return x.PlainText
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*SecretValue) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*SecretValue_SecretRef)(nil),
+		(*SecretValue_FilePath)(nil),
+		(*SecretValue_PlainText)(nil),
+	}
+}
+
 // Wraps a collection of FlavorCompatibilityInfo
 type FlavorCompatibility struct {
 	CompatiblePairs      []*CompatibleFlavorMeshPair `protobuf:"bytes,1,rep,name=compatible_pairs,json=compatiblePairs,proto3" json:"compatible_pairs,omitempty"`
@@ -882,7 +1438,7 @@ func (m *FlavorCompatibility) Reset()         { *m = FlavorCompatibility{} }
 func (m *FlavorCompatibility) String() string { return proto.CompactTextString(m) }
 func (*FlavorCompatibility) ProtoMessage()    {}
 func (*FlavorCompatibility) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{8}
+	return fileDescriptor_d1ad3a89626d72ea, []int{13}
 }
 func (m *FlavorCompatibility) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_FlavorCompatibility.Unmarshal(m, b)
@@ -922,7 +1478,7 @@ func (m *CompatibleFlavorMeshPair) Reset()         { *m = CompatibleFlavorMeshPa
 func (m *CompatibleFlavorMeshPair) String() string { return proto.CompactTextString(m) }
 func (*CompatibleFlavorMeshPair) ProtoMessage()    {}
 func (*CompatibleFlavorMeshPair) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{9}
+	return fileDescriptor_d1ad3a89626d72ea, []int{14}
 }
 func (m *CompatibleFlavorMeshPair) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CompatibleFlavorMeshPair.Unmarshal(m, b)
@@ -968,7 +1524,7 @@ func (m *RequirementSet) Reset()         { *m = RequirementSet{} }
 func (m *RequirementSet) String() string { return proto.CompactTextString(m) }
 func (*RequirementSet) ProtoMessage()    {}
 func (*RequirementSet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{10}
+	return fileDescriptor_d1ad3a89626d72ea, []int{15}
 }
 func (m *RequirementSet) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RequirementSet.Unmarshal(m, b)
@@ -1010,7 +1566,7 @@ func (m *MeshRequirement) Reset()         { *m = MeshRequirement{} }
 func (m *MeshRequirement) String() string { return proto.CompactTextString(m) }
 func (*MeshRequirement) ProtoMessage()    {}
 func (*MeshRequirement) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{11}
+	return fileDescriptor_d1ad3a89626d72ea, []int{16}
 }
 func (m *MeshRequirement) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MeshRequirement.Unmarshal(m, b)
@@ -1059,7 +1615,7 @@ func (m *GithubRepositoryLocation) Reset()         { *m = GithubRepositoryLocati
 func (m *GithubRepositoryLocation) String() string { return proto.CompactTextString(m) }
 func (*GithubRepositoryLocation) ProtoMessage()    {}
 func (*GithubRepositoryLocation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{12}
+	return fileDescriptor_d1ad3a89626d72ea, []int{17}
 }
 func (m *GithubRepositoryLocation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GithubRepositoryLocation.Unmarshal(m, b)
@@ -1119,7 +1675,7 @@ func (m *TgzLocation) Reset()         { *m = TgzLocation{} }
 func (m *TgzLocation) String() string { return proto.CompactTextString(m) }
 func (*TgzLocation) ProtoMessage()    {}
 func (*TgzLocation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{13}
+	return fileDescriptor_d1ad3a89626d72ea, []int{18}
 }
 func (m *TgzLocation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_TgzLocation.Unmarshal(m, b)
@@ -1158,7 +1714,7 @@ func (m *AllowedVersions) Reset()         { *m = AllowedVersions{} }
 func (m *AllowedVersions) String() string { return proto.CompactTextString(m) }
 func (*AllowedVersions) ProtoMessage()    {}
 func (*AllowedVersions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d1ad3a89626d72ea, []int{14}
+	return fileDescriptor_d1ad3a89626d72ea, []int{19}
 }
 func (m *AllowedVersions) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AllowedVersions.Unmarshal(m, b)
@@ -1193,6 +1749,7 @@ func (m *AllowedVersions) GetMaxVersion() string {
 }
 
 func init() {
+	proto.RegisterEnum("hub.solo.io.ParameterType", ParameterType_name, ParameterType_value)
 	proto.RegisterEnum("hub.solo.io.ApplicationType", ApplicationType_name, ApplicationType_value)
 	proto.RegisterEnum("hub.solo.io.MeshType", MeshType_name, MeshType_value)
 	proto.RegisterType((*ApplicationSpec)(nil), "hub.solo.io.ApplicationSpec")
@@ -1202,9 +1759,15 @@ func init() {
 	proto.RegisterType((*InstallationSteps)(nil), "hub.solo.io.InstallationSteps")
 	proto.RegisterType((*InstallationSteps_Step)(nil), "hub.solo.io.InstallationSteps.Step")
 	proto.RegisterType((*Flavor)(nil), "hub.solo.io.Flavor")
-	proto.RegisterType((*Parameter)(nil), "hub.solo.io.Parameter")
 	proto.RegisterType((*Layer)(nil), "hub.solo.io.Layer")
+	proto.RegisterType((*LayerOption)(nil), "hub.solo.io.LayerOption")
+	proto.RegisterType((*ResourceDependency)(nil), "hub.solo.io.ResourceDependency")
+	proto.RegisterType((*ResourceDependency_Secret)(nil), "hub.solo.io.ResourceDependency.Secret")
 	proto.RegisterType((*Kustomize)(nil), "hub.solo.io.Kustomize")
+	proto.RegisterType((*Parameter)(nil), "hub.solo.io.Parameter")
+	proto.RegisterType((*ParameterValue)(nil), "hub.solo.io.ParameterValue")
+	proto.RegisterType((*SecretRef)(nil), "hub.solo.io.SecretRef")
+	proto.RegisterType((*SecretValue)(nil), "hub.solo.io.SecretValue")
 	proto.RegisterType((*FlavorCompatibility)(nil), "hub.solo.io.FlavorCompatibility")
 	proto.RegisterType((*CompatibleFlavorMeshPair)(nil), "hub.solo.io.CompatibleFlavorMeshPair")
 	proto.RegisterType((*RequirementSet)(nil), "hub.solo.io.RequirementSet")
@@ -1217,93 +1780,121 @@ func init() {
 func init() { proto.RegisterFile("api/v1/registry.proto", fileDescriptor_d1ad3a89626d72ea) }
 
 var fileDescriptor_d1ad3a89626d72ea = []byte{
-	// 1373 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x4f, 0x6f, 0xdb, 0xb6,
-	0x1b, 0x8e, 0x1c, 0x3b, 0xb1, 0x5f, 0x27, 0xb1, 0xc2, 0xa4, 0x85, 0x9a, 0x16, 0x4d, 0x7e, 0xfe,
-	0xa1, 0x40, 0xda, 0xae, 0xf6, 0x9a, 0x75, 0x45, 0xbb, 0x61, 0x1b, 0x92, 0x34, 0x4d, 0xb2, 0xe6,
-	0x8f, 0x21, 0x67, 0x7f, 0xba, 0x8b, 0xc0, 0xc8, 0x8c, 0x4c, 0x54, 0x32, 0x35, 0x92, 0xf6, 0xea,
-	0x5c, 0x76, 0xda, 0x71, 0xc0, 0x3e, 0xc6, 0x3e, 0xc2, 0xae, 0x3b, 0xed, 0x63, 0x0c, 0xd8, 0x07,
-	0xd8, 0x71, 0xe7, 0x81, 0xa4, 0x24, 0x4b, 0x69, 0xb3, 0xb5, 0x43, 0x2f, 0x09, 0xf9, 0xbe, 0xcf,
-	0xf3, 0x90, 0x7c, 0xf9, 0x90, 0xa2, 0xe1, 0x0a, 0x8e, 0x69, 0x7b, 0x74, 0xbf, 0xcd, 0x49, 0x40,
-	0x85, 0xe4, 0xe3, 0x56, 0xcc, 0x99, 0x64, 0xa8, 0xde, 0x1f, 0x9e, 0xb6, 0x04, 0x0b, 0x59, 0x8b,
-	0xb2, 0x95, 0xe5, 0x80, 0x05, 0x4c, 0xc7, 0xdb, 0xaa, 0x65, 0x20, 0x2b, 0xab, 0x01, 0x63, 0x41,
-	0x48, 0xda, 0xba, 0x77, 0x3a, 0x3c, 0x6b, 0x4b, 0x1a, 0x11, 0x21, 0x71, 0x14, 0x27, 0x80, 0xf7,
-	0x02, 0x2a, 0x95, 0x8c, 0xcf, 0xa2, 0xb6, 0x92, 0xba, 0x47, 0x99, 0xf9, 0xff, 0x82, 0xca, 0x76,
-	0x36, 0xec, 0x99, 0x41, 0x37, 0x7f, 0x2d, 0x43, 0x63, 0x33, 0x8e, 0x43, 0xea, 0x63, 0x49, 0xd9,
-	0xa0, 0x1b, 0x13, 0x1f, 0xbd, 0x0f, 0x65, 0x39, 0x8e, 0x89, 0x63, 0xad, 0x59, 0xeb, 0x0b, 0x1b,
-	0x37, 0x5a, 0xb9, 0x49, 0xb5, 0x72, 0xd8, 0x93, 0x71, 0x4c, 0x5c, 0x8d, 0x44, 0x08, 0xca, 0x03,
-	0x1c, 0x11, 0xa7, 0xb4, 0x66, 0xad, 0xd7, 0x5c, 0xdd, 0x46, 0xd7, 0xa0, 0x1a, 0xb2, 0x80, 0x79,
-	0x43, 0x1e, 0x3a, 0xd3, 0x3a, 0x3e, 0xab, 0xfa, 0x5f, 0xf0, 0x10, 0xdd, 0x85, 0x45, 0xd1, 0x67,
-	0x5c, 0x7a, 0x3d, 0x22, 0x7c, 0x4e, 0x63, 0xa5, 0xe6, 0x94, 0x35, 0xc6, 0xd6, 0x89, 0x27, 0x93,
-	0x38, 0xba, 0x0d, 0x76, 0xc8, 0x06, 0x41, 0x01, 0x5b, 0xd1, 0xd8, 0x86, 0x8a, 0xe7, 0xa1, 0x77,
-	0x61, 0xb1, 0xc7, 0xfc, 0x61, 0x44, 0x06, 0x52, 0xcf, 0x50, 0x8f, 0x3d, 0x63, 0x74, 0x0b, 0x09,
-	0x35, 0x89, 0x5b, 0xb0, 0xc0, 0x49, 0xcc, 0x04, 0x95, 0x8c, 0x8f, 0x35, 0x72, 0x56, 0x23, 0xe7,
-	0x27, 0x51, 0x05, 0x6b, 0xc3, 0x12, 0x9e, 0xac, 0xd9, 0xf3, 0x39, 0xc1, 0x92, 0x71, 0xa7, 0xaa,
-	0xb1, 0x28, 0x97, 0xda, 0x36, 0x19, 0x74, 0x1f, 0x96, 0xf3, 0x84, 0x98, 0xb3, 0x11, 0xed, 0x11,
-	0xee, 0xd4, 0x34, 0x23, 0x2f, 0xd6, 0x49, 0x52, 0xe8, 0x43, 0xb8, 0x9a, 0xa7, 0x44, 0x98, 0x0e,
-	0x24, 0xa6, 0x03, 0xc2, 0x1d, 0xd0, 0xa4, 0x2b, 0xb9, 0xec, 0x61, 0x96, 0x44, 0xdb, 0x30, 0xd7,
-	0xc3, 0x92, 0x98, 0x39, 0x91, 0x9e, 0x53, 0x5f, 0xb3, 0xd6, 0xeb, 0x1b, 0x2b, 0x2d, 0xe3, 0x90,
-	0x56, 0xea, 0x90, 0xd6, 0x49, 0xea, 0x90, 0xad, 0xf2, 0x4f, 0xbf, 0xaf, 0x5a, 0x6e, 0x5d, 0xb1,
-	0xb6, 0x0d, 0x09, 0x6d, 0x42, 0x75, 0x44, 0xb8, 0xa0, 0x6c, 0x20, 0x9c, 0xb9, 0xb5, 0xe9, 0xf5,
-	0xfa, 0xc6, 0xad, 0xc2, 0x86, 0x7f, 0x69, 0x92, 0xa4, 0x77, 0xc1, 0x25, 0x6e, 0x46, 0x6b, 0x3e,
-	0x05, 0xfb, 0x42, 0x52, 0xa0, 0x0d, 0xa8, 0x08, 0xd5, 0x70, 0x2c, 0xad, 0x79, 0xa9, 0x89, 0xb4,
-	0x94, 0x81, 0x36, 0xff, 0xac, 0x80, 0x73, 0xd9, 0x70, 0xc8, 0x81, 0xd9, 0x64, 0x40, 0xed, 0xcb,
-	0x9a, 0x9b, 0x76, 0xd1, 0x2e, 0x2c, 0xe8, 0x32, 0xc4, 0xc3, 0xd3, 0x90, 0x8a, 0x3e, 0xe9, 0x69,
-	0x1b, 0xbe, 0x49, 0x21, 0xe6, 0x15, 0xaf, 0x93, 0xd2, 0xd0, 0xe7, 0x30, 0x67, 0xce, 0x8e, 0xe7,
-	0xf7, 0x31, 0x97, 0xce, 0xbc, 0x96, 0x29, 0x96, 0x63, 0x57, 0x03, 0xdc, 0xcc, 0x22, 0x07, 0xcc,
-	0xcc, 0x71, 0x6f, 0xca, 0xad, 0x1b, 0xf2, 0xb6, 0xe2, 0xa2, 0x4f, 0x60, 0xae, 0x4f, 0xc2, 0xc8,
-	0xc3, 0xdc, 0xef, 0xd3, 0x11, 0x71, 0x16, 0xb4, 0x96, 0x53, 0xd0, 0x3a, 0x09, 0xce, 0xf3, 0x74,
-	0x85, 0xdf, 0x34, 0x70, 0xb4, 0x0b, 0x8b, 0x11, 0x1e, 0xd0, 0x33, 0x22, 0xa4, 0xc8, 0x34, 0x1a,
-	0xff, 0xaa, 0x61, 0x67, 0xa4, 0x54, 0xe8, 0x18, 0x10, 0x1d, 0x08, 0x89, 0xc3, 0xd0, 0x78, 0x4b,
-	0x48, 0x12, 0x0b, 0xc7, 0xd6, 0x4a, 0x37, 0x0b, 0x4a, 0xfb, 0x39, 0x58, 0x57, 0xa1, 0xf6, 0xa6,
-	0xdc, 0x45, 0x7a, 0x31, 0x88, 0x56, 0xa1, 0x3e, 0xc2, 0xe1, 0x90, 0x08, 0x6f, 0x8c, 0xa3, 0xd0,
-	0xb9, 0xa9, 0xf7, 0x02, 0x4c, 0xe8, 0x39, 0x8e, 0x42, 0x74, 0x0a, 0x0d, 0x4e, 0xbe, 0x1d, 0x52,
-	0x4e, 0x7a, 0x5e, 0x88, 0x4f, 0x49, 0x28, 0x9c, 0x55, 0xed, 0x81, 0xc7, 0x6f, 0xe4, 0xab, 0x96,
-	0x9b, 0x90, 0x0f, 0x34, 0x77, 0x67, 0x20, 0xf9, 0xd8, 0x5d, 0xe0, 0x85, 0x20, 0xba, 0x07, 0xb3,
-	0x67, 0x21, 0x1e, 0x31, 0x2e, 0x9c, 0x75, 0xad, 0xbd, 0x54, 0xd0, 0x7e, 0xaa, 0x73, 0x6e, 0x8a,
-	0x41, 0x9f, 0xc2, 0x75, 0x4e, 0x94, 0xc7, 0xa4, 0x97, 0x16, 0xc8, 0x53, 0x77, 0x94, 0x88, 0xb1,
-	0x4f, 0x84, 0x73, 0x7b, 0xcd, 0x5a, 0xaf, 0xba, 0xd7, 0x12, 0xc8, 0x61, 0x82, 0x38, 0xca, 0x00,
-	0x2b, 0x9b, 0xb0, 0xf4, 0x9a, 0x59, 0x21, 0x1b, 0xa6, 0x5f, 0x90, 0x71, 0x62, 0x47, 0xd5, 0x44,
-	0xcb, 0x50, 0xd1, 0x95, 0x48, 0x2e, 0x42, 0xd3, 0xf9, 0xa8, 0xf4, 0xc8, 0xda, 0x5a, 0x82, 0xc5,
-	0xe2, 0x3e, 0xc4, 0xc4, 0x6f, 0xfe, 0x56, 0x82, 0xc5, 0x57, 0xca, 0x8e, 0x1e, 0x43, 0xc5, 0xec,
-	0x92, 0x39, 0x3a, 0xff, 0xff, 0xe7, 0x5d, 0x6a, 0xa9, 0xbf, 0xae, 0x61, 0xac, 0xfc, 0x65, 0x41,
-	0x59, 0xf5, 0xb3, 0x0b, 0xb9, 0x9c, 0xbb, 0x90, 0x2f, 0xda, 0xdb, 0x7a, 0x87, 0xf6, 0x2e, 0xbd,
-	0x03, 0x7b, 0x4f, 0xbf, 0xbd, 0xbd, 0xb7, 0x66, 0xa0, 0xac, 0x56, 0xde, 0xfc, 0xa1, 0x04, 0x33,
-	0x66, 0xd7, 0xb3, 0xa5, 0x5b, 0xb9, 0xa5, 0xaf, 0x41, 0x3d, 0xff, 0xf9, 0x30, 0xbb, 0x93, 0x0f,
-	0xa1, 0x1d, 0x58, 0xf6, 0x87, 0x42, 0xb2, 0x88, 0x9e, 0x9b, 0x0d, 0x0a, 0xf1, 0x98, 0x70, 0xe1,
-	0x4c, 0xeb, 0x3d, 0x40, 0x85, 0x49, 0x1d, 0xa8, 0x94, 0xbb, 0x54, 0xc0, 0xeb, 0x98, 0x40, 0x4f,
-	0xc1, 0x4e, 0xac, 0xaa, 0xbe, 0x35, 0x9e, 0x20, 0x52, 0x38, 0x65, 0x2d, 0x71, 0xbd, 0x20, 0xe1,
-	0x4e, 0x40, 0x5d, 0x22, 0xdd, 0x06, 0x2f, 0xf4, 0x05, 0x7a, 0x08, 0x10, 0x63, 0x8e, 0x23, 0x22,
-	0xd5, 0x24, 0x2a, 0x5a, 0xe1, 0x6a, 0x41, 0xa1, 0x93, 0xa6, 0xdd, 0x1c, 0xb2, 0xf9, 0xa3, 0x05,
-	0xb5, 0x2c, 0xf3, 0x1f, 0x4b, 0x91, 0x99, 0x78, 0x3a, 0x67, 0x62, 0x75, 0xff, 0xf6, 0xc8, 0x19,
-	0x1e, 0x86, 0x32, 0x31, 0x55, 0xda, 0x45, 0x2b, 0x50, 0x4d, 0x8f, 0xa7, 0xfe, 0x30, 0x57, 0xdd,
-	0xac, 0xdf, 0xdc, 0x85, 0x8a, 0xae, 0x0c, 0x7a, 0x08, 0xb5, 0x17, 0x49, 0xbd, 0x48, 0xe2, 0xbc,
-	0xe2, 0x7a, 0x9e, 0xa5, 0xd9, 0xbd, 0x29, 0x77, 0x02, 0x55, 0x1b, 0xac, 0x5e, 0x18, 0xcd, 0x5f,
-	0x2c, 0xa8, 0x65, 0x10, 0xf4, 0x19, 0xcc, 0x18, 0x37, 0xbe, 0xad, 0x89, 0x13, 0x1a, 0xfa, 0x18,
-	0xea, 0x32, 0x38, 0x7f, 0x0b, 0xfb, 0x82, 0x0c, 0xce, 0x53, 0xf7, 0xfe, 0x0f, 0xe6, 0xd8, 0x88,
-	0xf0, 0x10, 0x8f, 0xbd, 0x18, 0xcb, 0x7e, 0x52, 0xa7, 0x7a, 0x12, 0xeb, 0x60, 0xd9, 0xdf, 0x02,
-	0xf5, 0xf8, 0x31, 0xe4, 0x66, 0x00, 0x4b, 0xc6, 0x9a, 0xdb, 0x2c, 0x8a, 0xb1, 0xa4, 0xa7, 0x34,
-	0xa4, 0x72, 0x8c, 0x3a, 0x60, 0xfb, 0x49, 0x20, 0x24, 0x5e, 0x8c, 0x29, 0x4f, 0x4f, 0x7c, 0x71,
-	0x35, 0xdb, 0x19, 0xc8, 0xa8, 0x1c, 0x12, 0xd1, 0xef, 0x60, 0xca, 0xdd, 0xc6, 0x84, 0xae, 0xfa,
-	0xa2, 0x39, 0x02, 0xe7, 0x32, 0x30, 0xba, 0x0b, 0x33, 0xe6, 0x36, 0x4c, 0x2a, 0xf6, 0xda, 0x0b,
-	0x33, 0x81, 0xa0, 0x7b, 0x50, 0x8e, 0x88, 0xe8, 0x27, 0x65, 0xb9, 0xd6, 0xf2, 0x19, 0x27, 0x39,
-	0xeb, 0x0a, 0x36, 0xe4, 0x3e, 0x71, 0xc9, 0x99, 0xab, 0x61, 0xcd, 0xe7, 0xb0, 0x50, 0xf4, 0x33,
-	0xda, 0x05, 0x5b, 0x65, 0xbc, 0x9c, 0xad, 0x93, 0x71, 0x8b, 0x0f, 0x01, 0x35, 0xbd, 0x1c, 0xd5,
-	0x6d, 0x44, 0xc5, 0x40, 0xf3, 0x7b, 0x68, 0x5c, 0xc0, 0xa0, 0x0d, 0xa8, 0x69, 0xed, 0xdc, 0x13,
-	0xf5, 0xca, 0x2b, 0xa2, 0xfa, 0x6d, 0x5a, 0x8d, 0x92, 0x16, 0x7a, 0x94, 0x7b, 0xe4, 0x94, 0x5e,
-	0x33, 0x8f, 0xcd, 0x30, 0x64, 0xdf, 0x91, 0x5e, 0xf2, 0x4d, 0x12, 0xb9, 0xb7, 0x4d, 0x0c, 0xce,
-	0x65, 0x76, 0x52, 0xf7, 0x3f, 0xe3, 0x41, 0x7a, 0xff, 0x33, 0x1e, 0xa8, 0x03, 0xa7, 0x5e, 0x8f,
-	0xe9, 0x3b, 0x58, 0xb5, 0x15, 0x8a, 0x93, 0xb3, 0xc4, 0x24, 0xaa, 0x89, 0x6e, 0x40, 0xad, 0x47,
-	0x39, 0xf1, 0x95, 0x58, 0x72, 0x98, 0x26, 0x81, 0xe6, 0x2a, 0xd4, 0x73, 0xd6, 0x53, 0xf4, 0x21,
-	0xa7, 0xe9, 0x20, 0x43, 0x4e, 0x9b, 0x5d, 0x68, 0x5c, 0x98, 0xaf, 0xfa, 0x28, 0x47, 0x74, 0xe0,
-	0xa5, 0x0f, 0x24, 0x33, 0x3c, 0x44, 0x74, 0x90, 0x20, 0x34, 0x00, 0xbf, 0xcc, 0x00, 0xd3, 0x09,
-	0x00, 0xbf, 0x4c, 0x00, 0x77, 0x1e, 0x14, 0x7e, 0x06, 0xe8, 0xa2, 0xcd, 0x43, 0x6d, 0xe7, 0xeb,
-	0x93, 0x9d, 0xa3, 0xee, 0xfe, 0xf1, 0x91, 0x3d, 0x85, 0xaa, 0x50, 0x7e, 0xb2, 0x73, 0x78, 0x6c,
-	0x5b, 0xaa, 0x75, 0xb8, 0xd3, 0xdd, 0xb3, 0x4b, 0x77, 0x1e, 0x40, 0x35, 0xad, 0x36, 0xaa, 0x41,
-	0x65, 0xbf, 0x7b, 0xb2, 0x7f, 0x6c, 0x4f, 0xa1, 0x3a, 0xcc, 0x1e, 0xec, 0x1f, 0x3d, 0xdb, 0x71,
-	0x9f, 0xd8, 0x16, 0xb2, 0x61, 0x6e, 0xf3, 0xab, 0xae, 0xb7, 0xd9, 0xe9, 0x78, 0x86, 0xb5, 0x55,
-	0xfd, 0xf9, 0x8f, 0x9b, 0xd6, 0x37, 0xa5, 0xd1, 0xfd, 0xd3, 0x19, 0xfd, 0x34, 0xfb, 0xe0, 0xef,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x35, 0xed, 0x7d, 0xe9, 0x0f, 0x0d, 0x00, 0x00,
+	// 1819 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0xcd, 0x72, 0x1b, 0xc7,
+	0x11, 0xe6, 0xe2, 0x1f, 0x0d, 0x90, 0x58, 0x0e, 0x29, 0xd5, 0x8a, 0xb2, 0x45, 0x0a, 0x2e, 0xa5,
+	0x68, 0x29, 0x02, 0x2d, 0x46, 0x4e, 0xec, 0xa4, 0x9c, 0x14, 0x48, 0x41, 0x24, 0x6d, 0x92, 0x60,
+	0x2d, 0x60, 0x27, 0xce, 0x65, 0x6b, 0x09, 0x0c, 0x80, 0x29, 0xed, 0xee, 0x6c, 0x66, 0x06, 0x88,
+	0xa0, 0x4b, 0x4e, 0xb9, 0xa6, 0xf2, 0x12, 0x49, 0xf9, 0x90, 0x07, 0xc8, 0x35, 0xa7, 0x3c, 0x46,
+	0xaa, 0x72, 0xc9, 0x1b, 0xe4, 0x9c, 0x9a, 0x99, 0xdd, 0xc5, 0x2e, 0x08, 0xd9, 0x54, 0xca, 0xbe,
+	0x90, 0x33, 0xdd, 0x5f, 0xf7, 0xfc, 0xf4, 0xd7, 0x3d, 0xbd, 0x80, 0x3b, 0x6e, 0x48, 0x0e, 0x66,
+	0xcf, 0x0e, 0x18, 0x1e, 0x13, 0x2e, 0xd8, 0xbc, 0x15, 0x32, 0x2a, 0x28, 0xaa, 0x4d, 0xa6, 0xd7,
+	0x2d, 0x4e, 0x3d, 0xda, 0x22, 0x74, 0x67, 0x7b, 0x4c, 0xc7, 0x54, 0xc9, 0x0f, 0xe4, 0x48, 0x43,
+	0x76, 0x76, 0xc7, 0x94, 0x8e, 0x3d, 0x7c, 0xa0, 0x66, 0xd7, 0xd3, 0xd1, 0x81, 0x20, 0x3e, 0xe6,
+	0xc2, 0xf5, 0xc3, 0x08, 0xf0, 0xe3, 0x31, 0x11, 0xd2, 0xcd, 0x80, 0xfa, 0x07, 0xd2, 0xd5, 0x53,
+	0x42, 0xf5, 0xff, 0x57, 0x44, 0x1c, 0x24, 0xcb, 0x8e, 0x34, 0xba, 0xf9, 0x8f, 0x02, 0x34, 0xda,
+	0x61, 0xe8, 0x91, 0x81, 0x2b, 0x08, 0x0d, 0x7a, 0x21, 0x1e, 0xa0, 0x8f, 0xa0, 0x20, 0xe6, 0x21,
+	0xb6, 0x8c, 0x3d, 0x63, 0x7f, 0xe3, 0xf0, 0xbd, 0x56, 0x6a, 0x53, 0xad, 0x14, 0xb6, 0x3f, 0x0f,
+	0xb1, 0xad, 0x90, 0x08, 0x41, 0x21, 0x70, 0x7d, 0x6c, 0xe5, 0xf6, 0x8c, 0xfd, 0xaa, 0xad, 0xc6,
+	0xe8, 0x1e, 0x54, 0x3c, 0x3a, 0xa6, 0xce, 0x94, 0x79, 0x56, 0x5e, 0xc9, 0xcb, 0x72, 0xfe, 0x25,
+	0xf3, 0xd0, 0x13, 0xd8, 0xe4, 0x13, 0xca, 0x84, 0x33, 0xc4, 0x7c, 0xc0, 0x48, 0x28, 0xbd, 0x59,
+	0x05, 0x85, 0x31, 0x95, 0xe2, 0xc5, 0x42, 0x8e, 0x3e, 0x04, 0xd3, 0xa3, 0xc1, 0x38, 0x83, 0x2d,
+	0x2a, 0x6c, 0x43, 0xca, 0xd3, 0xd0, 0x27, 0xb0, 0x39, 0xa4, 0x83, 0xa9, 0x8f, 0x03, 0xa1, 0x76,
+	0xa8, 0xd6, 0x2e, 0x69, 0xbf, 0x19, 0x85, 0xdc, 0xc4, 0x23, 0xd8, 0x60, 0x38, 0xa4, 0x9c, 0x08,
+	0xca, 0xe6, 0x0a, 0x59, 0x56, 0xc8, 0xf5, 0x85, 0x54, 0xc2, 0x0e, 0x60, 0xcb, 0x5d, 0x9c, 0xd9,
+	0x19, 0x30, 0xec, 0x0a, 0xca, 0xac, 0x8a, 0xc2, 0xa2, 0x94, 0xea, 0x58, 0x6b, 0xd0, 0x33, 0xd8,
+	0x4e, 0x1b, 0x84, 0x8c, 0xce, 0xc8, 0x10, 0x33, 0xab, 0xaa, 0x2c, 0xd2, 0xce, 0xae, 0x22, 0x15,
+	0xfa, 0x18, 0xee, 0xa6, 0x4d, 0x7c, 0x97, 0x04, 0xc2, 0x25, 0x01, 0x66, 0x16, 0x28, 0xa3, 0x3b,
+	0x29, 0xed, 0x45, 0xa2, 0x44, 0xc7, 0x50, 0x1f, 0xba, 0x02, 0xeb, 0x3d, 0xe1, 0xa1, 0x55, 0xdb,
+	0x33, 0xf6, 0x6b, 0x87, 0x3b, 0x2d, 0xcd, 0x90, 0x56, 0xcc, 0x90, 0x56, 0x3f, 0x66, 0xc8, 0x51,
+	0xe1, 0xcf, 0xff, 0xda, 0x35, 0xec, 0x9a, 0xb4, 0x3a, 0xd6, 0x46, 0xa8, 0x0d, 0x95, 0x19, 0x66,
+	0x9c, 0xd0, 0x80, 0x5b, 0xf5, 0xbd, 0xfc, 0x7e, 0xed, 0xf0, 0x51, 0x26, 0xe0, 0x5f, 0x69, 0x25,
+	0x1e, 0x2e, 0xb1, 0xc4, 0x4e, 0xcc, 0x9a, 0x2f, 0xc1, 0x5c, 0x52, 0x72, 0x74, 0x08, 0x45, 0x2e,
+	0x07, 0x96, 0xa1, 0x7c, 0xbe, 0x95, 0x44, 0xca, 0x95, 0x86, 0x36, 0xff, 0x5a, 0x02, 0xeb, 0x6d,
+	0xcb, 0x21, 0x0b, 0xca, 0xd1, 0x82, 0x8a, 0x97, 0x55, 0x3b, 0x9e, 0xa2, 0x13, 0xd8, 0x50, 0xd7,
+	0x10, 0x4e, 0xaf, 0x3d, 0xc2, 0x27, 0x78, 0xa8, 0x68, 0x78, 0x9b, 0x8b, 0x58, 0x97, 0x76, 0x57,
+	0xb1, 0x19, 0xfa, 0x1c, 0xea, 0x3a, 0x77, 0x9c, 0xc1, 0xc4, 0x65, 0xc2, 0x5a, 0x57, 0x6e, 0xb2,
+	0xd7, 0x71, 0xa2, 0x00, 0x76, 0x42, 0x91, 0x73, 0xaa, 0xf7, 0x78, 0xba, 0x66, 0xd7, 0xb4, 0xf1,
+	0xb1, 0xb4, 0x45, 0x9f, 0x41, 0x7d, 0x82, 0x3d, 0xdf, 0x71, 0xd9, 0x60, 0x42, 0x66, 0xd8, 0xda,
+	0x50, 0xbe, 0xac, 0x8c, 0xaf, 0xfe, 0xf8, 0x4d, 0xda, 0x5c, 0xe2, 0xdb, 0x1a, 0x8e, 0x4e, 0x60,
+	0xd3, 0x77, 0x03, 0x32, 0xc2, 0x5c, 0xf0, 0xc4, 0x47, 0xe3, 0x3b, 0x7d, 0x98, 0x89, 0x51, 0xec,
+	0xa8, 0x0b, 0x88, 0x04, 0x5c, 0xb8, 0x9e, 0xa7, 0xb9, 0xc5, 0x05, 0x0e, 0xb9, 0x65, 0x2a, 0x4f,
+	0x0f, 0x32, 0x9e, 0xce, 0x52, 0xb0, 0x9e, 0x44, 0x9d, 0xae, 0xd9, 0x9b, 0x64, 0x59, 0x88, 0x76,
+	0xa1, 0x36, 0x73, 0xbd, 0x29, 0xe6, 0xce, 0xdc, 0xf5, 0x3d, 0xeb, 0x81, 0x8a, 0x05, 0x68, 0xd1,
+	0xd7, 0xae, 0xef, 0xa1, 0x6b, 0x68, 0x30, 0xfc, 0xbb, 0x29, 0x61, 0x78, 0xe8, 0x78, 0xee, 0x35,
+	0xf6, 0xb8, 0xb5, 0xab, 0x38, 0xf0, 0xe9, 0xad, 0x78, 0xd5, 0xb2, 0x23, 0xe3, 0x73, 0x65, 0xdb,
+	0x09, 0x04, 0x9b, 0xdb, 0x1b, 0x2c, 0x23, 0x44, 0x4f, 0xa1, 0x3c, 0xf2, 0xdc, 0x19, 0x65, 0xdc,
+	0xda, 0x57, 0xbe, 0xb7, 0x32, 0xbe, 0x5f, 0x2a, 0x9d, 0x1d, 0x63, 0xd0, 0x2f, 0xe1, 0x3e, 0xc3,
+	0x92, 0x63, 0xc2, 0x89, 0x2f, 0xc8, 0x91, 0x35, 0x8a, 0x87, 0xee, 0x00, 0x73, 0xeb, 0xc3, 0x3d,
+	0x63, 0xbf, 0x62, 0xdf, 0x8b, 0x20, 0x17, 0x11, 0xe2, 0x32, 0x01, 0xa0, 0x9f, 0x02, 0x84, 0x2e,
+	0x73, 0x7d, 0x2c, 0x30, 0xe3, 0xd6, 0x63, 0xb5, 0xe2, 0xdd, 0xcc, 0x8a, 0x57, 0xb1, 0xda, 0x4e,
+	0x21, 0x77, 0xda, 0xb0, 0xb5, 0xe2, 0x34, 0xc8, 0x84, 0xfc, 0x2b, 0x3c, 0x8f, 0x68, 0x2c, 0x87,
+	0x68, 0x1b, 0x8a, 0xea, 0x06, 0xa3, 0x02, 0xaa, 0x27, 0x3f, 0xcf, 0x7d, 0x62, 0x1c, 0x6d, 0xc1,
+	0x66, 0x36, 0x7e, 0x21, 0x1e, 0x34, 0xff, 0x99, 0x83, 0xcd, 0x1b, 0xe1, 0x42, 0x9f, 0x42, 0x51,
+	0x47, 0x57, 0xa7, 0xdc, 0x07, 0xdf, 0x1e, 0xdd, 0x96, 0xfc, 0x6b, 0x6b, 0x8b, 0x9d, 0xff, 0x1a,
+	0x50, 0x90, 0xf3, 0xa4, 0x90, 0x17, 0x52, 0x85, 0x7c, 0x39, 0x2d, 0x8c, 0xef, 0x31, 0x2d, 0x72,
+	0xdf, 0x43, 0x5a, 0xe4, 0xdf, 0x3d, 0x2d, 0x8e, 0x4a, 0x50, 0x90, 0x27, 0x6f, 0xfe, 0x31, 0x07,
+	0x25, 0xcd, 0x96, 0xe4, 0xe8, 0x46, 0xea, 0xe8, 0x7b, 0x50, 0x4b, 0x3f, 0x3b, 0x3a, 0x3a, 0x69,
+	0x11, 0xea, 0xc0, 0xf6, 0x60, 0xca, 0x05, 0xf5, 0xc9, 0x1b, 0x1d, 0x20, 0xcf, 0x9d, 0x4b, 0x92,
+	0xe4, 0x55, 0x0c, 0x50, 0x66, 0x53, 0xe7, 0x52, 0x65, 0x6f, 0x65, 0xf0, 0x4a, 0xc6, 0xd1, 0x4b,
+	0x30, 0x23, 0x8a, 0xcb, 0x37, 0xca, 0xe1, 0x58, 0x70, 0xab, 0xa0, 0x5c, 0xdc, 0xcf, 0xb8, 0xb0,
+	0x17, 0xa0, 0x1e, 0x16, 0x76, 0x83, 0x65, 0xe6, 0xcb, 0x4c, 0x2d, 0xde, 0x96, 0xa9, 0xcd, 0xbf,
+	0x19, 0x50, 0x54, 0x5b, 0x41, 0x1b, 0x90, 0x23, 0xc3, 0xe8, 0x12, 0x72, 0x64, 0x88, 0x1e, 0x42,
+	0x7d, 0x48, 0x78, 0xe8, 0xb9, 0x73, 0x27, 0xf5, 0xc4, 0xd7, 0x22, 0xd9, 0xe5, 0x8a, 0x5b, 0xca,
+	0xdf, 0xbc, 0xa5, 0x1d, 0xa8, 0x50, 0x35, 0x72, 0x3d, 0x45, 0xad, 0x8a, 0x9d, 0xcc, 0xd1, 0x21,
+	0x94, 0xf5, 0x38, 0xde, 0xaf, 0x75, 0xf3, 0xd2, 0xba, 0x0a, 0x60, 0xc7, 0x40, 0x99, 0x00, 0xb5,
+	0x94, 0xe2, 0x87, 0xd9, 0xf4, 0x73, 0xa8, 0xbe, 0x8a, 0x42, 0xa5, 0x13, 0x62, 0xf9, 0x2a, 0xbf,
+	0x88, 0xb5, 0xf6, 0x02, 0x28, 0xeb, 0xa3, 0x62, 0xb8, 0xae, 0x88, 0x51, 0xa7, 0x02, 0x52, 0xf4,
+	0x95, 0x92, 0x2c, 0x85, 0xa8, 0x74, 0xdb, 0x10, 0xa1, 0x3e, 0xdc, 0x61, 0x98, 0xd3, 0x29, 0x1b,
+	0x60, 0x67, 0x88, 0x43, 0x1c, 0x0c, 0x71, 0x30, 0x20, 0x98, 0x5b, 0x65, 0xe5, 0x62, 0x77, 0x89,
+	0x27, 0x1a, 0xf9, 0x22, 0x06, 0xce, 0xed, 0x6d, 0xb6, 0x2c, 0x23, 0x98, 0x37, 0xff, 0x62, 0x00,
+	0xba, 0x09, 0x46, 0x5f, 0xc2, 0x26, 0xc7, 0x03, 0x86, 0xc5, 0x62, 0xa9, 0x79, 0x94, 0xf8, 0x3f,
+	0xfa, 0x8e, 0x85, 0x5a, 0x3d, 0x65, 0x28, 0xd3, 0x4e, 0xbb, 0x58, 0xa8, 0x76, 0x3e, 0x82, 0x92,
+	0xd6, 0xae, 0xcc, 0x36, 0x04, 0x85, 0x57, 0x78, 0xce, 0xad, 0xdc, 0x5e, 0x5e, 0xca, 0xe4, 0x58,
+	0x26, 0xaa, 0xec, 0x30, 0x9b, 0x7f, 0x37, 0xa0, 0x9a, 0xdc, 0x37, 0xfa, 0x15, 0x94, 0x74, 0x55,
+	0x79, 0xd7, 0x62, 0x14, 0x99, 0xa1, 0x5f, 0x40, 0x4d, 0x8c, 0xdf, 0xbc, 0x43, 0x19, 0x02, 0x31,
+	0x7e, 0x13, 0x57, 0xa1, 0x87, 0x50, 0xa7, 0x33, 0xcc, 0x24, 0xbb, 0x42, 0x57, 0x4c, 0x62, 0xee,
+	0x44, 0xb2, 0x2b, 0x57, 0x4c, 0x8e, 0x40, 0x36, 0xbf, 0xda, 0xb8, 0xf9, 0x1f, 0x03, 0xaa, 0x49,
+	0x48, 0xff, 0xcf, 0x32, 0xd3, 0x8a, 0x5a, 0xf2, 0xbc, 0x6a, 0xc9, 0x77, 0x56, 0xd3, 0x25, 0xd5,
+	0x90, 0x7f, 0x0c, 0xe5, 0x21, 0x1e, 0xb9, 0x53, 0x4f, 0x44, 0xcc, 0xbd, 0xbf, 0xda, 0x44, 0x71,
+	0xd2, 0x8e, 0xb1, 0x32, 0x4f, 0xe3, 0x97, 0x56, 0x31, 0xb7, 0x62, 0x27, 0xf3, 0x1b, 0x39, 0x55,
+	0xba, 0x91, 0x53, 0xcd, 0x6f, 0x72, 0xb0, 0x91, 0x75, 0x8d, 0x3e, 0x80, 0x3a, 0x17, 0x8c, 0x04,
+	0x63, 0x9d, 0x10, 0xfa, 0xd8, 0xb2, 0xac, 0x6b, 0xa9, 0x06, 0xbd, 0x0f, 0x55, 0x12, 0x08, 0x67,
+	0xf1, 0x04, 0xe6, 0x4f, 0xd7, 0xec, 0x0a, 0x09, 0x84, 0x56, 0x3f, 0x84, 0xda, 0xc8, 0xa3, 0x6e,
+	0x0c, 0x90, 0x77, 0x60, 0xc8, 0x90, 0x28, 0xa1, 0x86, 0x3c, 0x82, 0xf5, 0x6b, 0x4a, 0x3d, 0xec,
+	0x06, 0x11, 0x48, 0x55, 0x99, 0xd3, 0x35, 0xbb, 0x1e, 0x89, 0x35, 0xac, 0x0d, 0xa0, 0x5a, 0x45,
+	0x8d, 0x29, 0xde, 0xae, 0x4d, 0x3c, 0x5d, 0xb3, 0xab, 0xd2, 0x4a, 0xbb, 0xf8, 0x0c, 0xea, 0x51,
+	0x66, 0x68, 0x27, 0xa5, 0x15, 0xd4, 0xd1, 0x1c, 0x57, 0x78, 0x75, 0xd4, 0xc5, 0x34, 0xe1, 0xf3,
+	0xe7, 0x50, 0xd5, 0x28, 0x1b, 0x8f, 0xd0, 0x13, 0xc8, 0x33, 0x3c, 0x8a, 0xb8, 0x7c, 0xaf, 0x35,
+	0xa0, 0x0c, 0xdf, 0x48, 0x30, 0x1b, 0x8f, 0x6c, 0x89, 0x8a, 0xbb, 0x87, 0x5c, 0xd2, 0x3d, 0x34,
+	0xff, 0x64, 0x40, 0x2d, 0xb5, 0x24, 0xfa, 0x19, 0x40, 0xb4, 0xc5, 0x85, 0xd7, 0xbb, 0x2b, 0x36,
+	0x68, 0xe3, 0x91, 0x3c, 0x1b, 0x4f, 0xf6, 0xf1, 0x3e, 0x54, 0x47, 0xc4, 0xc3, 0x9a, 0xd5, 0xb9,
+	0x28, 0x52, 0x15, 0x29, 0x92, 0xa4, 0x46, 0xbb, 0x00, 0xa1, 0xe7, 0x92, 0xc0, 0x11, 0xf8, 0xb5,
+	0xd0, 0xac, 0x97, 0xf6, 0x4a, 0xd6, 0xc7, 0xaf, 0x45, 0x72, 0xb8, 0x31, 0x6c, 0xe9, 0x47, 0xf5,
+	0x98, 0xfa, 0xa1, 0x2b, 0xc8, 0x35, 0xf1, 0x88, 0x98, 0xa3, 0x2b, 0x30, 0x07, 0x91, 0x40, 0x2d,
+	0x42, 0x58, 0xdc, 0xab, 0x64, 0xf3, 0xf7, 0x38, 0x01, 0x69, 0x2f, 0x17, 0x98, 0x4f, 0xae, 0x5c,
+	0xc2, 0xec, 0xc6, 0xc2, 0x5c, 0xce, 0x79, 0x73, 0x06, 0xd6, 0xdb, 0xc0, 0xe8, 0x09, 0x94, 0x74,
+	0xff, 0x17, 0xdd, 0xc0, 0xca, 0x16, 0x31, 0x82, 0xa0, 0xa7, 0x50, 0xf0, 0x31, 0x9f, 0x44, 0x85,
+	0xe0, 0x5b, 0x42, 0xa0, 0x60, 0xcd, 0xaf, 0x61, 0x23, 0xfb, 0x12, 0xa3, 0x13, 0x30, 0xa5, 0xc6,
+	0x49, 0x3d, 0xc8, 0xd1, 0xba, 0xd9, 0x4f, 0x1f, 0xb9, 0xbd, 0x94, 0xa9, 0xdd, 0xf0, 0xb3, 0x82,
+	0xe6, 0x1f, 0xa0, 0xb1, 0x84, 0x41, 0x87, 0x50, 0x55, 0xbe, 0x53, 0x1f, 0xe5, 0x77, 0x6e, 0x38,
+	0x55, 0xc9, 0x5f, 0xf1, 0xa3, 0x11, 0xfa, 0x24, 0xf5, 0x59, 0x97, 0x5b, 0xb1, 0x8f, 0xb6, 0xe7,
+	0xd1, 0xdf, 0xe3, 0x61, 0xd4, 0x85, 0xf3, 0xd4, 0xd7, 0x5c, 0x08, 0xd6, 0xdb, 0x0a, 0xa8, 0xe4,
+	0x1e, 0x65, 0xe3, 0xb8, 0x73, 0xa5, 0x6c, 0x2c, 0xcb, 0x99, 0xfc, 0x5e, 0x8e, 0xbf, 0xfc, 0xe5,
+	0x58, 0xa2, 0x24, 0xf1, 0x74, 0x59, 0x54, 0x9c, 0x7d, 0x0f, 0xaa, 0x43, 0xc2, 0xf0, 0x40, 0x3a,
+	0x8b, 0x7a, 0xcb, 0x85, 0xa0, 0xb9, 0x0b, 0xb5, 0x54, 0xb1, 0x95, 0xe6, 0x53, 0x46, 0xe2, 0x45,
+	0xa6, 0x8c, 0x34, 0x7b, 0xd0, 0x58, 0xda, 0xaf, 0x7c, 0x66, 0x7d, 0x12, 0x38, 0xf1, 0x27, 0xa1,
+	0x5e, 0x1e, 0x7c, 0x12, 0x44, 0x08, 0x05, 0x70, 0x5f, 0x27, 0x80, 0x7c, 0x04, 0x70, 0x5f, 0x47,
+	0x80, 0xc7, 0x5d, 0x58, 0xcf, 0x54, 0x4e, 0x04, 0x50, 0xea, 0xf5, 0xed, 0xb3, 0xcb, 0x13, 0x73,
+	0x0d, 0x55, 0xa1, 0xf8, 0xf2, 0xbc, 0xdb, 0xee, 0x9b, 0x06, 0xaa, 0x40, 0xe1, 0xa8, 0xdb, 0x3d,
+	0x37, 0x73, 0xa8, 0x0c, 0xf9, 0xb3, 0xcb, 0xbe, 0x99, 0x97, 0xa2, 0x17, 0xed, 0x7e, 0xc7, 0x2c,
+	0x28, 0x9b, 0xce, 0xb1, 0xdd, 0xe9, 0x9b, 0xc5, 0xc7, 0xcf, 0x33, 0xbf, 0xa4, 0x28, 0x97, 0xeb,
+	0x50, 0xed, 0xfc, 0xa6, 0xdf, 0xb9, 0xec, 0x9d, 0x75, 0x2f, 0xcd, 0x35, 0x65, 0xd7, 0xb9, 0xe8,
+	0x6a, 0xa7, 0x17, 0x9d, 0xde, 0xa9, 0x99, 0x7b, 0xfc, 0x1c, 0x2a, 0x71, 0xf8, 0xe4, 0xaa, 0x67,
+	0xbd, 0xfe, 0x59, 0xd7, 0x5c, 0x43, 0x35, 0x28, 0x9f, 0x9f, 0x5d, 0x7e, 0xd1, 0xb1, 0x5f, 0x98,
+	0x06, 0x32, 0xa1, 0xde, 0xfe, 0x75, 0xcf, 0x69, 0x5f, 0x5d, 0x39, 0xda, 0xea, 0xa8, 0xf2, 0xcd,
+	0xbf, 0x1f, 0x18, 0xbf, 0xcd, 0xcd, 0x9e, 0x5d, 0x97, 0x54, 0xd9, 0xfa, 0xc9, 0xff, 0x02, 0x00,
+	0x00, 0xff, 0xff, 0x4b, 0x62, 0x68, 0x07, 0x52, 0x12, 0x00, 0x00,
 }
 
 func (this *ApplicationSpec) Equal(that interface{}) bool {
@@ -1466,6 +2057,14 @@ func (this *VersionedApplicationSpec) Equal(that interface{}) bool {
 	}
 	if this.RespectManifestNamespaces != that1.RespectManifestNamespaces {
 		return false
+	}
+	if len(this.Parameters) != len(that1.Parameters) {
+		return false
+	}
+	for i := range this.Parameters {
+		if !this.Parameters[i].Equal(that1.Parameters[i]) {
+			return false
+		}
 	}
 	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
@@ -1762,14 +2361,14 @@ func (this *Flavor) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *Parameter) Equal(that interface{}) bool {
+func (this *Layer) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*Parameter)
+	that1, ok := that.(*Layer)
 	if !ok {
-		that2, ok := that.(Parameter)
+		that2, ok := that.(Layer)
 		if ok {
 			that1 = &that2
 		} else {
@@ -1781,34 +2380,94 @@ func (this *Parameter) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.Name != that1.Name {
+	if this.Id != that1.Id {
+		return false
+	}
+	if this.DisplayName != that1.DisplayName {
 		return false
 	}
 	if this.Description != that1.Description {
 		return false
 	}
-	if this.Value != that1.Value {
+	if this.Optional != that1.Optional {
 		return false
 	}
-	if this.Default != that1.Default {
+	if len(this.Options) != len(that1.Options) {
 		return false
 	}
-	if this.Required != that1.Required {
-		return false
+	for i := range this.Options {
+		if !this.Options[i].Equal(that1.Options[i]) {
+			return false
+		}
 	}
 	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
 }
-func (this *Layer) Equal(that interface{}) bool {
+func (this *LayerOption) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*Layer)
+	that1, ok := that.(*LayerOption)
 	if !ok {
-		that2, ok := that.(Layer)
+		that2, ok := that.(LayerOption)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Id != that1.Id {
+		return false
+	}
+	if this.DisplayName != that1.DisplayName {
+		return false
+	}
+	if this.Description != that1.Description {
+		return false
+	}
+	if !this.Kustomize.Equal(that1.Kustomize) {
+		return false
+	}
+	if this.HelmValues != that1.HelmValues {
+		return false
+	}
+	if len(this.Parameters) != len(that1.Parameters) {
+		return false
+	}
+	for i := range this.Parameters {
+		if !this.Parameters[i].Equal(that1.Parameters[i]) {
+			return false
+		}
+	}
+	if len(this.ResourceDependencies) != len(that1.ResourceDependencies) {
+		return false
+	}
+	for i := range this.ResourceDependencies {
+		if !this.ResourceDependencies[i].Equal(that1.ResourceDependencies[i]) {
+			return false
+		}
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *ResourceDependency) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ResourceDependency)
+	if !ok {
+		that2, ok := that.(ResourceDependency)
 		if ok {
 			that1 = &that2
 		} else {
@@ -1834,14 +2493,14 @@ func (this *Layer) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *Layer_Kustomize) Equal(that interface{}) bool {
+func (this *ResourceDependency_SecretDependency) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*Layer_Kustomize)
+	that1, ok := that.(*ResourceDependency_SecretDependency)
 	if !ok {
-		that2, ok := that.(Layer_Kustomize)
+		that2, ok := that.(ResourceDependency_SecretDependency)
 		if ok {
 			that1 = &that2
 		} else {
@@ -1853,7 +2512,42 @@ func (this *Layer_Kustomize) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.Kustomize.Equal(that1.Kustomize) {
+	if !this.SecretDependency.Equal(that1.SecretDependency) {
+		return false
+	}
+	return true
+}
+func (this *ResourceDependency_Secret) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ResourceDependency_Secret)
+	if !ok {
+		that2, ok := that.(ResourceDependency_Secret)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if len(this.Keys) != len(that1.Keys) {
+		return false
+	}
+	for i := range this.Keys {
+		if this.Keys[i] != that1.Keys[i] {
+			return false
+		}
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -1938,6 +2632,364 @@ func (this *Kustomize_TgzArchive) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.TgzArchive.Equal(that1.TgzArchive) {
+		return false
+	}
+	return true
+}
+func (this *Parameter) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Parameter)
+	if !ok {
+		that2, ok := that.(Parameter)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if this.Description != that1.Description {
+		return false
+	}
+	if this.Type != that1.Type {
+		return false
+	}
+	if !this.Default.Equal(that1.Default) {
+		return false
+	}
+	if this.Required != that1.Required {
+		return false
+	}
+	if this.DisplayName != that1.DisplayName {
+		return false
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *ParameterValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ParameterValue)
+	if !ok {
+		that2, ok := that.(ParameterValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if that1.Type == nil {
+		if this.Type != nil {
+			return false
+		}
+	} else if this.Type == nil {
+		return false
+	} else if !this.Type.Equal(that1.Type) {
+		return false
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *ParameterValue_StringValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ParameterValue_StringValue)
+	if !ok {
+		that2, ok := that.(ParameterValue_StringValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.StringValue != that1.StringValue {
+		return false
+	}
+	return true
+}
+func (this *ParameterValue_IntValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ParameterValue_IntValue)
+	if !ok {
+		that2, ok := that.(ParameterValue_IntValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.IntValue != that1.IntValue {
+		return false
+	}
+	return true
+}
+func (this *ParameterValue_FloatValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ParameterValue_FloatValue)
+	if !ok {
+		that2, ok := that.(ParameterValue_FloatValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.FloatValue != that1.FloatValue {
+		return false
+	}
+	return true
+}
+func (this *ParameterValue_BooleanValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ParameterValue_BooleanValue)
+	if !ok {
+		that2, ok := that.(ParameterValue_BooleanValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.BooleanValue != that1.BooleanValue {
+		return false
+	}
+	return true
+}
+func (this *ParameterValue_DateValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ParameterValue_DateValue)
+	if !ok {
+		that2, ok := that.(ParameterValue_DateValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if that1.DateValue == nil {
+		if this.DateValue != nil {
+			return false
+		}
+	} else if !this.DateValue.Equal(*that1.DateValue) {
+		return false
+	}
+	return true
+}
+func (this *ParameterValue_SecretValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ParameterValue_SecretValue)
+	if !ok {
+		that2, ok := that.(ParameterValue_SecretValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.SecretValue.Equal(that1.SecretValue) {
+		return false
+	}
+	return true
+}
+func (this *SecretRef) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SecretRef)
+	if !ok {
+		that2, ok := that.(SecretRef)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Ref.Equal(that1.Ref) {
+		return false
+	}
+	if this.Key != that1.Key {
+		return false
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *SecretValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SecretValue)
+	if !ok {
+		that2, ok := that.(SecretValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if that1.Type == nil {
+		if this.Type != nil {
+			return false
+		}
+	} else if this.Type == nil {
+		return false
+	} else if !this.Type.Equal(that1.Type) {
+		return false
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *SecretValue_SecretRef) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SecretValue_SecretRef)
+	if !ok {
+		that2, ok := that.(SecretValue_SecretRef)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.SecretRef.Equal(that1.SecretRef) {
+		return false
+	}
+	return true
+}
+func (this *SecretValue_FilePath) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SecretValue_FilePath)
+	if !ok {
+		that2, ok := that.(SecretValue_FilePath)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.FilePath != that1.FilePath {
+		return false
+	}
+	return true
+}
+func (this *SecretValue_PlainText) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SecretValue_PlainText)
+	if !ok {
+		that2, ok := that.(SecretValue_PlainText)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.PlainText != that1.PlainText {
 		return false
 	}
 	return true

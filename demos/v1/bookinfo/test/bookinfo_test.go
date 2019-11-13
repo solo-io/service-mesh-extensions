@@ -36,7 +36,6 @@ var _ = Describe("bookinfo", func() {
 		}
 		inputs = render.ValuesInputs{
 			Name:             name,
-			FlavorName:       "default",
 			InstallNamespace: namespace,
 			MeshRef: core.ResourceRef{
 				Name:      meshName,
@@ -48,6 +47,7 @@ var _ = Describe("bookinfo", func() {
 	bindVersion := func(versionString string) {
 		version = versionMap[versionString]
 		inputs.SpecDefinedValues = version.ValuesYaml
+		inputs.Flavor = test.GetFlavor("default", versionMap[versionString])
 		rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 		Expect(err).NotTo(HaveOccurred())
 		testManifest = NewTestManifestWithResources(rendered)
