@@ -31,7 +31,7 @@ versions:
         The URL of the prometheus service that flagger will use to gather canary metrics.
       required: true
       default:
-        stringValue: "http://prometheus.{{ .MeshRef.Namespace }}:9090"
+        stringValue: "http://prometheus.istio-system:9090"
   flavors:
   - name: istio
     description: "Install flagger to your Istio mesh"
@@ -76,7 +76,7 @@ versions:
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
       default:
-        stringValue: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+        stringValue: "supergloo:istio-system"
       required: true
     - name: SuperglooNamespace
       description: The namespace in which Supergloo is running.
@@ -116,7 +116,7 @@ versions:
         This value configures flagger to delegate the configuration of the selected mesh to supergloo.
         Values must be in the form "supergloo:MESH_NAME.MESH_NAMESPACE"
       default:
-        stringValue: "supergloo:{{ .MeshRef.Name }}.{{ .MeshRef.Namespace }}"
+        stringValue: "supergloo:istio-system"
       required: true
     - name: SuperglooNamespace
       description: The namespace in which Supergloo is running.
