@@ -59,7 +59,17 @@ var _ = Describe("bookinfo", func() {
 		})
 
 		It("has the correct number of resources", func() {
-			Expect(testManifest.NumResources()).To(Equal(10))
+			Expect(testManifest.NumResources()).To(Equal(18))
+		})
+	})
+
+	Context("1.15.0 with default values", func() {
+		BeforeEach(func() {
+			bindVersion("1.15.0")
+		})
+
+		It("has the correct number of resources", func() {
+			Expect(testManifest.NumResources()).To(Equal(18))
 		})
 	})
 })
