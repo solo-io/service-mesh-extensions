@@ -19,7 +19,6 @@ cluster.
 │       ├── glooshot
 │       └── kiali
 └── pkg/
-    ├── kustomize
     └── render
 
 ```

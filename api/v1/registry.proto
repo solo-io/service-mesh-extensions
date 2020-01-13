@@ -125,7 +125,7 @@ message Layer {
     repeated LayerOption options = 5;
 }
 
-// One option for configuring a layer. At least one of the kustomize or helm values should be set, or the layer
+// One option for configuring a layer. Helm values should be set, or the layer
 // will be a no-op during rendering.
 message LayerOption {
     // Unique identifier for the layer option, i.e. "strict"
@@ -134,8 +134,6 @@ message LayerOption {
     string display_name = 2;
     // A user-friendly description
     string description = 3;
-    // A kustomize overlay
-    Kustomize kustomize = 4;
     // A set of value overrides
     string helm_values = 5;
     // Optional set of parameters to be applied to the layer.
@@ -161,19 +159,6 @@ message ResourceDependency {
     oneof type {
         Secret secret_dependency = 1;
     }
-}
-
-// Represents a layer implemented via [kustomize](https://github.com/kubernetes-sigs/kustomize)
-message Kustomize {
-
-    // Location of the root of the kustomize directory structure
-    oneof location {
-        GithubRepositoryLocation github = 1;
-        TgzLocation tgz_archive = 2;
-    }
-
-    // Path to the overlay overlay that will be applied to the base (the rendered installation manifest).
-    string overlay_path = 3;
 }
 
 // Parameters represent values that are used to configure the installation of an extension.

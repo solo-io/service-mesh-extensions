@@ -38,7 +38,7 @@ func (m *manifestRenderer) ComputeResourcesForApplication(ctx context.Context, i
 		return nil, err
 	}
 
-	rawResources, err := ApplyLayers(ctx, inputs, manifests)
+	rawResources, err := GetResources(manifests)
 	if err != nil {
 		return nil, err
 	}
