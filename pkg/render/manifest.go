@@ -227,17 +227,6 @@ func GetManifestsFromApplicationSpec(ctx context.Context, inputs ValuesInputs, s
 	return manifests, nil
 }
 
-func GetResourcesFromManifests(ctx context.Context, manifests helmchart.Manifests) (kuberesource.UnstructuredResources, error) {
-	rawResources, err := manifests.ResourceList()
-	if err != nil {
-		wrapped := FailedToConvertManifestsError(err)
-		contextutils.LoggerFrom(ctx).Errorw(wrapped.Error(),
-			zap.Error(err))
-		return nil, wrapped
-	}
-	return rawResources, nil
-}
-
 func FilterByLabel(ctx context.Context, spec *hubv1.VersionedApplicationSpec, resources kuberesource.UnstructuredResources) kuberesource.UnstructuredResources {
 	labels := spec.GetRequiredLabels()
 	if len(labels) > 0 {
