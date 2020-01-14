@@ -6,12 +6,10 @@ import (
 	"text/template"
 
 	"github.com/solo-io/service-mesh-hub/pkg/render/validation"
-	"k8s.io/helm/pkg/manifest"
-
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
+	errors "github.com/rotisserie/eris"
 	"github.com/solo-io/go-utils/contextutils"
-	"github.com/solo-io/go-utils/errors"
 	"github.com/solo-io/go-utils/installutils"
 	"github.com/solo-io/go-utils/installutils/helmchart"
 	"github.com/solo-io/go-utils/installutils/kuberesource"
@@ -325,7 +323,7 @@ func getManifestsFromSteps(ctx context.Context, steps *hubv1.InstallationSteps, 
 	if len(steps.Steps) == 0 {
 		return nil, errors.Errorf("must provide at least one installation step")
 	}
-	var combinedManifests []manifest.Manifest
+	var combinedManifests helmchart.Manifests
 	var uniqueStepNames []string
 	for _, step := range steps.Steps {
 		if step.Name == "" {

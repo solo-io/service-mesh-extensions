@@ -1,7 +1,7 @@
 package prepare
 
 import (
-	"github.com/solo-io/go-utils/errors"
+	errors "github.com/rotisserie/eris"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/installspec"
 	"github.com/solo-io/service-mesh-hub/pkg/cli/options"
 	"github.com/spf13/cobra"
