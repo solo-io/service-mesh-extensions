@@ -16,13 +16,12 @@ generated-code:
 
 .PHONY: update-deps
 update-deps:
-	go get golang.org/x/tools/cmd/goimports
-	go get github.com/golang/mock/gomock
-	go get github.com/golang/mock/mockgen # fix vendoring problem also surfaced here: https://github.com/openshift/openshift-azure/issues/1582
-	go install github.com/golang/mock/mockgen
-	go get -u github.com/gogo/protobuf/gogoproto
-	go get -u github.com/gogo/protobuf/protoc-gen-gogo
-	go get -u github.com/solo-io/solo-kit
+	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
+	GO111MODULE=off go get github.com/golang/mock/gomock
+	GO111MODULE=off go get github.com/golang/mock/mockgen # fix vendoring problem also surfaced here: https://github.com/openshift/openshift-azure/issues/1582
+	GO111MODULE=off go install github.com/golang/mock/mockgen
+	GO111MODULE=off go get -u github.com/gogo/protobuf/gogoproto
+	GO111MODULE=off go get -u github.com/gogo/protobuf/protoc-gen-gogo
 
 #----------------------------------------------------------------------------------
 # hubctl
