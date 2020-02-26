@@ -48,3 +48,6 @@ timeout: 3000s
 tags: ['service-mesh-hub']
 options:
   machineType: 'N1_HIGHCPU_32'
+  volumes:
+  - name: "gopath"
+    path: "/go"
