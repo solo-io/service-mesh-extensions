@@ -17,19 +17,11 @@ steps:
   - 'GIT_SSH_CONFIG=FALSE'
   id: 'prepare-workspace'
 
-- name: 'gcr.io/cloud-builders/wget'
-  entrypoint: ./ci/spell.sh
-  args: ['check']
-  dir: &dir '/workspace/service-mesh-hub'
-  env:
-  # The LSCOMMAND is the env var which tells the spell script how to search for the files it needs to fix.
-  - 'LSCOMMAND=find * -type f | grep -v vendor | grep -v docs/themes | grep -v docs/site'
-  id: 'check-spelling'
 
 - name: gcr.io/cloud-builders/gsutil
   entrypoint: 'bash'
   args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/service-mesh-hub/service-mesh-hub-mod.tar.gz | tar -xzf -']
-  dir: *dir
+  dir: &dir '/workspace/service-mesh-hub'
   id: 'untar-mod-cache'
 
 - name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.6'
