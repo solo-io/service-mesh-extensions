@@ -11,7 +11,7 @@ import (
 	"github.com/solo-io/service-mesh-hub/test"
 )
 
-var _ = Describe("istio extension test", func() {
+var _ = XDescribe("istio extension test", func() {
 
 	const (
 		namespace = "istio"
