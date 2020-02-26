@@ -1,6 +1,6 @@
 .DS_Store
 .idea
-vendor/
+vendor*/
 docs/themes/
 docs/resources/
 site
