@@ -24,6 +24,12 @@ steps:
   dir: &dir '/workspace/service-mesh-hub'
   id: 'untar-mod-cache'
 
+- name: gcr.io/cloud-builders/gsutil
+  entrypoint: 'bash'
+  args: ['-c', './ci/check-code-and-docs-gen.sh']
+  dir: *dir
+  id: 'check-code-and-docs'
+
 - name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.6'
   args: ['-r', '-p', '-failFast', '-trace', '-progress', '-race', '-compilers=4',  '-noColor', '-randomizeAllSpecs', '-randomizeSuites']
   env:
