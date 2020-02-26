@@ -24,7 +24,7 @@ steps:
   dir: &dir '/workspace/service-mesh-hub'
   id: 'untar-mod-cache'
 
-- name: gcr.io/cloud-builders/gsutil
+- name: 'gcr.io/$PROJECT_ID/go-mod-make:0.2.6'
   entrypoint: 'bash'
   args: ['-c', './ci/check-code-and-docs-gen.sh']
   dir: *dir
