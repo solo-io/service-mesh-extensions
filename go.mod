@@ -9,7 +9,6 @@ require (
 	github.com/golang/protobuf v1.3.4
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/gofuzz v1.1.0 // indirect
-
 	github.com/helm/helm v2.13.1+incompatible
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible // indirect
