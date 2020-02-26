@@ -1,0 +1,65 @@
+syntax = "proto3";
+package core.solo.io;
+option go_package = "github.com/solo-io/solo-kit/pkg/api/v1/resources/core";
+
+import "gogoproto/gogo.proto";
+option (gogoproto.equal_all) = true;
+
+import "extproto/ext.proto";
+option (extproto.hash_all) = true;
+
+import "google/protobuf/wrappers.proto";
+
+/**
+ * Metadata contains general properties of resources for purposes of versioning, annotating, and namespacing.
+ */
+message Metadata {
+    /*
+    Name of the resource.
+
+    Names must be unique and follow the following syntax rules:
+
+    One or more lowercase rfc1035/rfc1123 labels separated by '.' with a maximum length of 253 characters.
+    */
+    string name = 2;
+
+    // Namespace is used for the namespacing of resources.
+    string namespace = 3;
+
+    // Cluster indicates the cluster this resource belongs to
+    // Cluster is only applicable in certain contexts, e.g. Kubernetes
+    // An empty string here refers to the local cluster
+    string cluster = 7;
+
+    // An opaque value that represents the internal version of this object that can
+    // be used by clients to determine when objects have changed.
+    string resource_version = 4 [(gogoproto.moretags) = "testdiff:\"ignore\"", (extproto.skip_hashing) = true];
+
+    // Map of string keys and values that can be used to organize and categorize
+    // (scope and select) objects. Some resources contain `selectors` which
+    // can be linked with other resources by their labels
+    map<string, string> labels = 5;
+
+    // Annotations is an unstructured key value map stored with a resource that may be
+    // set by external tools to store and retrieve arbitrary metadata.
+    map<string, string> annotations = 6;
+
+    // A sequence number representing a specific generation of the desired state.
+    // Currently only populated for resources backed by Kubernetes
+    int64 generation = 8 [(extproto.skip_hashing) = true];
+
+    // proto message representing kubernertes owner reference
+    // https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.15/#ownerreference-v1-meta
+    message OwnerReference {
+        string api_version = 1;
+        google.protobuf.BoolValue block_owner_deletion = 2;
+        google.protobuf.BoolValue controller = 3;
+        string kind = 4;
+        string name = 5;
+        string uid =  6;
+    }
+
+    //List of objects depended by this object.
+    // Currently only populated for resources backed by Kubernetes
+    repeated OwnerReference owner_references = 9;
+}

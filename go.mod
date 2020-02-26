@@ -21,6 +21,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rotisserie/eris v0.3.0
 	github.com/russross/blackfriday v1.5.2
+	github.com/solo-io/anyvendor v0.0.1
 	github.com/solo-io/go-utils v0.14.1
 	github.com/solo-io/solo-kit v0.13.2
 	github.com/spf13/afero v1.2.2

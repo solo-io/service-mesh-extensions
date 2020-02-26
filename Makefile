@@ -8,9 +8,16 @@ VERSION ?= $(shell echo $(TAGGED_VERSION) | cut -c 2-)
 LDFLAGS := "-X github.com/solo-io/service-mesh-hub/pkg/internal/version.Version=$(VERSION)"
 GCFLAGS := all="-N -l"
 
+PROTO_VENDOR := "vendor_any"
+
 .PHONY: generated-code
 generated-code:
-	protoc --gogo_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp:. -I$(GOPATH)/src -I$(GOPATH)/src/github.com/gogo/protobuf -I$(GOPATH)/src/github.com/gogo/protobuf/protobuf -I$(GOPATH)/src/github.com/solo-io/service-mesh-hub api/v1/registry.proto
+	go run generate.go
+	protoc --gogo_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp:. \
+		-I$(PROTO_VENDOR) -I$(PROTO_VENDOR)/github.com/gogo/protobuf \
+		-I$(PROTO_VENDOR)/github.com/solo-io/protoc-gen-ext \
+		-I$(PROTO_VENDOR)/github.com/solo-io/service-mesh-hub \
+		-I$(PROTO_VENDOR)/github.com/solo-io api/v1/registry.proto
 	go generate ./...
 	gofmt -w $(shell ls -d -- */ | grep -v vendor) && goimports -w $(shell ls -d -- */ | grep -v vendor)
 
