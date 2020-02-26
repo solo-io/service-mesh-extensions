@@ -1,4 +1,0 @@
-bases:
-  - ./../vanilla
-generators:
-  - mesh-ingress.yaml

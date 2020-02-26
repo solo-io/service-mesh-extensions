@@ -65,7 +65,7 @@ var _ = Describe("glooshot extension test", func() {
 			})
 
 			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(28))
+				Expect(testManifest.NumResources()).To(Equal(40))
 			})
 		})
 	})

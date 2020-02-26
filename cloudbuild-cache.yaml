@@ -1,47 +1,30 @@
 steps:
-- name: 'gcr.io/$PROJECT_ID/dep'
-  args: ['ensure']
-  env:
-  - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
-  id: 'dep'
-
-- name: 'gcr.io/$PROJECT_ID/go-make'
+- name: gcr.io/cloud-builders/gsutil
   entrypoint: 'bash'
-  args: ['-c', 'tar -zvcf service-mesh-hub-dep.tar.gz ./gopath/pkg/dep']
+  args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/service-mesh-hub/service-mesh-hub-mod.tar.gz | tar -xzf -']
   env:
-  - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
-  - 'GOPATH=/workspace/gopath'
-  id: 'create-dep-cache'
+  volumes: &vol
+  - name: 'gopath'
+    path: '/go/pkg'
+  id: 'untar-mod-cache'
 
-  # run all of the tests to fill the cache
-- name: 'gcr.io/$PROJECT_ID/e2e-ginkgo'
-  env:
-  - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
-  - 'GOPATH=/workspace/gopath'
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=test-cluster'
-  dir: './gopath/src/github.com/solo-io/service-mesh-hub'
-  args: ['build', '-r', 'cli/pkg', 'pkg', 'test/e2e']
-  waitFor: ['dep']
-  id: 'test'
+- name: 'golang:1.13'
+  args: ['go', 'mod', 'download']
+  volumes: *vol
+  id: 'download'
 
-- name: 'gcr.io/$PROJECT_ID/go-make'
+- name: 'golang:1.13'
+  args: ['go', 'mod', 'tidy']
+  volumes: *vol
+  id: 'tidy'
+
+- name: 'golang:1.13'
   entrypoint: 'bash'
-  args: ['-c', 'tar -zvcf service-mesh-hub-gocache.tar.gz $(go env GOCACHE)']
-  env:
-  - 'PROJECT_ROOT=github.com/solo-io/service-mesh-hub'
-  - 'GOPATH=/workspace/gopath'
-  id: 'create-go-cache'
+  volumes: *vol
+  args: ['-c', ' cd /go/pkg && tar -zvcf service-mesh-hub-mod.tar.gz mod']
+  id: 'tar-cache'
 
 - name: gcr.io/cloud-builders/gsutil
-  args: ['cp', 'service-mesh-hub-dep.tar.gz', 'gs://solo-public-cache/service-mesh-hub/service-mesh-hub-dep.tar.gz']
-  waitFor: ['create-dep-cache']
-
-- name: gcr.io/cloud-builders/gsutil
-  args: ['cp', 'service-mesh-hub-gocache.tar.gz', 'gs://solo-public-cache/service-mesh-hub/service-mesh-hub-gocache.tar.gz']
-  waitFor: ['create-go-cache']
-
-timeout: 6600s
-tags: ['service-mesh-hub-cache']
-options:
-  machineType: 'N1_HIGHCPU_32'
+  args: ['cp', '/go/pkg/service-mesh-hub-mod.tar.gz', 'gs://$PROJECT_ID-cache/service-mesh-hub/service-mesh-hub-mod.tar.gz']
+  volumes: *vol
+  id: 'upload-cache'

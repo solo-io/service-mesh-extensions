@@ -1,4 +1,0 @@
-bases:
-  - ./../base
-resources:
-  - custom-resources.yaml

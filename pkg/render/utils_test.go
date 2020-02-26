@@ -94,7 +94,7 @@ var _ = Describe("utils", func() {
 		It("works for empty string", func() {
 			actual, err := render.ConvertYamlStringToNestedMap("")
 			Expect(err).To(BeNil())
-			Expect(actual).To(BeNil())
+			Expect(actual).NotTo(BeNil())
 		})
 	})
 

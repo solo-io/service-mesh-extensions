@@ -1,4 +1,0 @@
-bases:
-- ./../base
-generators:
-- mesh-ingress.yaml

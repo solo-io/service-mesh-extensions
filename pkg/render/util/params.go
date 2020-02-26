@@ -3,7 +3,7 @@ package util
 import (
 	"strconv"
 
-	"github.com/solo-io/go-utils/errors"
+	errors "github.com/rotisserie/eris"
 	v1 "github.com/solo-io/service-mesh-hub/api/v1"
 )
 

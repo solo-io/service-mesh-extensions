@@ -8,13 +8,8 @@ if [ ! -f .gitignore ]; then
   echo "_output" > .gitignore
 fi
 
-git init
-git add .
-git commit -m "set up dummy repo for diffing" -q --allow-empty
 
 make update-deps
-
-PATH=/workspace/gopath/bin:$PATH
 
 set +e
 

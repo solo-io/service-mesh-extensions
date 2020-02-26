@@ -56,45 +56,6 @@ var _ = Describe("gloo extension test", func() {
 				}
 			}
 		)
-
-		PContext("0.13.26 with supergloo overlay", func() {
-			BeforeEach(func() {
-				version = versionMap["0.13.26"]
-				layers := []render.LayerInput{{
-					LayerId:  "supergloo",
-					OptionId: "ingress",
-				}}
-				inputs = testInput("supergloo", layers)
-				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
-				Expect(err).NotTo(HaveOccurred())
-				testManifest = NewTestManifestWithResources(rendered)
-			})
-
-			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(14))
-			})
-
-			It("has a mesh ingress", func() {
-				testManifest.ExpectCustomResource("MeshIngress", superglooNamesapce, name)
-			})
-		})
-		Context("0.13.26 with vanilla overlay", func() {
-			BeforeEach(func() {
-				version = versionMap["0.13.26"]
-				layers := []render.LayerInput{{
-					LayerId:  "custom-resources",
-					OptionId: "create",
-				}}
-				inputs = testInput("vanilla", layers)
-				rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
-				Expect(err).NotTo(HaveOccurred())
-				testManifest = NewTestManifestWithResources(rendered)
-			})
-
-			It("has the correct number of resources", func() {
-				Expect(testManifest.NumResources()).To(Equal(13))
-			})
-		})
 		Context("0.18.35", func() {
 			Context("with packaged flavor", func() {
 				BeforeEach(func() {
@@ -112,7 +73,7 @@ var _ = Describe("gloo extension test", func() {
 					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 					Expect(err).NotTo(HaveOccurred())
 					testManifest = NewTestManifestWithResources(rendered)
-					Expect(testManifest.NumResources()).To(Equal(35))
+					Expect(testManifest.NumResources()).To(Equal(36))
 				})
 
 				It("has the correct number of resources with apiserver disabled", func() {
@@ -120,7 +81,7 @@ var _ = Describe("gloo extension test", func() {
 					rendered, err := render.ComputeResourcesForApplication(context.TODO(), inputs, version)
 					Expect(err).NotTo(HaveOccurred())
 					testManifest = NewTestManifestWithResources(rendered)
-					Expect(testManifest.NumResources()).To(Equal(30))
+					Expect(testManifest.NumResources()).To(Equal(31))
 				})
 			})
 		})
@@ -146,7 +107,7 @@ var _ = Describe("gloo extension test", func() {
 			})
 
 			It("has the correct number of resources with gateway upgrade enabled", func() {
-				Expect(testManifest.NumResources()).To(Equal(30))
+				Expect(testManifest.NumResources()).To(Equal(37))
 			})
 
 			It("has a job with gateway upgrade enabled", func() {
